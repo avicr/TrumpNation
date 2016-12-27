@@ -16,7 +16,7 @@ using namespace std;
 class TEXTURE_RESOURCE_##RESOURCE_NAME : public TextureResource \
 { \
 	public: \
-	TEXTURE_RESOURCE_##RESOURCE_NAME() : TextureResource(TEXTURE_PATH##FILE_NAME) {} \
+	TEXTURE_RESOURCE_##RESOURCE_NAME() : TextureResource(FILE_NAME) {} \
 	~TEXTURE_RESOURCE_##RESOURCE_NAME() {}; \
 }; \
 public : \
@@ -36,7 +36,7 @@ public:
 	TextureResource(string InFileName) :
 		FileName(InFileName)
 	{
-		SDL_Surface * Image = SDL_LoadBMP(FileName.c_str());
+		SDL_Surface * Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
 		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
 		Texture = SDL_CreateTextureFromSurface(GRenderer, Image);
 		SDL_FreeSurface(Image);		
