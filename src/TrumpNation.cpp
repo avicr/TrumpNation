@@ -4,6 +4,8 @@
 	#include "SDL2/SDL.h"
 #endif
 
+#include "../inc/Sprite.h"
+
 int main(int argc, char ** argv)
 {
 	// variables
@@ -14,7 +16,7 @@ int main(int argc, char ** argv)
 	int y = 208;
 
 	// init SDL
-
+	Sprite TestSprite;
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window * window = SDL_CreateWindow("SDL2 Keyboard/Mouse events",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
