@@ -19,17 +19,18 @@ class ResourceManager
 	public:
 		int Blah()
 		{
-			return 0;
+			return 100;
 		}
 	};
 public:
 	static SDL_Texture *SpaceShipTexture;
 	Test ThingTest;
+	ResourceManager(SDL_Renderer *Renderer);
 	~ResourceManager();
 
 protected:
 	static void LoadResources(SDL_Renderer *Renderer);
-	static void LoadImage(string FileName, SDL_Texture *Texture, SDL_Renderer *Renderer);
+	static void LoadImage(string FileName, SDL_Texture **Texture, SDL_Renderer *Renderer);
 };
 
 extern ResourceManager *TheResourceManager;

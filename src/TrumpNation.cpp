@@ -12,8 +12,7 @@ ResourceManager *TheResourceManager;
 int main(int argc, char ** argv)
 {
 	// variables
-	TheResourceManager = new ResourceManager();
-
+	
 	TheResourceManager->ThingTest.Blah();
 	bool quit = false;
 	SDL_Event event;
@@ -25,9 +24,11 @@ int main(int argc, char ** argv)
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_Window * window = SDL_CreateWindow("SDL2 Keyboard/Mouse events",
 		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
-	SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);	
+	SDL_Renderer * Renderer = SDL_CreateRenderer(window, -1, 0);
 
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	TheResourceManager = new ResourceManager(Renderer);
+
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
 
 	// handle events
 
@@ -45,7 +46,7 @@ int main(int argc, char ** argv)
 			switch (event.key.keysym.sym)
 			{
 			case SDLK_LEFT:  x--; break;
-			case SDLK_RIGHT: x++; break;
+			case SDLK_RIGHT: x+= TheResourceManager->ThingTest.Blah(); break;
 			case SDLK_UP:    y--; break;
 			case SDLK_DOWN:  y++; break;
 			}
@@ -54,14 +55,14 @@ int main(int argc, char ** argv)
 
 		SDL_Rect dstrect = { x, y, 64, 64 };
 
-		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, TheResourceManager->SpaceShipTexture, NULL, &dstrect);
-		SDL_RenderPresent(renderer);
+		SDL_RenderClear(Renderer);
+		SDL_RenderCopy(Renderer, TheResourceManager->SpaceShipTexture, NULL, &dstrect);
+		SDL_RenderPresent(Renderer);
 	}
 
 	// cleanup SDL
 	
-	SDL_DestroyRenderer(renderer);
+	SDL_DestroyRenderer(Renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 
