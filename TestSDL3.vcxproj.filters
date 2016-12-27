@@ -23,9 +23,15 @@
     <ClCompile Include="src\TrumpNation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Sprite.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ResourceManager.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

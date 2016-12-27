@@ -157,9 +157,11 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\ResourceManager.h" />
     <ClInclude Include="inc\Sprite.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
     <ClCompile Include="src\TrumpNation.cpp" />
   </ItemGroup>
