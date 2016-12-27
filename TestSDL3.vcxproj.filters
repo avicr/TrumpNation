@@ -34,5 +34,8 @@
     <ClInclude Include="inc\ResourceManager.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Globals.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

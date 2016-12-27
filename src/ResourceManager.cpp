@@ -4,7 +4,7 @@ SDL_Texture *ResourceManager::SpaceShipTexture;
 
 ResourceManager::ResourceManager(SDL_Renderer *Renderer)
 {
-	LoadResources(Renderer);
+	
 }
 
 ResourceManager::~ResourceManager()

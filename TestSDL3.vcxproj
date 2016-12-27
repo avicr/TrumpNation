@@ -157,6 +157,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="inc\Globals.h" />
     <ClInclude Include="inc\ResourceManager.h" />
     <ClInclude Include="inc\Sprite.h" />
   </ItemGroup>
