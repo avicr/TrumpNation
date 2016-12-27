@@ -161,7 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sprite.cpp" />
-    <ClCompile Include="TestSDL3.cpp" />
+    <ClCompile Include="src\TrumpNation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

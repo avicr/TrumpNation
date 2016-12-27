@@ -17,10 +17,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestSDL3.cpp">
+    <ClCompile Include="src\Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Sprite.cpp">
+    <ClCompile Include="src\TrumpNation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
