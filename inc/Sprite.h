@@ -15,12 +15,18 @@ using namespace std;
 class Sprite
 {
 protected:
-	SDL_Rect m_Pos;
-	vector <SDL_Texture*> Frames;
+
+	// Screen region to render the sprite to
+	SDL_Rect Rect;
+
+	// Pointer to the current frame in the animation
+	SDL_Texture* CurrentFrame;
 
 public:
 	Sprite();
-	void LoadSpriteSheet(string FileName, int SpriteWidth, int SpriteHeight);
+	void SetFrame(SDL_Texture* Texture);
+	void SetPosition(int NewX, int NewY);
+	void Render(SDL_Renderer* Renderer);
 };
 
 #endif

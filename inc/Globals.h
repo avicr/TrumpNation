@@ -8,6 +8,5 @@
 #endif 
 
 extern SDL_Renderer * GRenderer;
-extern class ResourceManager *TheResourceManager;
 
 #endif

@@ -20,7 +20,7 @@ class TEXTURE_RESOURCE_##RESOURCE_NAME : public TextureResource \
 	~TEXTURE_RESOURCE_##RESOURCE_NAME() {}; \
 }; \
 public : \
-TEXTURE_RESOURCE_##RESOURCE_NAME RESOURCE_NAME
+TEXTURE_RESOURCE_##RESOURCE_NAME RESOURCE_NAME; 
 
 class TextureResource
 {	
@@ -32,7 +32,6 @@ protected:
 
 public:
 	
-
 	TextureResource(string InFileName) :
 		FileName(InFileName)
 	{
@@ -48,21 +47,18 @@ public:
 	}
 };
 
-// In a hurry here, no time to be fancy (should be a singleton but whateves). 
-// This class holds hardcoded references to each asset.
 class ResourceManager
 {
 	DECLARE_TEXTURE_RESORCE(Blah, "spaceship.bmp");
 
+private:
+	static ResourceManager *Instance;
+	ResourceManager();
 
 public:
-	static SDL_Texture *SpaceShipTexture;
-	ResourceManager(SDL_Renderer *Renderer);
-	~ResourceManager();
+	static SDL_Texture *SpaceShipTexture;	
 
-protected:
-	static void LoadResources(SDL_Renderer *Renderer);
-	static void LoadImage(string FileName, SDL_Texture **Texture, SDL_Renderer *Renderer);
+	static ResourceManager *GetInstance();
 };
 
 #endif

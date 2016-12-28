@@ -2,11 +2,11 @@
 
 SDL_Texture *ResourceManager::SpaceShipTexture;
 
-ResourceManager::ResourceManager(SDL_Renderer *Renderer)
+ResourceManager::ResourceManager()
 {
 	
 }
-
+/*
 ResourceManager::~ResourceManager()
 {
 	SDL_DestroyTexture(SpaceShipTexture);
@@ -23,4 +23,14 @@ void ResourceManager::LoadImage(string FileName, SDL_Texture **Texture, SDL_Rend
 	SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
 	*Texture = SDL_CreateTextureFromSurface(Renderer, Image);
 	SDL_FreeSurface(Image);
+}
+*/
+ResourceManager *ResourceManager::GetInstance()
+{
+	if (!Instance)
+	{
+		Instance = new ResourceManager;
+	}
+
+	return Instance;
 }
