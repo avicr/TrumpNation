@@ -7,29 +7,33 @@
 #include "../inc/ResourceManager.h"
 #include "../inc/Sprite.h"
 
-ResourceManager *ResourceManager::Instance = NULL;
-SDL_Renderer * GRenderer;
+SDL_Window *GWindow;
+SDL_Renderer *GRenderer;
+ResourceManager *GResourceManager;
+bool bSDLInitialized = false;
+Sprite TestSprite;
 
 void GameLoop();
 void Tick(double DeltaTime);
 void Render();
+void InitSDL();
 
 int main(int argc, char ** argv)
 {
-	// variables	
+	// variables		
 
-	// init SDL
-	
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_Window * window = SDL_CreateWindow("SDL2 Keyboard/Mouse events", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 480, 0);
-	GRenderer = SDL_CreateRenderer(window, -1, 0);	
-	
+	// init SDL	
+	InitSDL();
+
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
 	
+	GResourceManager = new ResourceManager;
+
 	GameLoop();
 	
+	delete GResourceManager;
 	SDL_DestroyRenderer(GRenderer);
-	SDL_DestroyWindow(window);
+	SDL_DestroyWindow(GWindow);
 	SDL_Quit();
 
 	return 0;
@@ -41,6 +45,8 @@ void GameLoop()
 	double StartTime = 0;
 	StartTime = SDL_GetTicks();
 	SDL_Event TheEvent;
+
+	TestSprite.PlayAnimation(ResourceManager::TrumpAnimation);
 
 	while (!bDone)
 	{
@@ -64,15 +70,38 @@ void GameLoop()
 void Tick(double DeltaTime)
 {	
 	SDL_Log("DeltaTime %f", DeltaTime);
+	TestSprite.Tick(DeltaTime);
 }
 
 void Render()
 {
-	Sprite Test;	
-	Test.SetFrame(ResourceManager::GetInstance()->Blah.Texture);
-	Test.SetPosition(20, 20);
+	
 	SDL_RenderClear(GRenderer);	
-	Test.Render(GRenderer);
+	
+	TestSprite.Render(GRenderer);
+	//SDL_Rect Rect = { 32, 32, 32, 32 };
+//	SDL_RenderCopy(GRenderer, ResourceManager::TrumpSpriteSheet->Texture, NULL, &Rect);
 	SDL_RenderPresent(GRenderer);
 
+}
+
+void InitSDL()
+{
+	if (!bSDLInitialized)
+	{
+		SDL_Init(SDL_INIT_VIDEO);
+		GWindow = SDL_CreateWindow("SDL2 Keyboard/Mouse events", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, 0);
+		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
+		bSDLInitialized = true;
+	}
+}
+
+SDL_Renderer *GetRenderer()
+{
+	if (GRenderer == NULL)
+	{
+		InitSDL();
+	}
+
+	return GRenderer;
 }

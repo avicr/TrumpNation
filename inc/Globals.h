@@ -7,6 +7,12 @@
 #include "SDL2/SDL.h"
 #endif 
 
-extern SDL_Renderer * GRenderer;
+#define TEXTURE_PATH "resource/textures/"
 
+extern class ResourceManager *GResourceManager;
+extern SDL_Window *GWindow;
+extern SDL_Renderer * GRenderer;
+extern bool bSDLInitialized;
+
+SDL_Renderer *GetRenderer();
 #endif

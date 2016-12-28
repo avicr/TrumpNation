@@ -8,37 +8,44 @@
 #endif
 #include <string>
 #include "Globals.h"
+#include "AssetResource.h"
+#include "Animation.h"
 
 using namespace std;
 
-#define TEXTURE_PATH "resource/textures/"
-#define DECLARE_TEXTURE_RESORCE(RESOURCE_NAME, FILE_NAME) \
+#define DECLARE_TEXTURE_RESOURCE(RESOURCE_NAME, FILE_NAME) \
 class TEXTURE_RESOURCE_##RESOURCE_NAME : public TextureResource \
 { \
 	public: \
-	TEXTURE_RESOURCE_##RESOURCE_NAME() : TextureResource(FILE_NAME) {} \
+	TEXTURE_RESOURCE_##RESOURCE_NAME() : TextureResource(FILE_NAME) {ResourceManager::##RESOURCE_NAME = new TEXTURE_RESOURCE_##RESOURCE_NAME(*this);} \
 	~TEXTURE_RESOURCE_##RESOURCE_NAME() {}; \
 }; \
 public : \
-TEXTURE_RESOURCE_##RESOURCE_NAME RESOURCE_NAME; 
+static TEXTURE_RESOURCE_##RESOURCE_NAME *RESOURCE_NAME;  \
+private : \
+static TEXTURE_RESOURCE_##RESOURCE_NAME _##RESOURCE_NAME;  
 
-class TextureResource
+#define INIT_TEXTURE_RESOURCE(RESOURCE_NAME) \
+ResourceManager::TEXTURE_RESOURCE_##RESOURCE_NAME ResourceManager::_##RESOURCE_NAME; \
+ResourceManager::TEXTURE_RESOURCE_##RESOURCE_NAME *ResourceManager::##RESOURCE_NAME = NULL; 
+
+class TextureResource : public AssetResource
 {	
 public:
 	SDL_Texture* Texture;
 
-protected:
-	string FileName;
-
 public:
 	
-	TextureResource(string InFileName) :
-		FileName(InFileName)
-	{
+	TextureResource(string InFileName) : AssetResource(InFileName) { }
+
+	TextureResource(const TextureResource &Other) :
+		AssetResource(Other.FileName)
+	{		
 		SDL_Surface * Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
 		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
-		Texture = SDL_CreateTextureFromSurface(GRenderer, Image);
-		SDL_FreeSurface(Image);		
+		Texture = SDL_CreateTextureFromSurface(GetRenderer(), Image);
+		SDL_FreeSurface(Image);
+		AddReferenceToManager();
 	}
 
 	~TextureResource()
@@ -49,16 +56,32 @@ public:
 
 class ResourceManager
 {
-	DECLARE_TEXTURE_RESORCE(Blah, "spaceship.bmp");
-
-private:
-	static ResourceManager *Instance;
-	ResourceManager();
+	friend AssetResource;
 
 public:
+	DECLARE_TEXTURE_RESOURCE(Blah, "spaceship.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "Trump512x256.bmp");
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int SpriteWidth = 128;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i % 4 * SpriteWidth, i / 4 * SpriteHeight, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::TrumpSpriteSheet->Texture, SrcRect, 0.05));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(TrumpAnimation)
+
+public:
+	ResourceManager();
+	~ResourceManager();
 	static SDL_Texture *SpaceShipTexture;	
 
-	static ResourceManager *GetInstance();
+private:
+	static vector <AssetResource*> AllResources;
 };
 
 #endif

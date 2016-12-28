@@ -26,6 +26,12 @@
     <ClCompile Include="src\ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AssetResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Sprite.h">
@@ -35,6 +41,12 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\Globals.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Animation.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AssetResource.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

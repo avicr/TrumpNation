@@ -1,11 +1,30 @@
 #include "../inc/ResourceManager.h"
 
 SDL_Texture *ResourceManager::SpaceShipTexture;
+vector <AssetResource*> ResourceManager::AllResources;
+
+INIT_TEXTURE_RESOURCE(Blah)
+INIT_TEXTURE_RESOURCE(TrumpSpriteSheet)
+
+INIT_ANIMATION_RESOURCE(TrumpAnimation)
 
 ResourceManager::ResourceManager()
 {
 	
 }
+
+ResourceManager::~ResourceManager()
+{
+	for (int i = 0; i < AllResources.size(); i++)
+	{
+		if (AllResources[i])
+		{
+			delete AllResources[i];
+			AllResources[i] = NULL;
+		}
+	}
+}
+
 /*
 ResourceManager::~ResourceManager()
 {
@@ -24,7 +43,7 @@ void ResourceManager::LoadImage(string FileName, SDL_Texture **Texture, SDL_Rend
 	*Texture = SDL_CreateTextureFromSurface(Renderer, Image);
 	SDL_FreeSurface(Image);
 }
-*/
+
 ResourceManager *ResourceManager::GetInstance()
 {
 	if (!Instance)
@@ -34,3 +53,4 @@ ResourceManager *ResourceManager::GetInstance()
 
 	return Instance;
 }
+*/
