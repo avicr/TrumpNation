@@ -1,6 +1,7 @@
 #include "../inc/Sprite.h"
 
-const double Sprite::MoveRate = 205;
+const double Sprite::MoveRate = 400;
+const double MaxVelocity = 255;
 
 Sprite::Sprite() :
 	Texture(NULL)
@@ -25,19 +26,39 @@ void Sprite::Tick(double DeltaTime)
 	
 	if (state[SDL_SCANCODE_UP]) 
 	{
-		VelY = DeltaTime * -MoveRate;
+		VelY += DeltaTime * -MoveRate;
+
+		if (VelY > MaxVelocity)
+		{
+			VelY = MaxVelocity;
+		}
 	}
 	else if (state[SDL_SCANCODE_RIGHT])
 	{
-		VelX = DeltaTime * MoveRate;
+		VelX += DeltaTime * MoveRate;
+
+		if (VelX > MaxVelocity)
+		{
+			VelX = MaxVelocity;
+		}
 	}
 	else if (state[SDL_SCANCODE_LEFT])
 	{
-		VelX = DeltaTime * -MoveRate;
+		VelX += DeltaTime * -MoveRate;
+
+		if (VelX > MaxVelocity)
+		{
+			VelX = MaxVelocity;
+		}
 	}
 	else if (state[SDL_SCANCODE_DOWN])
 	{
-		VelY = DeltaTime * MoveRate;
+		VelY += DeltaTime * MoveRate;
+
+		if (VelY > MaxVelocity)
+		{
+			VelY = MaxVelocity;
+		}
 	}
 	else
 	{
@@ -50,8 +71,8 @@ void Sprite::Tick(double DeltaTime)
 		}
 	}
 
-	Rect.x = VelX * DeltaTime;
-	Rect.y = VelY * DeltaTime;
+	Rect.x += VelX * DeltaTime;
+	Rect.y += VelY * DeltaTime;
 
 	if (AnimData.Anim)
 	{

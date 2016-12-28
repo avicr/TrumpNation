@@ -51,6 +51,11 @@ void GameLoop()
 	while (!bDone)
 	{
 		double DeltaTime = SDL_GetTicks() - StartTime;
+		if (DeltaTime == 0)
+		{
+			SDL_Delay(12);
+		}
+		DeltaTime = SDL_GetTicks() - StartTime;
 		StartTime = SDL_GetTicks();
 		Tick(DeltaTime / 1000);
 		Render();	
