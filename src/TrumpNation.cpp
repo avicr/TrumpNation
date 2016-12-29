@@ -56,6 +56,10 @@ void GameLoop()
 	double DeltaTime;
 	while (!bDone)
 	{
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+		{
+			bDone = true;
+		}
 		StartTime = CurrentTime;
 		CurrentTime = SDL_GetPerformanceCounter();
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());

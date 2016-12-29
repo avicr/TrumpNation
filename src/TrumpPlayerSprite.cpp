@@ -34,7 +34,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 
 	MovingFlags = MOVING_NONE;
-
+	
 	if (state[SDL_SCANCODE_UP])
 	{
 		MovingFlags |= MOVING_UP;
