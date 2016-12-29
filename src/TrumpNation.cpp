@@ -63,7 +63,6 @@ void GameLoop()
 		
 		Tick(DeltaTime * (double)0.001);
 		Render();	
-		SDL_Delay(10);
 		//Handle events on queue
 		while (SDL_PollEvent(&TheEvent) != 0)
 		{
@@ -101,8 +100,8 @@ void Render()
 	SDL_SetRenderDrawColor(GRenderer, 64, 64, 64, 255);
 	
 	SDL_Rect Rect = { 0, 0, 1024, 600 };
-	SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
-	//SDL_RenderClear(GRenderer);
+	//SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
+	SDL_RenderClear(GRenderer);
 	TestSprite->Render(GRenderer);
 	for (int i = 0; i < Mexicans.size(); i++)
 	{
