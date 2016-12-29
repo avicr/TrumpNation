@@ -27,7 +27,7 @@ static TEXTURE_RESOURCE_##RESOURCE_NAME _##RESOURCE_NAME;
 
 #define INIT_TEXTURE_RESOURCE(RESOURCE_NAME) \
 ResourceManager::TEXTURE_RESOURCE_##RESOURCE_NAME ResourceManager::_##RESOURCE_NAME; \
-ResourceManager::TEXTURE_RESOURCE_##RESOURCE_NAME *ResourceManager::##RESOURCE_NAME = NULL; 
+ResourceManager::TEXTURE_RESOURCE_##RESOURCE_NAME *ResourceManager::RESOURCE_NAME = NULL; 
 
 class TextureResource : public AssetResource
 {	

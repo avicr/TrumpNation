@@ -17,7 +17,7 @@ using namespace std;
 class ANIMATION_RESOURCE_##RESOURCE_NAME : public AnimationResource \
 { \
 	public: \
-	ANIMATION_RESOURCE_##RESOURCE_NAME() {ResourceManager::##RESOURCE_NAME = new ANIMATION_RESOURCE_##RESOURCE_NAME(*this);} \
+	ANIMATION_RESOURCE_##RESOURCE_NAME() {ResourceManager::RESOURCE_NAME = new ANIMATION_RESOURCE_##RESOURCE_NAME(*this);} \
 	ANIMATION_RESOURCE_##RESOURCE_NAME(const ANIMATION_RESOURCE_##RESOURCE_NAME &Other):AnimationResource(Other) { \
 	
 
