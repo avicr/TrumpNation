@@ -17,7 +17,7 @@ using namespace std;
 class TEXTURE_RESOURCE_##RESOURCE_NAME : public TextureResource \
 { \
 	public: \
-	TEXTURE_RESOURCE_##RESOURCE_NAME() : TextureResource(FILE_NAME) {ResourceManager::##RESOURCE_NAME = new TEXTURE_RESOURCE_##RESOURCE_NAME(*this);} \
+	TEXTURE_RESOURCE_##RESOURCE_NAME() : TextureResource(FILE_NAME) {ResourceManager::RESOURCE_NAME = new TEXTURE_RESOURCE_##RESOURCE_NAME(*this);} \
 	~TEXTURE_RESOURCE_##RESOURCE_NAME() {}; \
 }; \
 public : \
