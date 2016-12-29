@@ -9,6 +9,7 @@ public:
 	Mexican1Sprite();
 
 protected:
+	double Growth;
 	void HandleInput(double DeltaTime);
 };
 

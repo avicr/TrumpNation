@@ -14,7 +14,6 @@ SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
 TrumpPlayerSprite *TestSprite;
-Mexican1Sprite *TestMexicanSprite;
 Uint64 TickFreq;
 
 void GameLoop();
@@ -50,13 +49,10 @@ void GameLoop()
 	TickFreq = SDL_GetPerformanceFrequency();
 
 	TestSprite = new TrumpPlayerSprite();
-	TestMexicanSprite = new Mexican1Sprite();
 	TestSprite->PlayAnimation(ResourceManager::TrumpAnimation);
-	TestMexicanSprite->SetPosition(100, 10);
-	TestMexicanSprite->PlayAnimation(ResourceManager::Mexican1Animation);
 
 	Uint64 StartTime = SDL_GetPerformanceCounter();
-	Uint64 CurrentTime = 0;
+	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
 	while (!bDone)
 	{
@@ -67,7 +63,7 @@ void GameLoop()
 		
 		Tick(DeltaTime * (double)0.001);
 		Render();	
-
+		SDL_Delay(10);
 		//Handle events on queue
 		while (SDL_PollEvent(&TheEvent) != 0)
 		{
@@ -80,21 +76,38 @@ void GameLoop()
 	}
 }
 
+vector <Mexican1Sprite*> Mexicans;
 void Tick(double DeltaTime)
 {	
+	static double SpawnCountdown = 2;
+	SpawnCountdown -= DeltaTime;
+
+	if (SpawnCountdown <= 0)
+	{
+		Mexicans.push_back(new Mexican1Sprite());
+		SpawnCountdown = 1;
+	}
+
 	TestSprite->Tick(DeltaTime);
-	TestMexicanSprite->Tick(DeltaTime);
+	
+	for (int i = 0; i < Mexicans.size(); i++)
+	{
+		Mexicans[i]->Tick(DeltaTime);
+	}
 }
 
 void Render()
 {
 	SDL_SetRenderDrawColor(GRenderer, 64, 64, 64, 255);
-	SDL_RenderClear(GRenderer);	
 	
+	SDL_Rect Rect = { 0, 0, 1024, 600 };
+	SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
+	//SDL_RenderClear(GRenderer);
 	TestSprite->Render(GRenderer);
-	TestMexicanSprite->Render(GRenderer);
-	//SDL_Rect Rect = { 32, 32, 32, 32 };
-//	SDL_RenderCopy(GRenderer, ResourceManager::TrumpSpriteSheet->Texture, NULL, &Rect);
+	for (int i = 0; i < Mexicans.size(); i++)
+	{
+		Mexicans[i]->Render(GRenderer);
+	}
 	SDL_RenderPresent(GRenderer);
 
 }
@@ -103,7 +116,7 @@ void InitSDL()
 {
 	if (!bSDLInitialized)
 	{
-		SDL_Init(SDL_INIT_VIDEO);
+		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, 0);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		

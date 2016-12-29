@@ -60,7 +60,8 @@ class ResourceManager
 
 public:
 	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "Trump512x256.bmp");
-	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "mexican1.bmp");
+	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "MexicanGreen.bmp");
+	DECLARE_TEXTURE_RESOURCE(BackgroundTexture, "BG3.bmp");
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
 	{
@@ -77,20 +78,14 @@ public:
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(Mexican1Animation)
 	{
-		int SpriteWidth = 48;
-		int SpriteHeight = 69;
+		int SpriteWidth = 128;
+		int SpriteHeight = 136;
 
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
-			Frames.push_back(new Frame(ResourceManager::Mexican1SpriteSheet->Texture, SrcRect, 0.15));
+			Frames.push_back(new Frame(ResourceManager::Mexican1SpriteSheet->Texture, SrcRect, 0.07));
 		}
-
-		SDL_Rect SrcRect = {0, 0, SpriteWidth, SpriteHeight };
-		Frames.push_back(new Frame(ResourceManager::Mexican1SpriteSheet->Texture, SrcRect, 0.15));
-
-		SrcRect.x = 2 * SpriteWidth;
-		Frames.push_back(new Frame(ResourceManager::Mexican1SpriteSheet->Texture, SrcRect, 0.15));
 
 	}
 	END_DECLARE_ANIMATION_RESOURCE(Mexican1Animation)
