@@ -100,11 +100,11 @@ void Render()
 	SDL_SetRenderDrawColor(GRenderer, 217, 201, 124, 255);
 	
 	SDL_Rect Rect = { 0, 0, 1024, 264 };
-	SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
+	//SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
 	SDL_RenderClear(GRenderer);
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
 	SDL_RenderFillRect(GRenderer, &Rect);
-	//TestSprite->Render(GRenderer);
+	TestSprite->Render(GRenderer);
 	for (int i = 0; i < Mexicans.size(); i++)
 	{
 		Mexicans[i]->Render(GRenderer);
