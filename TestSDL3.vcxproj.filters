@@ -32,6 +32,12 @@
     <ClCompile Include="src\AssetResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TrumpPlayerSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mexican1Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Sprite.h">
@@ -47,6 +53,12 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\AssetResource.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TrumpPlayerSprite.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Mexican1Sprite.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

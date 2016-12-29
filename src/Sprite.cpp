@@ -1,63 +1,58 @@
 #include "../inc/Sprite.h"
 
-const double Sprite::MoveRate = 444;
-const double MaxVelocity = 333;
-
 Sprite::Sprite() :
 	Texture(NULL)
 {	
 	Flip = SDL_FLIP_NONE;
 	Rect.x = 0;
 	Rect.y = 0;
-	/*Rect.w = 80;
-	Rect.h = 80;*/
-	Rect.w = 48;
-	Rect.h = 69;
+	Rect.w = 0;
+	Rect.h = 0;
+	
 	VelX = 0;
 	VelY = 0;
 	AccelX = 0;
 	AccelY = 0;
-
 	PosX = 0;
 	PosY = 0;
+
+	MoveRate = 444;
+	MaxVelocity = 333;
+	TransitionSpeed = 7;
+	StopSpeed = 16;
+
+	MovingFlags = MOVING_NONE;
 }
 
 void Sprite::Tick(double DeltaTime)
 {
-	const Uint8 *state = SDL_GetKeyboardState(NULL);
-	const double transition_speed = 7;
-	const double StopSpeed = 16;
-
-	if (DeltaTime <= 0)
+	HandleInput(DeltaTime);
+	if (MovingFlags & MOVING_UP)
 	{
-		SDL_Log("DELTA TIME SUCKS");
+		VelY = VelY * (1 - DeltaTime * TransitionSpeed) + -MaxVelocity * (DeltaTime * TransitionSpeed);
 	}
-	if (state[SDL_SCANCODE_UP]) 
+	else if (MovingFlags & MOVING_DOWN)
 	{
-		VelY = VelY * (1 - DeltaTime * transition_speed) + -MaxVelocity * (DeltaTime * transition_speed);
-	}
-	else if (state[SDL_SCANCODE_DOWN])
-	{
-		VelY = VelY * (1 - DeltaTime * transition_speed) + MaxVelocity * (DeltaTime * transition_speed);
+		VelY = VelY * (1 - DeltaTime * TransitionSpeed) + MaxVelocity * (DeltaTime * TransitionSpeed);
 	}
 	else
 	{
 		VelY = VelY * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);
 	}
-	
-	if (state[SDL_SCANCODE_RIGHT])
+
+	if (MovingFlags & MOVING_RIGHT)
 	{
-		VelX = VelX * (1 - DeltaTime * transition_speed) + MaxVelocity * (DeltaTime * transition_speed);
+		VelX = VelX * (1 - DeltaTime * TransitionSpeed) + MaxVelocity * (DeltaTime * TransitionSpeed);
 
 		if (abs(VelX) > MaxVelocity * 0.50)
 		{
 			Flip = SDL_FLIP_NONE;
 		}
 	}
-	else if (state[SDL_SCANCODE_LEFT])
+	else if (MovingFlags & MOVING_LEFT)
 	{
-		VelX = VelX * (1 - DeltaTime * transition_speed) + -MaxVelocity * (DeltaTime * transition_speed);
-		
+		VelX = VelX * (1 - DeltaTime * TransitionSpeed) + -MaxVelocity * (DeltaTime * TransitionSpeed);
+
 		if (abs(VelX) > MaxVelocity * 0.50)
 		{
 			Flip = SDL_FLIP_HORIZONTAL;
@@ -68,40 +63,27 @@ void Sprite::Tick(double DeltaTime)
 		VelX = VelX * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);
 	}
 
-	if (abs(VelX) <= StopSpeed*2 && abs(VelY) <= StopSpeed*2)
-	{
-		//VelX = 0;
-		//VelY = 0;
-		AnimData.CurrentFrameIndex = 0;
-		Frame *CurFrame = AnimData.Anim->GetFrame(0);
-		if (CurFrame)
-		{
-			AnimData.CountDown = CurFrame->GetFrameTime();
-			Texture = CurFrame->GetTexture();
-		}
-	}
-
 	if (abs(VelX) > MaxVelocity)
 	{
 		VelX = MaxVelocity;
 	}
 
-	if (VelY > MaxVelocity)
+	if (abs(VelY) > MaxVelocity)
 	{
 		VelY = MaxVelocity;
 	}
 
-	/*SDL_Log("VelX: %f", VelX * DeltaTime);
-	SDL_Log("VelX: %f", VelY * DeltaTime);*/
 	PosX += VelX * DeltaTime;
 	PosY += VelY * DeltaTime;
 
-	double Magnitude = sqrt(VelX * VelX + VelY * VelY);
-	SDL_Log("MAG %f", Magnitude);
-	SetAnimationPlayRate(Magnitude / MaxVelocity * 1.75);
-
 	Rect.x = round(PosX);
 	Rect.y = round(PosY);
+
+	TickAnimation(DeltaTime);
+}
+
+void Sprite::TickAnimation(double DeltaTime)
+{
 	if (AnimData.Anim)
 	{
 		AnimData.CountDown -= DeltaTime * AnimData.PlayRate;
@@ -114,17 +96,23 @@ void Sprite::Tick(double DeltaTime)
 				AnimData.CurrentFrameIndex = 0;
 			}
 
-			AnimData.CountDown = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex)->GetFrameTime();
-
-			Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
-			if (CurFrame)
-			{
-				AnimData.CountDown = CurFrame->GetFrameTime();
-				Texture = CurFrame->GetTexture();
-				/*Rect.w = CurFrame->GetSrcRect().w;
-				Rect.h = CurFrame->GetSrcRect().h;*/
-			}
+			UpdateAnimationData();
 		}
+	}
+}
+
+void Sprite::HandleInput(double DeltaTime)
+{
+
+}
+
+void Sprite::UpdateAnimationData()
+{
+	Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
+	if (CurFrame)
+	{
+		AnimData.CountDown = CurFrame->GetFrameTime();
+		Texture = CurFrame->GetTexture();
 	}
 }
 
@@ -147,6 +135,16 @@ void Sprite::SetPosition(int NewX, int NewY)
 	PosY = NewY;
 }
 
+void Sprite::SetWidth(int NewWidth)
+{
+	Rect.w = NewWidth;
+}
+
+void Sprite::SetHeight(int NewHeight)
+{
+	Rect.h = NewHeight;
+}
+
 void Sprite::Render(SDL_Renderer* Renderer)
 {
 	if (AnimData.Anim)
@@ -165,14 +163,7 @@ void Sprite::PlayAnimation(AnimationResource *Anim)
 	{
 		AnimData.Anim = Anim;
 		AnimData.CurrentFrameIndex = 0;
-		Frame *CurFrame = Anim->GetFrame(0);
-		if (CurFrame)
-		{
-			AnimData.CountDown = CurFrame->GetFrameTime();
-			Texture = CurFrame->GetTexture();
-			//Rect.w = CurFrame->GetSrcRect().w;
-			//Rect.h = CurFrame->GetSrcRect().h;
-		}
+		UpdateAnimationData();
 	}
 }
 

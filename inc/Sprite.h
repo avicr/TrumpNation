@@ -13,10 +13,18 @@
 
 using namespace std;
 
+enum eMovingFlags
+{
+	MOVING_NONE  = 0,
+	MOVING_UP    = 1,
+	MOVING_DOWN  = 2,
+	MOVING_LEFT  = 4,
+	MOVING_RIGHT = 8
+};
+
 class Sprite
 {
 protected:
-	static const double MoveRate;
 	SDL_RendererFlip Flip;
 	// Screen region to render the sprite to
 	SDL_Rect Rect;
@@ -34,14 +42,26 @@ protected:
 	double PosX;
 	double PosY;
 
+	double MoveRate;
+	double MaxVelocity;
+	double TransitionSpeed;
+	double StopSpeed;
+	
+	int MovingFlags;
+
 public:
 	Sprite();
-	void Tick(double DeltaTime);
+	virtual void Tick(double DeltaTime);
+	virtual void TickAnimation(double DeltaTime);
+	virtual void HandleInput(double DeltaTime);
 	void SetTexture(SDL_Texture* Texture);
 	void SetPosition(int NewX, int NewY);
+	void SetWidth(int NewWidth);
+	void SetHeight(int NewHeight);
 	void Render(SDL_Renderer* Renderer);
 	void PlayAnimation(AnimationResource *Anim);
 	void SetAnimationPlayRate(double Rate);
+	void UpdateAnimationData();
 	void StopAnimation();
 };
 

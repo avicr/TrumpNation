@@ -6,13 +6,15 @@
 
 #include "../inc/ResourceManager.h"
 #include "../inc/Sprite.h"
+#include "../inc/TrumpPlayerSprite.h"
+#include "../inc/Mexican1Sprite.h"
 
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
-Sprite TestSprite;
-Sprite TestMexicanSprite;
+TrumpPlayerSprite *TestSprite;
+Mexican1Sprite *TestMexicanSprite;
 Uint64 TickFreq;
 
 void GameLoop();
@@ -46,9 +48,12 @@ void GameLoop()
 	bool bDone = false;
 	SDL_Event TheEvent;
 	TickFreq = SDL_GetPerformanceFrequency();
-	TestSprite.PlayAnimation(ResourceManager::TrumpAnimation);
-	TestMexicanSprite.SetPosition(100, 100);
-	TestMexicanSprite.PlayAnimation(ResourceManager::Mexican1Animation);
+
+	TestSprite = new TrumpPlayerSprite();
+	TestMexicanSprite = new Mexican1Sprite();
+	TestSprite->PlayAnimation(ResourceManager::TrumpAnimation);
+	TestMexicanSprite->SetPosition(100, 10);
+	TestMexicanSprite->PlayAnimation(ResourceManager::Mexican1Animation);
 
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = 0;
@@ -77,8 +82,8 @@ void GameLoop()
 
 void Tick(double DeltaTime)
 {	
-	TestSprite.Tick(DeltaTime);
-	TestMexicanSprite.Tick(DeltaTime);
+	TestSprite->Tick(DeltaTime);
+	TestMexicanSprite->Tick(DeltaTime);
 }
 
 void Render()
@@ -86,8 +91,8 @@ void Render()
 	SDL_SetRenderDrawColor(GRenderer, 64, 64, 64, 255);
 	SDL_RenderClear(GRenderer);	
 	
-	TestSprite.Render(GRenderer);
-	TestMexicanSprite.Render(GRenderer);
+	TestSprite->Render(GRenderer);
+	TestMexicanSprite->Render(GRenderer);
 	//SDL_Rect Rect = { 32, 32, 32, 32 };
 //	SDL_RenderCopy(GRenderer, ResourceManager::TrumpSpriteSheet->Texture, NULL, &Rect);
 	SDL_RenderPresent(GRenderer);
