@@ -152,7 +152,8 @@ void Sprite::Render(SDL_Renderer* Renderer)
 		Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
 		if (CurFrame)
 		{		
-			SDL_RenderCopyEx(Renderer, Texture, &CurFrame->GetSrcRect(), &Rect, 0, NULL, Flip);
+			SDL_Rect SrcRect = CurFrame->GetSrcRect();
+			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &Rect, 0, NULL, Flip);
 		}		
 	}
 }
