@@ -15,11 +15,13 @@ ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
 TrumpPlayerSprite *TestSprite;
 Uint64 TickFreq;
+SDL_Texture *bigTexture;
 
 void GameLoop();
 void Tick(double DeltaTime);
 void Render();
 void InitSDL();
+void CreateBackBuffer();
 
 int main(int argc, char ** argv)
 {
@@ -31,6 +33,7 @@ int main(int argc, char ** argv)
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
 	
 	GResourceManager = new ResourceManager;
+	CreateBackBuffer();
 
 	GameLoop();
 	
@@ -97,6 +100,7 @@ void Tick(double DeltaTime)
 
 void Render()
 {
+	SDL_SetRenderTarget(GRenderer, bigTexture);
 	SDL_SetRenderDrawColor(GRenderer, 217, 201, 124, 255);
 	
 	SDL_Rect Rect = { 0, 0, 1024, 264 };
@@ -109,6 +113,9 @@ void Render()
 	{
 		Mexicans[i]->Render(GRenderer);
 	}
+	SDL_SetRenderTarget(GRenderer, NULL);
+	SDL_Rect ScreenSize = { 0, 0, 1024, 600 };
+	SDL_RenderCopy(GRenderer, bigTexture, &ScreenSize, &ScreenSize);
 	SDL_RenderPresent(GRenderer);
 
 }
@@ -119,10 +126,18 @@ void InitSDL()
 	{
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, 0);
-		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
-		
+		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);		
+
 		bSDLInitialized = true;
 	}
+}
+
+void CreateBackBuffer()
+{
+	Uint32 pixelFormat;
+	SDL_QueryTexture(ResourceManager::TrumpSpriteSheet->Texture, &pixelFormat, NULL, NULL, NULL);
+	bigTexture = SDL_CreateTexture(GRenderer, pixelFormat, SDL_TEXTUREACCESS_TARGET, 1024, 600);
+	SDL_SetRenderTarget(GRenderer, bigTexture);
 }
 
 SDL_Renderer *GetRenderer()
