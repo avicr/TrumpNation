@@ -12,6 +12,8 @@ SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
 Sprite TestSprite;
+Sprite TestMexicanSprite;
+Uint64 TickFreq;
 
 void GameLoop();
 void Tick(double DeltaTime);
@@ -42,22 +44,23 @@ int main(int argc, char ** argv)
 void GameLoop()
 {
 	bool bDone = false;
-	double StartTime = 0;
-	StartTime = SDL_GetTicks();
 	SDL_Event TheEvent;
-
+	TickFreq = SDL_GetPerformanceFrequency();
 	TestSprite.PlayAnimation(ResourceManager::TrumpAnimation);
+	TestMexicanSprite.SetPosition(100, 100);
+	TestMexicanSprite.PlayAnimation(ResourceManager::Mexican1Animation);
 
+	Uint64 StartTime = SDL_GetPerformanceCounter();
+	Uint64 CurrentTime = 0;
+	double DeltaTime;
 	while (!bDone)
 	{
-		double DeltaTime = SDL_GetTicks() - StartTime;
-		if (DeltaTime == 0)
-		{
-			SDL_Delay(12);
-		}
-		DeltaTime = SDL_GetTicks() - StartTime;
-		StartTime = SDL_GetTicks();
-		Tick(DeltaTime / 1000);
+		StartTime = CurrentTime;
+		CurrentTime = SDL_GetPerformanceCounter();
+		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+
+		
+		Tick(DeltaTime * (double)0.001);
 		Render();	
 
 		//Handle events on queue
@@ -74,16 +77,17 @@ void GameLoop()
 
 void Tick(double DeltaTime)
 {	
-	SDL_Log("DeltaTime %f", DeltaTime);
 	TestSprite.Tick(DeltaTime);
+	TestMexicanSprite.Tick(DeltaTime);
 }
 
 void Render()
 {
-	
+	SDL_SetRenderDrawColor(GRenderer, 64, 64, 64, 255);
 	SDL_RenderClear(GRenderer);	
 	
 	TestSprite.Render(GRenderer);
+	TestMexicanSprite.Render(GRenderer);
 	//SDL_Rect Rect = { 32, 32, 32, 32 };
 //	SDL_RenderCopy(GRenderer, ResourceManager::TrumpSpriteSheet->Texture, NULL, &Rect);
 	SDL_RenderPresent(GRenderer);
@@ -95,8 +99,9 @@ void InitSDL()
 	if (!bSDLInitialized)
 	{
 		SDL_Init(SDL_INIT_VIDEO);
-		GWindow = SDL_CreateWindow("SDL2 Keyboard/Mouse events", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, 0);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, 0);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
+		
 		bSDLInitialized = true;
 	}
 }

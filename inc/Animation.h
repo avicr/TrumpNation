@@ -70,9 +70,10 @@ struct AnimInfo
 {
 	AnimationResource *Anim;
 	double CountDown;
+	double PlayRate;
 	int CurrentFrameIndex;	
 
-	AnimInfo() : Anim(NULL), CurrentFrameIndex(0) {};
+	AnimInfo() : Anim(NULL), CurrentFrameIndex(0), PlayRate(1) {};
 
 };
 #endif

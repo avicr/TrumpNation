@@ -17,6 +17,7 @@ class Sprite
 {
 protected:
 	static const double MoveRate;
+	SDL_RendererFlip Flip;
 	// Screen region to render the sprite to
 	SDL_Rect Rect;
 
@@ -40,6 +41,7 @@ public:
 	void SetPosition(int NewX, int NewY);
 	void Render(SDL_Renderer* Renderer);
 	void PlayAnimation(AnimationResource *Anim);
+	void SetAnimationPlayRate(double Rate);
 	void StopAnimation();
 };
 
