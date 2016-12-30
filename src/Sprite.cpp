@@ -44,7 +44,7 @@ void Sprite::Tick(double DeltaTime)
 	{
 		VelX = VelX * (1 - DeltaTime * TransitionSpeed) + MaxVelocity * (DeltaTime * TransitionSpeed);
 
-		if (abs(VelX) > MaxVelocity * 0.50)
+		if (abs(VelX) > MaxVelocity * 0.350)
 		{
 			Flip = SDL_FLIP_NONE;
 		}
@@ -53,7 +53,7 @@ void Sprite::Tick(double DeltaTime)
 	{
 		VelX = VelX * (1 - DeltaTime * TransitionSpeed) + -MaxVelocity * (DeltaTime * TransitionSpeed);
 
-		if (abs(VelX) > MaxVelocity * 0.50)
+		if (abs(VelX) > MaxVelocity * 0.350)
 		{
 			Flip = SDL_FLIP_HORIZONTAL;
 		}
@@ -151,8 +151,16 @@ void Sprite::Render(SDL_Renderer* Renderer)
 	{
 		Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
 		if (CurFrame)
-		{		
+		{
 			SDL_Rect SrcRect = CurFrame->GetSrcRect();
+			/*SDL_Rect ShadowRect;
+			SDL_Rect ShadowSrcRect = { 0, 0, 68, 51 };
+			ShadowRect.x = Rect.x - (Rect.w * 0.6) * 0.5 + 40;
+			ShadowRect.y = Rect.y + Rect.h - Rect.h * 0.15 + 6;
+			ShadowRect.w = (double)Rect.w * 0.6;
+			ShadowRect.h = (double)Rect.h * 0.15;
+
+			SDL_RenderCopyEx(Renderer, ResourceManager::ShadowTexture->Texture, &ShadowSrcRect, &ShadowRect, 0, NULL, SDL_FLIP_NONE);*/
 			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &Rect, 0, NULL, Flip);
 		}		
 	}

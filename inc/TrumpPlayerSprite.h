@@ -11,6 +11,8 @@ public:
 	virtual void TickAnimation(double DeltaTime);
 
 protected:
+	SDL_Joystick *Joy;
+
 	void HandleInput(double DeltaTime);
 };
 

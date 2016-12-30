@@ -27,13 +27,14 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 	if (state[SDL_SCANCODE_RETURN] || Rect.y > 600)
 	{
-		Rect.y = 0;
+		return;
+		/*Rect.y = 0;
 		PosX = rand() % 900;
 		PosY = 264;
 		VelX = 0;
 		VelY = 0;
 		Growth = 0;
-		MovingFlags = 0;
+		MovingFlags = 0;*/
 	}
 
 	if (Growth < 1)

@@ -51,6 +51,8 @@ void GameLoop()
 	TestSprite = new TrumpPlayerSprite();
 	TestSprite->PlayAnimation(ResourceManager::TrumpAnimation);
 
+	SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
+
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
@@ -82,7 +84,7 @@ void GameLoop()
 vector <Mexican1Sprite*> Mexicans;
 void Tick(double DeltaTime)
 {	
-	static double SpawnCountdown = 2;
+	static double SpawnCountdown = 1;
 	SpawnCountdown -= DeltaTime;
 
 	if (SpawnCountdown <= 0)
@@ -93,7 +95,7 @@ void Tick(double DeltaTime)
 
 	TestSprite->Tick(DeltaTime);
 	
-	for (int i = 0; i < Mexicans.size(); i++)
+	for (int i = Mexicans.size() - 1; i >= 0; i--)
 	{
 		Mexicans[i]->Tick(DeltaTime);
 	}
@@ -109,10 +111,11 @@ void Render()
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
 	SDL_RenderFillRect(GRenderer, &Rect);
 	TestSprite->Render(GRenderer);
-	for (int i = 0; i < Mexicans.size(); i++)
+	for (int i = Mexicans.size() - 1; i >= 0; i--)
 	{
 		Mexicans[i]->Render(GRenderer);
 	}
+	//SDL_RenderCopy(GRenderer, ResourceManager::ShadowTexture->Texture, &Rect, &Rect);
 	SDL_RenderPresent(GRenderer);
 
 }
@@ -121,7 +124,7 @@ void InitSDL()
 {
 	if (!bSDLInitialized)
 	{
-		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		

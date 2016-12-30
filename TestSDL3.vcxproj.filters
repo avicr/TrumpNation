@@ -55,5 +55,11 @@
     <ClInclude Include="inc\AssetResource.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="inc\Mexican1Sprite.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TrumpPlayerSprite.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

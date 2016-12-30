@@ -6,6 +6,7 @@ vector <AssetResource*> ResourceManager::AllResources;
 INIT_TEXTURE_RESOURCE(TrumpSpriteSheet)
 INIT_TEXTURE_RESOURCE(Mexican1SpriteSheet)
 INIT_TEXTURE_RESOURCE(BackgroundTexture)
+INIT_TEXTURE_RESOURCE(ShadowTexture)
 
 INIT_ANIMATION_RESOURCE(TrumpAnimation)
 INIT_ANIMATION_RESOURCE(Mexican1Animation)
