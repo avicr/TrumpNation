@@ -5,17 +5,30 @@ Mexican1Sprite::Mexican1Sprite()
 	float scale = 0.58;
 	SetWidth(128 * scale);
 	SetHeight(136 * scale);
-
+	
 	MoveRate = 444;
 	MaxVelocity = 222;
 	TransitionSpeed = 2;
 	StopSpeed = 4;
+	PosX = rand() % (1024 - Rect.w);
 	Rect.y = 0;
-	PosX = rand() % 900;
 	PosY = 264;
 	VelX = 0;
 	VelY = 0;
 	Growth = 0;
+	bClimbingWall = false;
+
+	int WallIndex = (int)round(PosX / 64);
+	if (WallArray[WallIndex])
+	{
+		MoveRate = 333;
+		PosY = 160;
+		bClimbingWall = true;
+		PosX = WallIndex * 64;
+	}
+
+	
+	
 	MovingFlags = 0;
 	PlayAnimation(ResourceManager::Mexican1Animation);
 }
@@ -27,6 +40,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 	if (state[SDL_SCANCODE_RETURN] || Rect.y > 600)
 	{
+		bPendingDelete = true;
 		return;
 		/*Rect.y = 0;
 		PosX = rand() % 900;
@@ -37,6 +51,14 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 		MovingFlags = 0;*/
 	}
 
+	if (PosY >= 280 && bClimbingWall)
+	{
+		MaxVelocity = 444;
+		VelY = 0;
+		MovingFlags = MOVING_DOWN;
+		TransitionSpeed = 1;
+		bClimbingWall = false;
+	}
 	if (Growth < 1)
 	{
 		Growth += DeltaTime * GrowthRate;
@@ -46,8 +68,19 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 			Growth = 1;
 			MovingFlags = MOVING_DOWN;
 		}
-		PosY = 264 - 128 * 0.58 * Growth;
-		Rect.w = 128 * 0.58 * Growth;
-		Rect.h = 136 * 0.58 * Growth;
+
+		if (bClimbingWall)
+		{
+			PosY = 158 - 128 * 0.58 * Growth;
+			StopSpeed = 0.5;
+			TransitionSpeed = 33;
+			MaxVelocity = 500;
+		}
+		else
+		{
+			PosY = 264 - 128 * 0.58 * Growth;
+			Rect.w = 128 * 0.58 * Growth;
+			Rect.h = 136 * 0.58 * Growth;
+		}
 	}
 }

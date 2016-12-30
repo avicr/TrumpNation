@@ -20,6 +20,7 @@ Sprite::Sprite() :
 	MaxVelocity = 333;
 	TransitionSpeed = 7;
 	StopSpeed = 16;
+	bPendingDelete = false;
 
 	MovingFlags = MOVING_NONE;
 }
@@ -184,4 +185,9 @@ void Sprite::SetAnimationPlayRate(double Rate)
 void Sprite::StopAnimation()
 {
 	AnimData.Anim = NULL;
+}
+
+bool Sprite::GetPendingDelete()
+{
+	return bPendingDelete;
 }

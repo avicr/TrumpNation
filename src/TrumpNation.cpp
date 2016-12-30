@@ -15,6 +15,8 @@ ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
 TrumpPlayerSprite *TestSprite;
 Uint64 TickFreq;
+vector <Mexican1Sprite*> Mexicans;
+bool WallArray[16];
 
 void GameLoop();
 void Tick(double DeltaTime);
@@ -53,6 +55,9 @@ void GameLoop()
 
 	SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
 
+	memset(WallArray, 0, sizeof(WallArray));
+	WallArray[1] = true;
+	WallArray[2] = true;
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
@@ -81,16 +86,15 @@ void GameLoop()
 	}
 }
 
-vector <Mexican1Sprite*> Mexicans;
 void Tick(double DeltaTime)
 {	
-	static double SpawnCountdown = 1;
+	static double SpawnCountdown = 0.15;
 	SpawnCountdown -= DeltaTime;
 
 	if (SpawnCountdown <= 0)
 	{
 		Mexicans.push_back(new Mexican1Sprite());
-		SpawnCountdown = 1;
+		SpawnCountdown = 0.15;
 	}
 
 	TestSprite->Tick(DeltaTime);
@@ -98,6 +102,13 @@ void Tick(double DeltaTime)
 	for (int i = Mexicans.size() - 1; i >= 0; i--)
 	{
 		Mexicans[i]->Tick(DeltaTime);
+
+		if (Mexicans[i]->GetPendingDelete())
+		{
+			delete Mexicans[i];
+			Mexicans.erase(Mexicans.begin() + i);
+			i--;
+		}
 	}
 }
 
@@ -110,12 +121,26 @@ void Render()
 	SDL_RenderClear(GRenderer);
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
 	SDL_RenderFillRect(GRenderer, &Rect);
-	TestSprite->Render(GRenderer);
+
+	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
+	{
+		Rect.x = WallIndex * 64;
+		Rect.y = 160;
+		Rect.w = 64;
+		Rect.h = 160;
+
+		if (WallArray[WallIndex])
+		{
+			SDL_RenderCopy(GRenderer, ResourceManager::WallTexture->Texture, NULL, &Rect);
+		}
+	}
+
 	for (int i = Mexicans.size() - 1; i >= 0; i--)
 	{
 		Mexicans[i]->Render(GRenderer);
 	}
-	//SDL_RenderCopy(GRenderer, ResourceManager::ShadowTexture->Texture, &Rect, &Rect);
+	TestSprite->Render(GRenderer);
+
 	SDL_RenderPresent(GRenderer);
 
 }

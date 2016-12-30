@@ -13,6 +13,7 @@ extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;
 extern SDL_Renderer * GRenderer;
 extern bool bSDLInitialized;
+extern bool WallArray[16];
 
 SDL_Renderer *GetRenderer();
 #endif

@@ -10,6 +10,7 @@ public:
 
 protected:
 	double Growth;
+	bool bClimbingWall;
 	void HandleInput(double DeltaTime);
 };
 

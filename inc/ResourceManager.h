@@ -63,6 +63,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "MexicanGreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(BackgroundTexture, "BG3.bmp");
 	DECLARE_TEXTURE_RESOURCE(ShadowTexture, "Shadow.bmp");
+	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
 	{
