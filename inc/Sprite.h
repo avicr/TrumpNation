@@ -34,6 +34,7 @@ protected:
 
 	AnimInfo AnimData;
 
+	bool bPendingDelete;
 	double VelX;
 	double VelY;
 	double AccelX;
@@ -63,6 +64,7 @@ public:
 	void SetAnimationPlayRate(double Rate);
 	void UpdateAnimationData();
 	void StopAnimation();
+	bool GetPendingDelete();
 };
 
 #endif
