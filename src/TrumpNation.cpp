@@ -56,8 +56,24 @@ void GameLoop()
 	SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
 
 	memset(WallArray, 0, sizeof(WallArray));
+	WallArray[0] = false;
 	WallArray[1] = true;
-	WallArray[2] = true;
+	WallArray[2] = false;
+	WallArray[3] = true;
+	WallArray[4] = false;
+	WallArray[5] = true;
+	WallArray[6] = true;
+	WallArray[7] = true;
+	WallArray[8] = false;
+	WallArray[9] = true;
+	WallArray[10] = false;
+	WallArray[11] = true;
+	WallArray[12] = true;
+	WallArray[13] = true;
+	WallArray[14] = false;
+	WallArray[15] = true;
+	
+
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;

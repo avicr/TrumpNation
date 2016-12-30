@@ -18,6 +18,27 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 void TrumpPlayerSprite::Tick(double DeltaTime)
 {
 	Sprite::Tick(DeltaTime);
+
+	if (PosX < 0 - 20)
+	{
+		PosX = -20;
+	}
+
+	if (PosY < WALL_TOP + 100)
+	{
+		PosY = WALL_TOP + 100;
+	}
+
+	if (PosX + Rect.w > 1024)
+	{
+		PosX = 1024 - Rect.w;
+	}
+
+	if (PosY + Rect.h > 600)
+	{
+		PosY = 600 - Rect.h;
+	}
+
 	if (abs(VelX) <= StopSpeed * 2 && abs(VelY) <= StopSpeed * 2)
 	{
 		AnimData.CurrentFrameIndex = 0;

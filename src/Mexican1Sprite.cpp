@@ -3,6 +3,13 @@
 Mexican1Sprite::Mexican1Sprite()
 {
 	float scale = 0.58;
+	SDL_Rect WallRect;
+	SDL_Rect CollisionRect;
+	SDL_Rect ResultRect;
+	bool bBehindWall = false;
+	bool bGood = false;
+	int WallIndex = 0;
+
 	SetWidth(128 * scale);
 	SetHeight(136 * scale);
 	
@@ -10,30 +17,91 @@ Mexican1Sprite::Mexican1Sprite()
 	MaxVelocity = 222;
 	TransitionSpeed = 2;
 	StopSpeed = 4;
-	PosX =  rand() % (1024 - Rect.w);
-	PosY = HORIZON;
-	Rect.x = PosX;
-	Rect.y = PosY;
+	PosY = HORIZON;	
 	VelX = 0;
 	VelY = 0;
 	Growth = 0;
-	bClimbingWall = false;
+	
 
-	int WallIndex = (int)round(PosX / 64);
-	if (WallArray[WallIndex])
+	do
 	{
-		SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
-		SDL_Rect CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
-		SDL_Rect ResultRect;
-		bool bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);
+		PosX = rand() % (1024 - Rect.w);
+		bClimbingWall = false;
+		CollisionRect = { 0, 0, 0, 0 };
+		bBehindWall = false;		
+		Rect.x = PosX;
+		Rect.y = PosY;
+		bGood = false;
 
-		if (!SDL_RectEquals(&ResultRect, &CollisionRect) || !bBehindWall)
+		WallIndex = (int)round(PosX / 64);
+		if (WallArray[WallIndex])
 		{
-			PosX = rand() % (1024 - Rect.w);
+			CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
+			bClimbingWall = true;			
+			WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };			
+			bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);						
+
+			// Not behind wall, we are good
+			if (!bBehindWall)
+			{
+				bGood = true;
+			}
+			// If we are totally covered by the first wall, we are good
+			else if (SDL_RectEquals(&ResultRect, &CollisionRect))
+			{
+				bGood = true;
+			}
+			// If we are partially covered by the first wall, and there is a second wall next to it, we are fully covered and good
+			else if ((WallIndex < 15 && WallArray[WallIndex + 1]))
+			{
+				bGood = true;
+			}
+			else
+			{
+				bGood = false;
+			}
 		}
-		MoveRate = 333;
+		// Not covered by first wall index, but are by second wall index
+		else if (WallIndex < 15 && WallArray[WallIndex + 1])
+		{
+			CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };			
+			WallRect = { (WallIndex+1) * 64, WALL_TOP, 64, 160 };
+			bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);			
+			
+			if (!bBehindWall)
+			{
+				bGood = true;
+			}
+			else
+			{
+				PosX = (int)round(PosX / 64) * 64;
+				bGood = true;
+				bBehindWall = false;
+			}
+		}
+		else
+		{
+			bGood = true;
+		}
+	} while (!bGood);
+
+	// If we spawn with a wall to the left of us
+	if (!bBehindWall && (WallIndex >= 0 * WallArray[WallIndex - 1]))
+	{
+		CollisionRect = { Rect.x, Rect.y - 22, Rect.w, Rect.h };
+		WallRect = { (WallIndex - 1) * 64, WALL_TOP, 64, 160 };
+		
+		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
+		{
+			PosX = WallIndex * 64 + 5;
+		}
+	}
+
+	if (bBehindWall)
+	{
 		bClimbingWall = true;
-		PosX = WallIndex * 64;
+		MoveRate = 333;
+		//PosX = WallIndex * 64;
 	}
 
 	MovingFlags = 0;
@@ -49,11 +117,6 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 		{
 			SDL_Rect SrcRect = CurFrame->GetSrcRect();
 
-			if (bClimbingWall)
-			{
-
-			}
-
 			SDL_Rect RenderRect = Rect;
 
 			if (bClimbingWall)
@@ -65,6 +128,7 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 			{
 				RenderRect.w *= Growth;
 				RenderRect.h *= Growth;
+				//RenderRect.x -= (Rect.w / 2) * Growth;
 			}
 			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &RenderRect, 0, NULL, Flip);
 		}
