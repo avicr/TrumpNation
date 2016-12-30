@@ -10,9 +10,10 @@ Mexican1Sprite::Mexican1Sprite()
 	MaxVelocity = 222;
 	TransitionSpeed = 2;
 	StopSpeed = 4;
-	PosX = rand() % (1024 - Rect.w);
-	Rect.y = 0;
-	PosY = 264;
+	PosX =  rand() % (1024 - Rect.w);
+	PosY = HORIZON;
+	Rect.x = PosX;
+	Rect.y = PosY;
 	VelX = 0;
 	VelY = 0;
 	Growth = 0;
@@ -21,16 +22,53 @@ Mexican1Sprite::Mexican1Sprite()
 	int WallIndex = (int)round(PosX / 64);
 	if (WallArray[WallIndex])
 	{
+		SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
+		SDL_Rect CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
+		SDL_Rect ResultRect;
+		bool bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);
+
+		if (!SDL_RectEquals(&ResultRect, &CollisionRect) || !bBehindWall)
+		{
+			PosX = rand() % (1024 - Rect.w);
+		}
 		MoveRate = 333;
-		PosY = 160;
 		bClimbingWall = true;
 		PosX = WallIndex * 64;
 	}
 
-	
-	
 	MovingFlags = 0;
 	PlayAnimation(ResourceManager::Mexican1Animation);
+}
+
+void Mexican1Sprite::Render(SDL_Renderer *Renderer)
+{
+	if (AnimData.Anim)
+	{
+		Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
+		if (CurFrame)
+		{
+			SDL_Rect SrcRect = CurFrame->GetSrcRect();
+
+			if (bClimbingWall)
+			{
+
+			}
+
+			SDL_Rect RenderRect = Rect;
+
+			if (bClimbingWall)
+			{
+				RenderRect.h = Rect.h * Growth;
+				SrcRect.h *= Growth;
+			}
+			else
+			{
+				RenderRect.w *= Growth;
+				RenderRect.h *= Growth;
+			}
+			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &RenderRect, 0, NULL, Flip);
+		}
+	}
 }
 
 void Mexican1Sprite::HandleInput(double DeltaTime)
@@ -71,16 +109,14 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 		if (bClimbingWall)
 		{
-			PosY = 158 - 128 * 0.58 * Growth;
+			PosY = WALL_TOP - Rect.h * Growth + 1;
 			StopSpeed = 0.5;
 			TransitionSpeed = 33;
 			MaxVelocity = 500;
 		}
 		else
 		{
-			PosY = 264 - 128 * 0.58 * Growth;
-			Rect.w = 128 * 0.58 * Growth;
-			Rect.h = 136 * 0.58 * Growth;
+			PosY = HORIZON - Rect.h * Growth + 1;
 		}
 	}
 }

@@ -8,6 +8,8 @@
 #endif 
 
 #define TEXTURE_PATH "resource/textures/"
+#define HORIZON 264
+#define WALL_TOP HORIZON - 104
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;

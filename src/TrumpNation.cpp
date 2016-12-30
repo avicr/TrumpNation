@@ -114,18 +114,21 @@ void Tick(double DeltaTime)
 
 void Render()
 {
+	// Clear to ground color
 	SDL_SetRenderDrawColor(GRenderer, 217, 201, 124, 255);
-	
-	SDL_Rect Rect = { 0, 0, 1024, 264 };
-	//SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
 	SDL_RenderClear(GRenderer);
+
+	//SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
+
+	// Render sky
+	SDL_Rect Rect = { 0, 0, 1024, HORIZON };
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
 	SDL_RenderFillRect(GRenderer, &Rect);
 
 	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
 	{
 		Rect.x = WallIndex * 64;
-		Rect.y = 160;
+		Rect.y = WALL_TOP;
 		Rect.w = 64;
 		Rect.h = 160;
 

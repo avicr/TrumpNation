@@ -7,6 +7,7 @@ class Mexican1Sprite : public Sprite
 {
 public:
 	Mexican1Sprite();
+	void Render(SDL_Renderer *Renderer);
 
 protected:
 	double Growth;
