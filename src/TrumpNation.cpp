@@ -116,6 +116,11 @@ void Render()
 		Mexicans[i]->Render(GRenderer);
 	}
 	//SDL_RenderCopy(GRenderer, ResourceManager::ShadowTexture->Texture, &Rect, &Rect);
+	if (Mexicans.size())
+	{
+		Mexicans[0]->SetPosition(0, 600 - 136 * 0.58);
+		Mexicans[0]->Render(GRenderer);
+	}
 	SDL_RenderPresent(GRenderer);
 
 }
