@@ -106,13 +106,13 @@ void GameLoop()
 
 void Tick(double DeltaTime)
 {	
-	static double SpawnCountdown = 0.15;
+	static double SpawnCountdown = 0.25;// 0.15;
 	SpawnCountdown -= DeltaTime;
 
 	if (SpawnCountdown <= 0)
 	{
 		Mexicans.push_back(new Mexican1Sprite());
-		SpawnCountdown = 0.15;
+		SpawnCountdown = 0.25;// 0.15;
 	}
 
 	TestSprite->Tick(DeltaTime);
@@ -120,6 +120,7 @@ void Tick(double DeltaTime)
 	for (int i = Mexicans.size() - 1; i >= 0; i--)
 	{
 		Mexicans[i]->Tick(DeltaTime);
+		Mexicans[i]->CheckCollision(TestSprite);
 
 		if (Mexicans[i]->GetPendingDelete())
 		{
@@ -169,14 +170,17 @@ void Render()
 		}
 	}
 
-	for (int i = Mexicans.size() - 1; i >= 0; i--)
-	{
-		Mexicans[i]->Render(GRenderer);
-	}
-
 	for (int i = Items.size() - 1; i >= 0; i--)
 	{
 		Items[i]->Render(GRenderer);
+	}
+
+	for (int i = Mexicans.size() - 1; i >= 0; i--)
+	{
+		Mexicans[i]->Render(GRenderer);
+		/*SDL_Rect CollisionRect = Mexicans[i]->GetCollisionRect();
+		SDL_SetRenderDrawColor(GRenderer, 255, 0, 0, 255);
+		SDL_RenderDrawRect(GRenderer, &CollisionRect);*/
 	}
 
 	TestSprite->Render(GRenderer);

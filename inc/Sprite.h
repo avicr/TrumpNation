@@ -55,6 +55,9 @@ public:
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);
 	virtual void HandleInput(double DeltaTime);
+	virtual void CheckCollision(class TrumpPlayerSprite *OtherSprite);
+	virtual void Interact(class TrumpPlayerSprite *OtherSprite);
+	virtual SDL_Rect GetCollisionRect();
 	void SetTexture(SDL_Texture* Texture);
 	void SetPosition(int NewX, int NewY);
 	void SetWidth(int NewWidth);

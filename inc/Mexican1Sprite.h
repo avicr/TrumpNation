@@ -8,7 +8,10 @@ class Mexican1Sprite : public Sprite
 public:
 	Mexican1Sprite();
 	void HandleWallPlaced(int WallIndex);
+	SDL_Rect GetCollisionRect();
 	void Render(SDL_Renderer *Renderer);
+	void CheckCollision(TrumpPlayerSprite *OtherSprite);
+	void Interact(TrumpPlayerSprite *OtherSprite);
 
 protected:
 	double Growth;

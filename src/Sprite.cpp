@@ -107,6 +107,19 @@ void Sprite::HandleInput(double DeltaTime)
 
 }
 
+void Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
+{
+
+}
+void Sprite::Interact(TrumpPlayerSprite *OtherSprite)
+{
+}
+
+SDL_Rect Sprite::GetCollisionRect()
+{
+	return Rect;
+}
+
 void Sprite::UpdateAnimationData()
 {
 	Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);

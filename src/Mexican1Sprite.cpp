@@ -1,4 +1,5 @@
 #include "../inc/Mexican1Sprite.h"
+#include "../inc/TrumpPlayerSprite.h"
 
 Mexican1Sprite::Mexican1Sprite()
 {
@@ -144,6 +145,13 @@ void Mexican1Sprite::HandleWallPlaced(int WallIndex)
 	}
 }
 
+SDL_Rect Mexican1Sprite::GetCollisionRect()
+{
+	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 20, Rect.w - 40, Rect.h - 30 };
+
+	return CollisionRect;
+}
+
 void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 {
 	if (AnimData.Anim)
@@ -170,6 +178,7 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 		}
 	}
 }
+
 
 void Mexican1Sprite::HandleInput(double DeltaTime)
 {
@@ -219,4 +228,25 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 			PosY = HORIZON - Rect.h * Growth + 1;
 		}
 	}
+}
+
+void Mexican1Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
+{
+	if (Growth < 1)
+	{
+		return;
+	}
+	SDL_Rect TrumpCollision = OtherSprite->GetCollisionRect();
+	SDL_Rect ResultRect;
+
+	SDL_Rect CollisionRect = GetCollisionRect();
+	if (SDL_IntersectRect(&TrumpCollision, &CollisionRect, &ResultRect))
+	{
+		Interact(OtherSprite);
+	}
+}
+
+void Mexican1Sprite::Interact(TrumpPlayerSprite *OtherSprite)
+{
+	exit(1);
 }

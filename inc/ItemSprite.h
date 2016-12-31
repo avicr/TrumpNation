@@ -6,7 +6,7 @@
 class ItemSprite : public Sprite
 {
 public:
-	void CheckCollision(TrumpPlayerSprite *OtherSprite);
+	virtual void CheckCollision(TrumpPlayerSprite *OtherSprite);
 	virtual void Interact(TrumpPlayerSprite *OtherSprite) {};
 };
 
