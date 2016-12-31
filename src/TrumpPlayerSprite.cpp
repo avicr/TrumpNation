@@ -1,4 +1,6 @@
 #include "../inc/TrumpPlayerSprite.h"
+#include "../inc/Mexican1Sprite.h"
+#include "../inc/ItemSprite.h"
 
 TrumpPlayerSprite::TrumpPlayerSprite()
 {
@@ -13,6 +15,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	PosX = 445;
 	PosY = 340;
 	Joy = SDL_JoystickOpen(0);
+	bHasWall = false;
 }
 
 void TrumpPlayerSprite::Tick(double DeltaTime)
@@ -54,6 +57,17 @@ void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 	Sprite::TickAnimation(DeltaTime);
 }
 
+SDL_Rect TrumpPlayerSprite::GetCollisionRect()
+{
+	SDL_Rect CollisionRect = { Rect.x + 26, Rect.y + 32, 30, 45 };
+	return CollisionRect;
+}
+
+void TrumpPlayerSprite::SetHasWall(bool bInHasWall)
+{
+	bHasWall = bInHasWall;
+}
+
 void TrumpPlayerSprite::HandleInput(double DeltaTime)
 {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
@@ -86,8 +100,23 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		VelX = VelX * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);
 	}
 
-	if (state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0)))
+	if (bHasWall && (state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
 	{
-		SDL_Log("Yay!");
+		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + 130)
+		{
+			int WallIndex = (int)round(PosX / 64);
+
+			if (!WallArray[WallIndex])
+			{
+				WallArray[WallIndex] = true;
+				bHasWall = false;
+				Items.push_back(new BrickItem(470, 570));
+
+				for (int i = 0; i < Mexicans.size(); i++)
+				{
+					Mexicans[i]->HandleWallPlaced(WallIndex);
+				}
+			}
+		}
 	}
 }

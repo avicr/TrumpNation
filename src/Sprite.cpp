@@ -148,12 +148,13 @@ void Sprite::SetHeight(int NewHeight)
 
 void Sprite::Render(SDL_Renderer* Renderer)
 {
+	SDL_Rect SrcRect = { 0, 0, Rect.w, Rect.h };
 	if (AnimData.Anim)
 	{
 		Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
 		if (CurFrame)
 		{
-			SDL_Rect SrcRect = CurFrame->GetSrcRect();
+			SrcRect = CurFrame->GetSrcRect();
 			/*SDL_Rect ShadowRect;
 			SDL_Rect ShadowSrcRect = { 0, 0, 68, 51 };
 			ShadowRect.x = Rect.x - (Rect.w * 0.6) * 0.5 + 40;
@@ -164,6 +165,10 @@ void Sprite::Render(SDL_Renderer* Renderer)
 			SDL_RenderCopyEx(Renderer, ResourceManager::ShadowTexture->Texture, &ShadowSrcRect, &ShadowRect, 0, NULL, SDL_FLIP_NONE);*/
 			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &Rect, 0, NULL, Flip);
 		}		
+	}
+	else if (Texture)
+	{
+		SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &Rect, 0, NULL, Flip);
 	}
 }
 

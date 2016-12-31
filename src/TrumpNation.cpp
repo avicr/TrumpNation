@@ -8,6 +8,7 @@
 #include "../inc/Sprite.h"
 #include "../inc/TrumpPlayerSprite.h"
 #include "../inc/Mexican1Sprite.h"
+#include "../inc/ItemSprite.h"
 
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
@@ -16,6 +17,7 @@ bool bSDLInitialized = false;
 TrumpPlayerSprite *TestSprite;
 Uint64 TickFreq;
 vector <Mexican1Sprite*> Mexicans;
+vector <ItemSprite *> Items;
 bool WallArray[16];
 
 void GameLoop();
@@ -53,27 +55,27 @@ void GameLoop()
 	TestSprite = new TrumpPlayerSprite();
 	TestSprite->PlayAnimation(ResourceManager::TrumpAnimation);
 
+	Items.push_back(new BrickItem(470, 570));
 	SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
 
 	memset(WallArray, 0, sizeof(WallArray));
 	WallArray[0] = false;
-	WallArray[1] = true;
+	WallArray[1] = false;
 	WallArray[2] = false;
-	WallArray[3] = true;
+	WallArray[3] = false;
 	WallArray[4] = false;
-	WallArray[5] = true;
-	WallArray[6] = true;
-	WallArray[7] = true;
+	WallArray[5] = false;
+	WallArray[6] = false;
+	WallArray[7] = false;
 	WallArray[8] = false;
-	WallArray[9] = true;
+	WallArray[9] = false;
 	WallArray[10] = false;
-	WallArray[11] = true;
-	WallArray[12] = true;
-	WallArray[13] = true;
+	WallArray[11] = false;
+	WallArray[12] = false;
+	WallArray[13] = false;
 	WallArray[14] = false;
-	WallArray[15] = true;
+	WallArray[15] = false;
 	
-
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
@@ -126,6 +128,19 @@ void Tick(double DeltaTime)
 			i--;
 		}
 	}
+
+	for (int i = Items.size() - 1; i >= 0; i--)
+	{
+		Items[i]->Tick(DeltaTime);
+		Items[i]->CheckCollision(TestSprite);
+
+		if (Items[i]->GetPendingDelete())
+		{
+			delete Items[i];
+			Items.erase(Items.begin() + i);
+			i--;
+		}
+	}
 }
 
 void Render()
@@ -158,6 +173,12 @@ void Render()
 	{
 		Mexicans[i]->Render(GRenderer);
 	}
+
+	for (int i = Items.size() - 1; i >= 0; i--)
+	{
+		Items[i]->Render(GRenderer);
+	}
+
 	TestSprite->Render(GRenderer);
 
 	SDL_RenderPresent(GRenderer);

@@ -86,7 +86,7 @@ Mexican1Sprite::Mexican1Sprite()
 	} while (!bGood);
 
 	// If we spawn with a wall to the left of us
-	if (!bBehindWall && (WallIndex >= 0 * WallArray[WallIndex - 1]))
+	if (!bBehindWall)
 	{
 		CollisionRect = { Rect.x, Rect.y - 22, Rect.w, Rect.h };
 		WallRect = { (WallIndex - 1) * 64, WALL_TOP, 64, 160 };
@@ -106,6 +106,42 @@ Mexican1Sprite::Mexican1Sprite()
 
 	MovingFlags = 0;
 	PlayAnimation(ResourceManager::Mexican1Animation);
+}
+
+void Mexican1Sprite::HandleWallPlaced(int WallIndex)
+{
+	SDL_Rect CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 40, Rect.h };
+	SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
+	SDL_Rect ResultRect;
+
+	if (PosY > WALL_TOP + 100)
+	{
+		return;
+	}
+
+	if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
+	{
+		bPendingDelete = true;
+	}
+	else if (WallIndex < 15 && WallArray[WallIndex + 1])
+	{
+		CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 40, Rect.h };
+		WallRect = { (WallIndex + 1) * 64, WALL_TOP, 64, 160 };
+		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
+		{
+			bPendingDelete = true;
+		}
+	}
+	else
+	{
+		/*CollisionRect = { Rect.x + 10, Rect.y - 22, Rect.w, Rect.h };
+		WallRect = { (WallIndex - 1) * 64, WALL_TOP, 64, 160 };
+
+		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
+		{
+			bPendingDelete = true;
+		}*/
+	}
 }
 
 void Mexican1Sprite::Render(SDL_Renderer *Renderer)
@@ -140,7 +176,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	const double GrowthRate = 0.5;
 
-	if (state[SDL_SCANCODE_RETURN] || Rect.y > 600)
+	if (Rect.y > 600)
 	{
 		bPendingDelete = true;
 		return;
