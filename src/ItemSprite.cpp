@@ -20,5 +20,6 @@ BrickItem::BrickItem(int X, int Y)
 void BrickItem::Interact(TrumpPlayerSprite *OtherSprite)
 {
 	OtherSprite->SetHasWall(true);
+	Mix_PlayChannel(-1, PickUpItemFX, 0);
 	bPendingDelete = true;
 }

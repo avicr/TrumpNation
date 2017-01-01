@@ -1,7 +1,9 @@
 #ifdef _WIN32
 	#include <SDL.h>
+	#include <SDL_mixer.h>
 #else
 	#include "SDL2/SDL.h"
+	#include "SDL2/SDL_mixer.h"
 #endif
 
 #include "../inc/ResourceManager.h"
@@ -19,12 +21,18 @@ Uint64 TickFreq;
 vector <Mexican1Sprite*> Mexicans;
 vector <ItemSprite *> Items;
 bool WallArray[16];
+Mix_Chunk *PickUpItemFX = NULL;
+Mix_Chunk *PlaceWallFX = NULL;
+Mix_Chunk *StepFX = NULL;
+Mix_Music *TitleMusic = NULL;
+
 
 void GameLoop();
 void DoTitleScreen();
 void Tick(double DeltaTime);
 void Render();
 void InitSDL();
+void CleanUp();
 
 int main(int argc, char ** argv)
 {
@@ -40,12 +48,22 @@ int main(int argc, char ** argv)
 	DoTitleScreen();
 	GameLoop();
 	
+	CleanUp();	
+
+	return 0;
+}
+
+void CleanUp()
+{
 	delete GResourceManager;
+
+	Mix_FreeChunk(PlaceWallFX);
+	Mix_FreeChunk(PickUpItemFX);	
+	Mix_FreeChunk(StepFX);
+	
 	SDL_DestroyRenderer(GRenderer);
 	SDL_DestroyWindow(GWindow);
 	SDL_Quit();
-
-	return 0;
 }
 
 void GameLoop()
@@ -197,6 +215,8 @@ void DoTitleScreen()
 {
 	bool bDone = false;
 	SDL_Event TheEvent;
+	TitleMusic = Mix_LoadMUS("resource/sounds/title.wav");
+	Mix_PlayMusic(TitleMusic, -1);
 	Sprite *TrumpIntroSprite = new Sprite();
 	TrumpIntroSprite->SetPosition(445, 300);
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
@@ -238,6 +258,8 @@ void DoTitleScreen()
 		}
 	}
 
+	Mix_HaltMusic();	
+	Mix_FreeMusic(TitleMusic);
 	delete TrumpIntroSprite;
 }
 
@@ -246,6 +268,17 @@ void InitSDL()
 	if (!bSDLInitialized)
 	{
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
+		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 4, 1024) == -1)
+		{
+
+		}
+		else
+		{
+			PickUpItemFX = Mix_LoadWAV("resource/sounds/Pickupitem.wav");
+			PlaceWallFX = Mix_LoadWAV("resource/sounds/Placewall.wav");
+			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
+		}
+
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		

@@ -13,6 +13,7 @@ public:
 	void SetHasWall(bool bInHasWall);
 
 protected:
+	bool bPlayingStepFX;
 	bool bHasWall;
 	SDL_Joystick *Joy;
 

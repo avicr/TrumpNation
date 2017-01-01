@@ -64,8 +64,5 @@
     <ClInclude Include="inc\TrumpPlayerSprite.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\ItemSprite.h">
-      <Filter>inc</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

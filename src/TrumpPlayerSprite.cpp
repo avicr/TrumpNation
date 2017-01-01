@@ -16,6 +16,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	PosY = 340;
 	Joy = SDL_JoystickOpen(0);
 	bHasWall = false;
+	bPlayingStepFX = false;
 }
 
 void TrumpPlayerSprite::Tick(double DeltaTime)
@@ -74,30 +75,50 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	SDL_JoystickUpdate();
 	MovingFlags = MOVING_NONE;
 	Sint16 Test = SDL_JoystickGetAxis(Joy, 1);
+	bool bPlayerMoving = false;
+	bPlayerMoving = false;
+
 	if (state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) <= -32767))
 	{
 		MovingFlags |= MOVING_UP;
+		bPlayerMoving = true;
 	}
 	else if (state[SDL_SCANCODE_DOWN] || (Joy && SDL_JoystickGetAxis(Joy, 1) == 32767))
 	{
 		MovingFlags |= MOVING_DOWN;
+		bPlayerMoving = true;
 	}
 	else
 	{
-		VelY = VelY * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);
+		VelY = VelY * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);		
 	}
 	
 	if (state[SDL_SCANCODE_RIGHT] || (Joy && SDL_JoystickGetAxis(Joy, 0) == 32767))
 	{
 		MovingFlags |= MOVING_RIGHT;
+		bPlayerMoving = true;
 	}
 	else if (state[SDL_SCANCODE_LEFT] || (Joy && SDL_JoystickGetAxis(Joy, 0) <= -32767))
 	{
 		MovingFlags |= MOVING_LEFT;
+		bPlayerMoving = true;
 	}
 	else
 	{
-		VelX = VelX * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);
+		VelX = VelX * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);		
+	}
+
+	if (bPlayerMoving && !bPlayingStepFX)
+	{
+		Mix_PlayChannel(0, StepFX, -1);
+		bPlayingStepFX = true;
+		SDL_Log("PLAYING OMG");
+	}
+	else if (!bPlayerMoving && bPlayingStepFX)
+	{
+		Mix_HaltChannel(0);
+		bPlayingStepFX = false;
+		SDL_Log("STOPING OMG");
 	}
 
 	if (bHasWall && (state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
@@ -108,6 +129,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 
 			if (!WallArray[WallIndex * 2])
 			{
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
 				WallArray[WallIndex * 2] = true;
 				WallArray[WallIndex * 2 + 1] = true;
 
