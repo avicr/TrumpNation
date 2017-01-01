@@ -60,11 +60,14 @@ class ResourceManager
 
 public:
 	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "Trump512x256.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "TrumpTie512x256.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "MexicanGreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(BackgroundTexture, "BG3.bmp");
 	DECLARE_TEXTURE_RESOURCE(ShadowTexture, "Shadow.bmp");
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
+	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
+	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
 	{
@@ -78,6 +81,19 @@ public:
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(TrumpAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpIntroAnimation)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int SpriteWidth = 128;
+			int SpriteHeight = 128;
+			SDL_Rect SrcRect = { i % 4 * SpriteWidth, i / 4 * SpriteHeight, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::TrumpIntroSpriteSheet->Texture, SrcRect, 0.05));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(TrumpIntroAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(Mexican1Animation)
 	{

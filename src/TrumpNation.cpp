@@ -21,6 +21,7 @@ vector <ItemSprite *> Items;
 bool WallArray[16];
 
 void GameLoop();
+void DoTitleScreen();
 void Tick(double DeltaTime);
 void Render();
 void InitSDL();
@@ -36,6 +37,7 @@ int main(int argc, char ** argv)
 	
 	GResourceManager = new ResourceManager;
 
+	DoTitleScreen();
 	GameLoop();
 	
 	delete GResourceManager;
@@ -185,8 +187,58 @@ void Render()
 
 	TestSprite->Render(GRenderer);
 
+	SDL_Rect HUDRect = { 0, 0, 1024, 86 };
+	SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
 	SDL_RenderPresent(GRenderer);
 
+}
+
+void DoTitleScreen()
+{
+	bool bDone = false;
+	SDL_Event TheEvent;
+	Sprite *TrumpIntroSprite = new Sprite();
+	TrumpIntroSprite->SetPosition(445, 300);
+	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
+	TrumpIntroSprite->SetWidth(128);
+	TrumpIntroSprite->SetHeight(128);
+
+	Uint64 StartTime = SDL_GetPerformanceCounter();
+	Uint64 CurrentTime = SDL_GetPerformanceCounter();
+	double DeltaTime;
+	while (!bDone)
+	{
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_RETURN])
+		{
+			bDone = true;
+		}
+		StartTime = CurrentTime;
+		CurrentTime = SDL_GetPerformanceCounter();
+		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+
+
+		TrumpIntroSprite->Tick(DeltaTime * (double)0.001);
+
+		SDL_Rect TitleRect = { 0, 0, 1024, 600 };
+		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, &TitleRect, &TitleRect);
+		TrumpIntroSprite->Render(GRenderer);
+		SDL_RenderPresent(GRenderer);
+
+		while (SDL_PollEvent(&TheEvent) != 0)
+		{
+			////User requests quit
+			//if (TheEvent.type == SDL_KEYDOWN)
+			//{
+			//	bDone = true;
+			//}
+			if (TheEvent.type == SDL_QUIT)
+			{
+				bDone = true;
+			}
+		}
+	}
+
+	delete TrumpIntroSprite;
 }
 
 void InitSDL()

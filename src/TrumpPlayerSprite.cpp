@@ -73,8 +73,8 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	SDL_JoystickUpdate();
 	MovingFlags = MOVING_NONE;
-	
-	if (state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) == -32768))
+	Sint16 Test = SDL_JoystickGetAxis(Joy, 1);
+	if (state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) <= -32767))
 	{
 		MovingFlags |= MOVING_UP;
 	}
@@ -91,7 +91,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	{
 		MovingFlags |= MOVING_RIGHT;
 	}
-	else if (state[SDL_SCANCODE_LEFT] || (Joy && SDL_JoystickGetAxis(Joy, 0) == -32768))
+	else if (state[SDL_SCANCODE_LEFT] || (Joy && SDL_JoystickGetAxis(Joy, 0) <= -32767))
 	{
 		MovingFlags |= MOVING_LEFT;
 	}
@@ -104,17 +104,20 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	{
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + 130)
 		{
-			int WallIndex = (int)round(PosX / 64);
+			int WallIndex = (int)round(PosX / 128);
 
-			if (!WallArray[WallIndex])
+			if (!WallArray[WallIndex * 2])
 			{
-				WallArray[WallIndex] = true;
+				WallArray[WallIndex * 2] = true;
+				WallArray[WallIndex * 2 + 1] = true;
+
 				bHasWall = false;
 				Items.push_back(new BrickItem(rand() % 1024 - 32, (rand() % (200) + HORIZON + 65)));
 
 				for (int i = 0; i < Mexicans.size(); i++)
 				{
-					Mexicans[i]->HandleWallPlaced(WallIndex);
+					Mexicans[i]->HandleWallPlaced(WallIndex * 2);
+					Mexicans[i]->HandleWallPlaced(WallIndex * 2 + 1);
 				}
 			}
 		}
