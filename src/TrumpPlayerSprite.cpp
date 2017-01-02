@@ -8,14 +8,15 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	SetWidth(80);
 	SetHeight(80);
 
-	NumLives = 3;
+	NumLives = 2;
 	MoveRate = 444;
 	MaxVelocity = 333;
 	TransitionSpeed = 7;
 	
 	StopSpeed = 16;
 
-	bDying = false;
+	DyingCountDown = 2;
+	PlayerState = StatePlaying;
 	Score = 0;
 	PosX = 445;
 	PosY = 340;
@@ -27,6 +28,20 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 void TrumpPlayerSprite::Tick(double DeltaTime)
 {
 	Sprite::Tick(DeltaTime);
+
+	if (PlayerState == StateDying)
+	{
+		DyingCountDown -= DeltaTime;
+
+		if (DyingCountDown <= 0)
+		{
+			DyingCountDown = 2;
+			NumLives--;
+			SDL_Log("Lives: %d", NumLives);
+			TheGame->SetLevel(TheGame->GetLevelNumber());
+			PlayerState = StateDead;
+		}
+	}
 
 	if (PosX < 0 - 20)
 	{
@@ -52,7 +67,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 
 void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 {
-	if (!bDying)
+	if (PlayerState != StateDying && PlayerState != StateDead)
 	{
 		double Magnitude = sqrt(VelX * VelX + VelY * VelY);
 		SetAnimationPlayRate(Magnitude / MaxVelocity * 1.65);
@@ -94,7 +109,7 @@ int TrumpPlayerSprite::GetScore()
 
 void TrumpPlayerSprite::HandleInput(double DeltaTime)
 {
-	if (bDying)
+	if (PlayerState == StateDying || PlayerState == StateDead)
 	{		
 		Mix_HaltChannel(0);
 		bPlayingStepFX = false;
@@ -189,11 +204,18 @@ void TrumpPlayerSprite::SetNumLives(int Amount)
 
 void TrumpPlayerSprite::TakeDamage()
 {
-	bDying = true;
+	PlayerState = StateDying;
 	PlayAnimation(ResourceManager::TrumpDamageAnimation);
 }
 
-bool TrumpPlayerSprite::GetDying()
+void TrumpPlayerSprite::Reset()
 {
-	return bDying;
+	SetPosition(445, 340);
+	PlayerState = StatePlaying;
+	PlayAnimation(ResourceManager::TrumpAnimation);
+}
+
+ePlayerState TrumpPlayerSprite::GetPlayerState()
+{
+	return PlayerState;
 }

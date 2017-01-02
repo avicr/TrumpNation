@@ -29,9 +29,9 @@ void Game::OnMexicanEscaped()
 	NumMexicansEscaped++;
 }
 
-void Game::IncreaseLevel()
+void Game::SetLevel(int NewLevel)
 {
-	CurrentLevel++;
+	CurrentLevel = NewLevel;
 	memset(WallArray, 0, sizeof(WallArray));
 
 	/*WallArray[0] = true;
@@ -57,11 +57,6 @@ int Game::GetLevelNumber()
 	return CurrentLevel;
 }
 
-void Game::SetLevel(int Level)
-{
-	CurrentLevel = Level;
-}
-
 bool Game::LevelComplete()
 {
 	for (int i = 0; i < 16; i++)
@@ -72,5 +67,6 @@ bool Game::LevelComplete()
 		}
 	}
 
+	SetLevel(CurrentLevel + 1);
 	return true;
 }

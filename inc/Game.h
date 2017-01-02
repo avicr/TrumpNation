@@ -7,7 +7,6 @@ public:
 	Game();
 
 	void OnMexicanEscaped();
-	void IncreaseLevel();
 	int GetLevelNumber();
 	void SetLevel(int Level);
 	bool LevelComplete();

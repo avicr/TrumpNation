@@ -3,6 +3,13 @@
 
 #include "../inc/Sprite.h"
 
+enum ePlayerState
+{
+	StateWaiting = 0,
+	StatePlaying,
+	StateDying,
+	StateDead
+};
 class TrumpPlayerSprite : public Sprite
 {
 public:
@@ -16,14 +23,16 @@ public:
 	int GetNumLives();
 	void SetNumLives(int Amount);
 	void TakeDamage();
-	bool GetDying();
+	void Reset();
+	ePlayerState GetPlayerState();
 
 protected:
+	ePlayerState PlayerState;
+	double DyingCountDown;
 	int NumLives;
 	int Score;
 	bool bPlayingStepFX;
 	bool bHasWall;
-	bool bDying;
 	SDL_Joystick *Joy;
 
 	void HandleInput(double DeltaTime);

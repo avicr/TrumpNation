@@ -79,7 +79,7 @@ void GameLoop()
 
 	while (!bGameComplete)
 	{
-		ThePlayer->SetPosition(445, 340);
+		ThePlayer->Reset();
 		Items.push_back(new BrickItem(470, 570));
 		SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
 		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4));
@@ -88,7 +88,7 @@ void GameLoop()
 		double DeltaTime;
 		bool bDone = false;
 
-		while (!bGameComplete && !TheGame->LevelComplete())
+		while (!bGameComplete && !bDone)
 		{
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
 			{
@@ -98,15 +98,20 @@ void GameLoop()
 
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A])
 			{
-				TheGame->IncreaseLevel();
+				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
 				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A]) { SDL_PollEvent(&TheEvent); }
 			}
 
 			StartTime = CurrentTime;
 			CurrentTime = SDL_GetPerformanceCounter();
 			DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
-
 			Tick(DeltaTime * (double)0.001);
+
+			if (TheGame->LevelComplete() || ThePlayer->GetPlayerState() == StateDead)
+			{
+				bDone = true;
+			}
+
 			Render();
 
 			//Handle events on queue
@@ -119,7 +124,11 @@ void GameLoop()
 				}
 			}
 		}
-		TheGame->IncreaseLevel();
+		
+		if (ThePlayer->GetNumLives() < 0)
+		{
+			bGameComplete = true;
+		}
 		Mexicans.DeleteAll();
 		Items.DeleteAll();
 	}
@@ -142,7 +151,7 @@ void Tick(double DeltaTime)
 
 	ThePlayer->Tick(DeltaTime);
 
-	if (!ThePlayer->GetDying())
+	if (ThePlayer->GetPlayerState() != StateDead && ThePlayer->GetPlayerState() != StateDying)
 	{
 		Mexicans.Tick(DeltaTime);
 		Items.Tick(DeltaTime);
