@@ -8,6 +8,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	SetWidth(80);
 	SetHeight(80);
 
+	NumLives = 3;
 	MoveRate = 444;
 	MaxVelocity = 333;
 	TransitionSpeed = 7;
@@ -158,4 +159,19 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 			}
 		}
 	}
+}
+
+int TrumpPlayerSprite::GetNumLives()
+{
+	return NumLives;
+}
+
+void TrumpPlayerSprite::SetNumLives(int Amount)
+{
+	NumLives = Amount;
+}
+
+void TrumpPlayerSprite::TakeDamage()
+{
+
 }

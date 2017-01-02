@@ -242,11 +242,10 @@ void Mexican1Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
 	SDL_Rect CollisionRect = GetCollisionRect();
 	if (SDL_IntersectRect(&TrumpCollision, &CollisionRect, &ResultRect))
 	{
-		Interact(OtherSprite);
+		OtherSprite->TakeDamage();
 	}
 }
 
 void Mexican1Sprite::Interact(TrumpPlayerSprite *OtherSprite)
 {
-	exit(1);
 }

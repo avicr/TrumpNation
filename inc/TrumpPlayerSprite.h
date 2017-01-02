@@ -13,8 +13,12 @@ public:
 	void SetHasWall(bool bInHasWall);
 	void AddToScore(int Amount);
 	int GetScore();
+	int GetNumLives();
+	void SetNumLives(int Amount);
+	void TakeDamage();
 
 protected:
+	int NumLives;
 	int Score;
 	bool bPlayingStepFX;
 	bool bHasWall;
