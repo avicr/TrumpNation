@@ -1,6 +1,7 @@
 #include "../inc/TrumpPlayerSprite.h"
 #include "../inc/Mexican1Sprite.h"
 #include "../inc/ItemSprite.h"
+#include "../inc/SpriteList.h"
 
 TrumpPlayerSprite::TrumpPlayerSprite()
 {
@@ -10,8 +11,10 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	MoveRate = 444;
 	MaxVelocity = 333;
 	TransitionSpeed = 7;
+	
 	StopSpeed = 16;
 
+	Score = 0;
 	PosX = 445;
 	PosY = 340;
 	Joy = SDL_JoystickOpen(0);
@@ -67,6 +70,16 @@ SDL_Rect TrumpPlayerSprite::GetCollisionRect()
 void TrumpPlayerSprite::SetHasWall(bool bInHasWall)
 {
 	bHasWall = bInHasWall;
+}
+
+void TrumpPlayerSprite::AddToScore(int Amount)
+{
+	Score += Amount;
+}
+
+int TrumpPlayerSprite::GetScore()
+{
+	return Score;
 }
 
 void TrumpPlayerSprite::HandleInput(double DeltaTime)
@@ -127,11 +140,12 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		{
 			int WallIndex = (int)round(PosX / 128);
 
-			if (!WallArray[WallIndex * 2])
+			if (!TheGame->WallArray[WallIndex * 2])
 			{
+				Score += 1500;
 				Mix_PlayChannel(-1, PlaceWallFX, 0);
-				WallArray[WallIndex * 2] = true;
-				WallArray[WallIndex * 2 + 1] = true;
+				TheGame->WallArray[WallIndex * 2] = true;
+				TheGame->WallArray[WallIndex * 2 + 1] = true;
 
 				bHasWall = false;
 				Items.push_back(new BrickItem(rand() % 1024 - 32, (rand() % (200) + HORIZON + 65)));

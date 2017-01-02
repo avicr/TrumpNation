@@ -209,3 +209,8 @@ bool Sprite::GetPendingDelete()
 {
 	return bPendingDelete;
 }
+
+void Sprite::Delete()
+{
+	bPendingDelete = true;
+}

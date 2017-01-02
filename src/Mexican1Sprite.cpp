@@ -35,7 +35,7 @@ Mexican1Sprite::Mexican1Sprite()
 		bGood = false;
 
 		WallIndex = (int)round(PosX / 64);
-		if (WallArray[WallIndex])
+		if (TheGame->WallArray[WallIndex])
 		{
 			CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
 			bClimbingWall = true;			
@@ -53,7 +53,7 @@ Mexican1Sprite::Mexican1Sprite()
 				bGood = true;
 			}
 			// If we are partially covered by the first wall, and there is a second wall next to it, we are fully covered and good
-			else if ((WallIndex < 15 && WallArray[WallIndex + 1]))
+			else if ((WallIndex < 15 && TheGame->WallArray[WallIndex + 1]))
 			{
 				bGood = true;
 			}
@@ -63,7 +63,7 @@ Mexican1Sprite::Mexican1Sprite()
 			}
 		}
 		// Not covered by first wall index, but are by second wall index
-		else if (WallIndex < 15 && WallArray[WallIndex + 1])
+		else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
 		{
 			CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };			
 			WallRect = { (WallIndex+1) * 64, WALL_TOP, 64, 160 };
@@ -124,7 +124,7 @@ void Mexican1Sprite::HandleWallPlaced(int WallIndex)
 	{
 		bPendingDelete = true;
 	}
-	else if (WallIndex < 15 && WallArray[WallIndex + 1])
+	else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
 	{
 		CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 40, Rect.h };
 		WallRect = { (WallIndex + 1) * 64, WALL_TOP, 64, 160 };

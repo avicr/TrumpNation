@@ -11,21 +11,21 @@
 #include "../inc/TrumpPlayerSprite.h"
 #include "../inc/Mexican1Sprite.h"
 #include "../inc/ItemSprite.h"
+#include "../inc/SpriteList.h"
 
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
-TrumpPlayerSprite *TestSprite;
 Uint64 TickFreq;
-vector <Mexican1Sprite*> Mexicans;
-vector <ItemSprite *> Items;
-bool WallArray[16];
+SpriteList Items;
+SpriteList Mexicans;
 Mix_Chunk *PickUpItemFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
 Mix_Chunk *StepFX = NULL;
 Mix_Music *TitleMusic = NULL;
-
+Game *TheGame;
+TrumpPlayerSprite *ThePlayer;
 
 void GameLoop();
 void DoTitleScreen();
@@ -33,6 +33,7 @@ void Tick(double DeltaTime);
 void Render();
 void InitSDL();
 void CleanUp();
+void DrawHUD(SDL_Renderer *Renderer);
 
 int main(int argc, char ** argv)
 {
@@ -68,100 +69,80 @@ void CleanUp()
 
 void GameLoop()
 {
-	bool bDone = false;
 	SDL_Event TheEvent;
 	TickFreq = SDL_GetPerformanceFrequency();
+	bool bGameComplete = false;
+	ThePlayer = new TrumpPlayerSprite();
+	ThePlayer->PlayAnimation(ResourceManager::TrumpAnimation);
+	TheGame = new Game();
+	TheGame->SetLevel(1);
 
-	TestSprite = new TrumpPlayerSprite();
-	TestSprite->PlayAnimation(ResourceManager::TrumpAnimation);
-
-	Items.push_back(new BrickItem(470, 570));
-	SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
-
-	memset(WallArray, 0, sizeof(WallArray));
-	WallArray[0] = false;
-	WallArray[1] = false;
-	WallArray[2] = false;
-	WallArray[3] = false;
-	WallArray[4] = false;
-	WallArray[5] = false;
-	WallArray[6] = false;
-	WallArray[7] = false;
-	WallArray[8] = false;
-	WallArray[9] = false;
-	WallArray[10] = false;
-	WallArray[11] = false;
-	WallArray[12] = false;
-	WallArray[13] = false;
-	WallArray[14] = false;
-	WallArray[15] = false;
-	
-	Uint64 StartTime = SDL_GetPerformanceCounter();
-	Uint64 CurrentTime = SDL_GetPerformanceCounter();
-	double DeltaTime;
-	while (!bDone)
+	while (!bGameComplete)
 	{
-		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
-		{
-			bDone = true;
-		}
-		StartTime = CurrentTime;
-		CurrentTime = SDL_GetPerformanceCounter();
-		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+		ThePlayer->SetPosition(445, 340);
+		Items.push_back(new BrickItem(470, 570));
+		SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
+		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4));
+		Uint64 StartTime = SDL_GetPerformanceCounter();
+		Uint64 CurrentTime = SDL_GetPerformanceCounter();
+		double DeltaTime;
+		bool bDone = false;
 
-		
-		Tick(DeltaTime * (double)0.001);
-		Render();	
-		//Handle events on queue
-		while (SDL_PollEvent(&TheEvent) != 0)
+		while (!bGameComplete && !TheGame->LevelComplete())
 		{
-			//User requests quit
-			if (TheEvent.type == SDL_QUIT)
+			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
 			{
-				bDone = true;
+				bGameComplete = true;
+				
+			}
+
+			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A])
+			{
+				TheGame->IncreaseLevel();
+				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A]) { SDL_PollEvent(&TheEvent); }
+			}
+
+			StartTime = CurrentTime;
+			CurrentTime = SDL_GetPerformanceCounter();
+			DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+
+			Tick(DeltaTime * (double)0.001);
+			Render();
+
+			//Handle events on queue
+			while (SDL_PollEvent(&TheEvent) != 0)
+			{
+				//User requests quit
+				if (TheEvent.type == SDL_QUIT)
+				{
+					bGameComplete = true;
+				}
 			}
 		}
+		TheGame->IncreaseLevel();
+		Mexicans.DeleteAll();
+		Items.DeleteAll();
 	}
+	delete ThePlayer;
+	delete TheGame;
+	ThePlayer = NULL;
+	TheGame = NULL;
 }
 
 void Tick(double DeltaTime)
 {	
-	static double SpawnCountdown = 0.25;// 0.15;
+	static double SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
 	SpawnCountdown -= DeltaTime;
 
 	if (SpawnCountdown <= 0)
 	{
 		Mexicans.push_back(new Mexican1Sprite());
-		SpawnCountdown = 0.25;// 0.15;
+		SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
 	}
 
-	TestSprite->Tick(DeltaTime);
-	
-	for (int i = Mexicans.size() - 1; i >= 0; i--)
-	{
-		Mexicans[i]->Tick(DeltaTime);
-		Mexicans[i]->CheckCollision(TestSprite);
-
-		if (Mexicans[i]->GetPendingDelete())
-		{
-			delete Mexicans[i];
-			Mexicans.erase(Mexicans.begin() + i);
-			i--;
-		}
-	}
-
-	for (int i = Items.size() - 1; i >= 0; i--)
-	{
-		Items[i]->Tick(DeltaTime);
-		Items[i]->CheckCollision(TestSprite);
-
-		if (Items[i]->GetPendingDelete())
-		{
-			delete Items[i];
-			Items.erase(Items.begin() + i);
-			i--;
-		}
-	}
+	ThePlayer->Tick(DeltaTime);
+	Mexicans.Tick(DeltaTime);
+	Items.Tick(DeltaTime);
 }
 
 void Render()
@@ -184,29 +165,17 @@ void Render()
 		Rect.w = 64;
 		Rect.h = 160;
 
-		if (WallArray[WallIndex])
+		if (TheGame->WallArray[WallIndex])
 		{
 			SDL_RenderCopy(GRenderer, ResourceManager::WallTexture->Texture, NULL, &Rect);
 		}
 	}
 
-	for (int i = Items.size() - 1; i >= 0; i--)
-	{
-		Items[i]->Render(GRenderer);
-	}
+	Items.Render(GRenderer);
+	Mexicans.Render(GRenderer);
 
-	for (int i = Mexicans.size() - 1; i >= 0; i--)
-	{
-		Mexicans[i]->Render(GRenderer);
-		/*SDL_Rect CollisionRect = Mexicans[i]->GetCollisionRect();
-		SDL_SetRenderDrawColor(GRenderer, 255, 0, 0, 255);
-		SDL_RenderDrawRect(GRenderer, &CollisionRect);*/
-	}
-
-	TestSprite->Render(GRenderer);
-
-	SDL_Rect HUDRect = { 0, 0, 1024, 86 };
-	SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
+	ThePlayer->Render(GRenderer);
+	DrawHUD(GRenderer);
 	SDL_RenderPresent(GRenderer);
 
 }
@@ -294,4 +263,23 @@ SDL_Renderer *GetRenderer()
 	}
 
 	return GRenderer;
+}
+
+void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer)
+{
+	for (int i = 0; i < Text.size(); i++)
+	{
+		SDL_Rect SrcRect = { Text.at(i) % 16 * 32, Text.at(i) / 16 * 32, 32, 32 };
+		SDL_Rect DstRect = { X + i * SizeX, Y, SizeX, SizeY };
+		SDL_RenderCopy(Renderer, ResourceManager::FontTexture->Texture, &SrcRect, &DstRect);
+
+	}
+}
+
+void DrawHUD(SDL_Renderer *Renderer)
+{
+	SDL_Rect HUDRect = { 0, 0, 1024, 86 };
+	SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
+	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 30, 32, 32, Renderer);
+	DrawText(std::to_string(ThePlayer->GetScore()), 918, 15, 18, 32, Renderer);
 }

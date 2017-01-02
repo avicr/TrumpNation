@@ -58,16 +58,18 @@ public:
 	virtual void CheckCollision(class TrumpPlayerSprite *OtherSprite);
 	virtual void Interact(class TrumpPlayerSprite *OtherSprite);
 	virtual SDL_Rect GetCollisionRect();
+	virtual void HandleWallPlaced(int WallIndex) {};
 	void SetTexture(SDL_Texture* Texture);
 	void SetPosition(int NewX, int NewY);
 	void SetWidth(int NewWidth);
 	void SetHeight(int NewHeight);
-	void Render(SDL_Renderer* Renderer);
+	virtual void Render(SDL_Renderer* Renderer);
 	void PlayAnimation(AnimationResource *Anim);
 	void SetAnimationPlayRate(double Rate);
 	void UpdateAnimationData();
 	void StopAnimation();
 	bool GetPendingDelete();
+	void Delete();
 };
 
 #endif

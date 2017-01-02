@@ -9,23 +9,27 @@
 #include "SDL2/SDL_mixer.h"
 #endif
 
+#include "../inc/Game.h"
 #include <vector>
 #define TEXTURE_PATH "resource/textures/"
 #define HORIZON 264
 #define WALL_TOP HORIZON - 104
+#define MEXICAN_SPAWN_RATE 0.25
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;
 extern SDL_Renderer * GRenderer;
 extern bool bSDLInitialized;
-extern bool WallArray[16];
-extern std::vector <class Mexican1Sprite*> Mexicans;
-extern std::vector <class ItemSprite*> Items;
+extern class SpriteList Mexicans;
+extern class SpriteList Items;
+extern class TrumpPlayerSprite *ThePlayer;
+
 
 extern Mix_Chunk *PickUpItemFX;
 extern Mix_Chunk *PlaceWallFX;
 extern Mix_Chunk *StepFX;
 extern Mix_Music *TitleMusic;
+extern Game *TheGame;
 
 
 SDL_Renderer *GetRenderer();
