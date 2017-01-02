@@ -215,7 +215,7 @@ void DoTitleScreen()
 {
 	bool bDone = false;
 	SDL_Event TheEvent;
-	TitleMusic = Mix_LoadMUS("resource/sounds/title.wav");
+	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
 	Mix_PlayMusic(TitleMusic, -1);
 	Sprite *TrumpIntroSprite = new Sprite();
 	TrumpIntroSprite->SetPosition(445, 300);
@@ -268,7 +268,7 @@ void InitSDL()
 	if (!bSDLInitialized)
 	{
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
-		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 4, 1024) == -1)
+		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
 		{
 
 		}
