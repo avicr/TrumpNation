@@ -16,12 +16,14 @@ public:
 	int GetNumLives();
 	void SetNumLives(int Amount);
 	void TakeDamage();
+	bool GetDying();
 
 protected:
 	int NumLives;
 	int Score;
 	bool bPlayingStepFX;
 	bool bHasWall;
+	bool bDying;
 	SDL_Joystick *Joy;
 
 	void HandleInput(double DeltaTime);

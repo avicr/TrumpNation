@@ -4,6 +4,7 @@ SDL_Texture *ResourceManager::SpaceShipTexture;
 vector <AssetResource*> ResourceManager::AllResources;
 
 INIT_TEXTURE_RESOURCE(TrumpSpriteSheet)
+INIT_TEXTURE_RESOURCE(TrumpDamageSpriteSheet)
 INIT_TEXTURE_RESOURCE(TrumpIntroSpriteSheet)
 INIT_TEXTURE_RESOURCE(Mexican1SpriteSheet)
 INIT_TEXTURE_RESOURCE(BackgroundTexture)
@@ -17,6 +18,7 @@ INIT_TEXTURE_RESOURCE(FontTexture);
 INIT_ANIMATION_RESOURCE(TrumpAnimation)
 INIT_ANIMATION_RESOURCE(TrumpIntroAnimation)
 INIT_ANIMATION_RESOURCE(Mexican1Animation)
+INIT_ANIMATION_RESOURCE(TrumpDamageAnimation)
 
 ResourceManager::ResourceManager()
 {

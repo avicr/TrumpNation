@@ -15,6 +15,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	
 	StopSpeed = 16;
 
+	bDying = false;
 	Score = 0;
 	PosX = 445;
 	PosY = 340;
@@ -46,18 +47,26 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 	{
 		PosY = 600 - Rect.h;
 	}
-
-	if (abs(VelX) <= StopSpeed * 2 && abs(VelY) <= StopSpeed * 2)
-	{
-		AnimData.CurrentFrameIndex = 0;
-		UpdateAnimationData();
-	}
+	
 }
 
 void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 {
-	double Magnitude = sqrt(VelX * VelX + VelY * VelY);
-	SetAnimationPlayRate(Magnitude / MaxVelocity * 1.65);
+	if (!bDying)
+	{
+		double Magnitude = sqrt(VelX * VelX + VelY * VelY);
+		SetAnimationPlayRate(Magnitude / MaxVelocity * 1.65);
+
+		if (abs(VelX) <= StopSpeed * 2 && abs(VelY) <= StopSpeed * 2)
+		{
+			AnimData.CurrentFrameIndex = 0;
+			UpdateAnimationData();
+		}
+	}
+	else
+	{
+		SetAnimationPlayRate(1);
+	}
 
 	Sprite::TickAnimation(DeltaTime);
 }
@@ -85,6 +94,15 @@ int TrumpPlayerSprite::GetScore()
 
 void TrumpPlayerSprite::HandleInput(double DeltaTime)
 {
+	if (bDying)
+	{		
+		Mix_HaltChannel(0);
+		bPlayingStepFX = false;
+		VelX = 0;
+		VelY = 0;
+		return;
+	}
+
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	SDL_JoystickUpdate();
 	MovingFlags = MOVING_NONE;
@@ -125,14 +143,12 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	if (bPlayerMoving && !bPlayingStepFX)
 	{
 		Mix_PlayChannel(0, StepFX, -1);
-		bPlayingStepFX = true;
-		SDL_Log("PLAYING OMG");
+		bPlayingStepFX = true;		
 	}
 	else if (!bPlayerMoving && bPlayingStepFX)
 	{
 		Mix_HaltChannel(0);
 		bPlayingStepFX = false;
-		SDL_Log("STOPING OMG");
 	}
 
 	if (bHasWall && (state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
@@ -173,5 +189,11 @@ void TrumpPlayerSprite::SetNumLives(int Amount)
 
 void TrumpPlayerSprite::TakeDamage()
 {
+	bDying = true;
+	PlayAnimation(ResourceManager::TrumpDamageAnimation);
+}
 
+bool TrumpPlayerSprite::GetDying()
+{
+	return bDying;
 }

@@ -141,8 +141,12 @@ void Tick(double DeltaTime)
 	}
 
 	ThePlayer->Tick(DeltaTime);
-	Mexicans.Tick(DeltaTime);
-	Items.Tick(DeltaTime);
+
+	if (!ThePlayer->GetDying())
+	{
+		Mexicans.Tick(DeltaTime);
+		Items.Tick(DeltaTime);
+	}
 }
 
 void Render()
