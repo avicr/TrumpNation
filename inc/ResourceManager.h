@@ -90,7 +90,7 @@ public:
 			int SpriteHeight = 128;
 			SDL_Rect SrcRect = { i % 4 * SpriteWidth, i / 4 * SpriteHeight, SpriteWidth, SpriteHeight };
 
-			Frames.push_back(new Frame(ResourceManager::TrumpIntroSpriteSheet->Texture, SrcRect, 0.05));
+			Frames.push_back(new Frame(ResourceManager::TrumpIntroSpriteSheet->Texture, SrcRect, 0.03));
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(TrumpIntroAnimation)
