@@ -100,6 +100,13 @@ Mexican1Sprite::Mexican1Sprite()
 
 	if (bBehindWall)
 	{
+		if (rand() % 4 != 0)
+		{
+			bPendingDelete = true;
+			SDL_Log("Abort spawn");
+			return;
+		}
+
 		bClimbingWall = true;
 		MoveRate = 333;
 		//PosX = WallIndex * 64;

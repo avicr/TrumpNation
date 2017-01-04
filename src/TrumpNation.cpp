@@ -1,9 +1,11 @@
 #ifdef _WIN32
 	#include <SDL.h>
 	#include <SDL_mixer.h>
+	#include <SDL_ttf.h>
 #else
 	#include "SDL2/SDL.h"
 	#include "SDL2/SDL_mixer.h"
+	#include "SDL2/SDL_ttf.h"
 #endif
 
 #include "../inc/ResourceManager.h"
@@ -12,6 +14,13 @@
 #include "../inc/Mexican1Sprite.h"
 #include "../inc/ItemSprite.h"
 #include "../inc/SpriteList.h"
+
+struct Glyph
+{
+	int Width;
+	int Height;
+	SDL_Texture *Texture;
+};
 
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
@@ -26,6 +35,8 @@ Mix_Chunk *StepFX = NULL;
 Mix_Music *TitleMusic = NULL;
 Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
+Glyph Numerals36[10];
+Glyph Numerals20[10];
 
 void GameLoop();
 void DoTitleScreen();
@@ -34,6 +45,7 @@ void Render();
 void InitSDL();
 void CleanUp();
 void DrawHUD(SDL_Renderer *Renderer);
+void LoadNumerals(string FontName, int Point, Glyph Glyphs[10]);
 
 int main(int argc, char ** argv)
 {
@@ -61,7 +73,15 @@ void CleanUp()
 	Mix_FreeChunk(PlaceWallFX);
 	Mix_FreeChunk(PickUpItemFX);	
 	Mix_FreeChunk(StepFX);
-	
+
+	for (int i = 0; i < 10; i++)
+	{
+		SDL_DestroyTexture(Numerals20[i].Texture);
+		SDL_DestroyTexture(Numerals36[i].Texture);
+	}
+
+	TTF_Quit();
+
 	SDL_DestroyRenderer(GRenderer);
 	SDL_DestroyWindow(GWindow);
 	SDL_Quit();
@@ -250,6 +270,8 @@ void InitSDL()
 	if (!bSDLInitialized)
 	{
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
+		TTF_Init();
+		
 		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
 		{
 
@@ -264,6 +286,8 @@ void InitSDL()
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		
+		LoadNumerals("resource/fonts/segoeuib.ttf", 36, Numerals36);
+		LoadNumerals("resource/fonts/segoeuib.ttf", 28, Numerals20);
 		bSDLInitialized = true;
 	}
 }
@@ -278,14 +302,18 @@ SDL_Renderer *GetRenderer()
 	return GRenderer;
 }
 
-void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer)
+void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10])
 {
 	for (int i = 0; i < Text.size(); i++)
 	{
-		SDL_Rect SrcRect = { Text.at(i) % 16 * 32, Text.at(i) / 16 * 32, 32, 32 };
-		SDL_Rect DstRect = { X + i * SizeX, Y, SizeX, SizeY };
-		SDL_RenderCopy(Renderer, ResourceManager::FontTexture->Texture, &SrcRect, &DstRect);
+		char CharToRender = Text.at(i) - '0';
+		if (CharToRender >= 0 && CharToRender < 10)
+		{
+			SDL_Rect SrcRect = { 0, 0, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
+			SDL_Rect DstRect = { X + i * Glyphs[CharToRender].Width, Y, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
 
+			SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
+		}
 	}
 }
 
@@ -293,6 +321,26 @@ void DrawHUD(SDL_Renderer *Renderer)
 {
 	SDL_Rect HUDRect = { 0, 0, 1024, 86 };
 	SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
-	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 30, 32, 32, Renderer);
-	DrawText(std::to_string(ThePlayer->GetScore()), 918, 15, 18, 32, Renderer);
+	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, Numerals36);
+	DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, Numerals20);
+	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, Numerals20);
+}
+
+void LoadNumerals(string FontName, int Point, Glyph Glyphs[10])
+{
+	SDL_Color Black = { 0, 0, 0, 0 };
+
+	TTF_Font *Font = TTF_OpenFont(FontName.c_str(), Point);
+
+	for (int i = 0; i < 10; i++)
+	{
+		Uint32 OutFormat;
+		int OutAccess;
+		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, '0' + i, Black);
+		Glyphs[i].Texture = SDL_CreateTextureFromSurface(GRenderer, NumeralSurface);
+		SDL_QueryTexture(Glyphs[i].Texture, &OutFormat, &OutAccess, &Glyphs[i].Width, &Glyphs[i].Height);
+		SDL_FreeSurface(NumeralSurface);
+	}
+
+	TTF_CloseFont(Font);
 }

@@ -180,7 +180,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 				TheGame->WallArray[WallIndex * 2 + 1] = true;
 
 				bHasWall = false;
-				Items.push_back(new BrickItem(rand() % 1024 - 32, (rand() % (200) + HORIZON + 65)));
+				Items.push_back(new BrickItem(rand() % 992, (rand() % (200) + HORIZON + 65)));
 
 				for (int i = 0; i < Mexicans.size(); i++)
 				{
