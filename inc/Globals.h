@@ -15,6 +15,7 @@
 #define HORIZON 264
 #define WALL_TOP HORIZON - 104
 #define MEXICAN_SPAWN_RATE 0.25
+#define WALL_PLACE_ZONE 140
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;

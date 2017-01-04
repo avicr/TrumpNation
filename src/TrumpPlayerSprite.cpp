@@ -168,9 +168,9 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 
 	if (bHasWall && (state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
 	{
-		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + 130)
+		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 		{
-			int WallIndex = (int)round(PosX / 128);
+			int WallIndex = (int)round((PosX - Rect.w / 2) / 128);
 
 			if (!TheGame->WallArray[WallIndex * 2])
 			{
@@ -218,4 +218,22 @@ void TrumpPlayerSprite::Reset()
 ePlayerState TrumpPlayerSprite::GetPlayerState()
 {
 	return PlayerState;
+}
+
+void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
+{
+	if (bHasWall && PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
+	{
+		int WallIndex = (int)round((PosX - Rect.w/2) / 128);
+		SDL_Rect DstRect = { WallIndex * 128, WALL_TOP,ResourceManager::WallTexture->SrcRect.w, ResourceManager::WallTexture->SrcRect.h };
+
+		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 64);
+		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);
+		DstRect.x += 64;;
+		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);
+		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 255);
+	}
+
+	Sprite::Render(Renderer);
+
 }

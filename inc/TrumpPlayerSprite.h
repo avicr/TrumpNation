@@ -25,6 +25,7 @@ public:
 	void TakeDamage();
 	void Reset();
 	ePlayerState GetPlayerState();
+	void Render(SDL_Renderer *Renderer);
 
 protected:
 	ePlayerState PlayerState;

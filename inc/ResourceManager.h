@@ -33,6 +33,7 @@ class TextureResource : public AssetResource
 {	
 public:
 	SDL_Texture* Texture;
+	SDL_Rect SrcRect;
 
 public:
 	
@@ -44,6 +45,7 @@ public:
 		SDL_Surface * Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
 		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
 		Texture = SDL_CreateTextureFromSurface(GetRenderer(), Image);
+		SrcRect = { 0, 0, Image->w, Image->h };
 		SDL_FreeSurface(Image);
 		AddReferenceToManager();
 	}
