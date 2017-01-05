@@ -72,7 +72,7 @@ void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 		double Magnitude = sqrt(VelX * VelX + VelY * VelY);
 		SetAnimationPlayRate(Magnitude / MaxVelocity * 1.65);
 
-		if (abs(VelX) <= StopSpeed * 2 && abs(VelY) <= StopSpeed * 2)
+		if (fabs(VelX) <= StopSpeed * 2 && fabs(VelY) <= StopSpeed * 2)
 		{
 			AnimData.CurrentFrameIndex = 0;
 			UpdateAnimationData();

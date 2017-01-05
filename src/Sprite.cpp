@@ -45,7 +45,7 @@ void Sprite::Tick(double DeltaTime)
 	{
 		VelX = VelX * (1 - DeltaTime * TransitionSpeed) + MaxVelocity * (DeltaTime * TransitionSpeed);
 
-		if (abs(VelX) > MaxVelocity * 0.350)
+		if (fabs(VelX) > MaxVelocity * 0.350)
 		{
 			Flip = SDL_FLIP_NONE;
 		}
@@ -54,7 +54,7 @@ void Sprite::Tick(double DeltaTime)
 	{
 		VelX = VelX * (1 - DeltaTime * TransitionSpeed) + -MaxVelocity * (DeltaTime * TransitionSpeed);
 
-		if (abs(VelX) > MaxVelocity * 0.350)
+		if (fabs(VelX) > MaxVelocity * 0.350)
 		{
 			Flip = SDL_FLIP_HORIZONTAL;
 		}
@@ -64,12 +64,12 @@ void Sprite::Tick(double DeltaTime)
 		VelX = VelX * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);
 	}
 
-	if (abs(VelX) > MaxVelocity)
+	if (fabs(VelX) > MaxVelocity)
 	{
 		VelX = MaxVelocity;
 	}
 
-	if (abs(VelY) > MaxVelocity)
+	if (fabs(VelY) > MaxVelocity)
 	{
 		VelY = MaxVelocity;
 	}
