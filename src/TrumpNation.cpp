@@ -45,7 +45,7 @@ void Render();
 void InitSDL();
 void CleanUp();
 void DrawHUD(SDL_Renderer *Renderer);
-void LoadNumerals(string FontName, int Point, Glyph Glyphs[10]);
+void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10]);
 
 int main(int argc, char ** argv)
 {
@@ -328,17 +328,19 @@ void DrawHUD(SDL_Renderer *Renderer)
 	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, Numerals20);
 }
 
-void LoadNumerals(string FontName, int Point, Glyph Glyphs[10])
+void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10])
 {
 	SDL_Color Black = { 0, 0, 0, 0 };
-
-	TTF_Font *Font = TTF_OpenFont(FontName.c_str(), Point);
-
+	SDL_Log("Before open font");
+	TTF_Font *Font = TTF_OpenFont(FontName, Point);
+	SDL_Log("After open font");
 	for (int i = 0; i < 10; i++)
 	{
 		Uint32 OutFormat;
 		int OutAccess;
+SDL_Log("Before render glyph %s, %d", FontName, Font);
 		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, '0' + i, Black);
+SDL_Log("After render glypth");
 		Glyphs[i].Texture = SDL_CreateTextureFromSurface(GRenderer, NumeralSurface);
 		SDL_QueryTexture(Glyphs[i].Texture, &OutFormat, &OutAccess, &Glyphs[i].Width, &Glyphs[i].Height);
 		SDL_FreeSurface(NumeralSurface);
