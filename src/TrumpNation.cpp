@@ -137,6 +137,7 @@ void GameLoop()
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
+				SDL_Log("Event Type: %d", TheEvent.type);
 				if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
 				{
 					ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
