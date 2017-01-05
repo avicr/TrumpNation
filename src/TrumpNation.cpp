@@ -37,6 +37,10 @@ Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
 Glyph Numerals36[10];
 Glyph Numerals20[10];
+SDL_Texture *BackBuffer;
+int WindowWidth;
+int WindowHeight;
+
 
 void GameLoop();
 void DoTitleScreen();
@@ -46,6 +50,7 @@ void InitSDL();
 void CleanUp();
 void DrawHUD(SDL_Renderer *Renderer);
 void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10]);
+void PresentBackBuffer();
 
 int main(int argc, char ** argv)
 {
@@ -214,8 +219,7 @@ void Render()
 
 	ThePlayer->Render(GRenderer);
 	DrawHUD(GRenderer);
-	SDL_RenderPresent(GRenderer);
-
+	PresentBackBuffer();
 }
 
 void DoTitleScreen()
@@ -235,7 +239,7 @@ void DoTitleScreen()
 	double DeltaTime;
 	while (!bDone)
 	{
-		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_RETURN])
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_RETURN] || SDL_GetKeyboardState(NULL)[SDL_SCANCODE_SPACE])
 		{
 			bDone = true;
 		}
@@ -249,7 +253,7 @@ void DoTitleScreen()
 		SDL_Rect TitleRect = { 0, 0, 1024, 600 };
 		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, &TitleRect, &TitleRect);
 		TrumpIntroSprite->Render(GRenderer);
-		SDL_RenderPresent(GRenderer);
+		PresentBackBuffer();
 
 		while (SDL_PollEvent(&TheEvent) != 0)
 		{
@@ -289,8 +293,11 @@ void InitSDL()
 			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
+		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
+		SDL_SetRenderTarget(GRenderer, BackBuffer);
 		SDL_Log("After create window");
 		LoadNumerals("resource/fonts/segoeuib.ttf", 36, Numerals36);
 		LoadNumerals("resource/fonts/segoeuib.ttf", 28, Numerals20);
@@ -350,4 +357,14 @@ void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10])
 	}
 
 	TTF_CloseFont(Font);
+}
+
+void PresentBackBuffer()
+{
+	SDL_SetRenderTarget(GRenderer, NULL);
+	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+	SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 512, WindowHeight / 2 - 300, 1024, 600 };
+	SDL_RenderCopy(GRenderer, BackBuffer, &BackBufferRect, &BackBufferDstRect);
+	SDL_RenderPresent(GRenderer);
+	SDL_SetRenderTarget(GRenderer, BackBuffer);
 }
