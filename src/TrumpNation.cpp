@@ -137,6 +137,10 @@ void GameLoop()
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
+				if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
+				{
+					ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
+				}
 				//User requests quit
 				if (TheEvent.type == SDL_QUIT)
 				{
@@ -330,17 +334,15 @@ void DrawHUD(SDL_Renderer *Renderer)
 
 void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10])
 {
-	SDL_Color Black = { 0, 0, 0, 0 };
-	SDL_Log("Before open font");
+	SDL_Color Black = { 0, 0, 0, 0 };	
 	TTF_Font *Font = TTF_OpenFont(FontName, Point);
-	SDL_Log("After open font");
+	
 	for (int i = 0; i < 10; i++)
 	{
 		Uint32 OutFormat;
 		int OutAccess;
-SDL_Log("Before render glyph %s, %d", FontName, Font);
+
 		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, '0' + i, Black);
-SDL_Log("After render glypth");
 		Glyphs[i].Texture = SDL_CreateTextureFromSurface(GRenderer, NumeralSurface);
 		SDL_QueryTexture(Glyphs[i].Texture, &OutFormat, &OutAccess, &Glyphs[i].Width, &Glyphs[i].Height);
 		SDL_FreeSurface(NumeralSurface);
