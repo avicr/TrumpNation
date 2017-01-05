@@ -270,8 +270,9 @@ void InitSDL()
 	if (!bSDLInitialized)
 	{
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
+		SDL_Log("SDL INIT");
 		TTF_Init();
-		
+		SDL_Log("After TTF INIT");
 		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
 		{
 
@@ -285,9 +286,10 @@ void InitSDL()
 
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
-		
+		SDL_Log("After create window");
 		LoadNumerals("resource/fonts/segoeuib.ttf", 36, Numerals36);
 		LoadNumerals("resource/fonts/segoeuib.ttf", 28, Numerals20);
+		SDL_Log("After load numerals");
 		bSDLInitialized = true;
 	}
 }
