@@ -58,7 +58,7 @@ public:
 	virtual void CheckCollision(class TrumpPlayerSprite *OtherSprite);
 	virtual void Interact(class TrumpPlayerSprite *OtherSprite);
 	virtual SDL_Rect GetCollisionRect();
-	virtual void HandleWallPlaced(int WallIndex) {};
+	virtual bool HandleWallPlaced(int WallIndex) { return false; };
 	void SetTexture(SDL_Texture* Texture);
 	void SetPosition(int NewX, int NewY);
 	void SetWidth(int NewWidth);

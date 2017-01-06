@@ -21,7 +21,7 @@ Mexican1Sprite::Mexican1Sprite()
 	PosY = HORIZON;	
 	VelX = 0;
 	VelY = 0;
-	Growth = 0.1;
+	Growth = 0;
 	
 
 	do
@@ -113,31 +113,47 @@ Mexican1Sprite::Mexican1Sprite()
 	}
 
 	MovingFlags = 0;
-	PlayAnimation(ResourceManager::Mexican1Animation);
+	if (!bSwapSprites)
+	{
+		PlayAnimation(ResourceManager::Mexican1Animation);
+	}
+	else
+	{
+		PlayAnimation(ResourceManager::TrumpAnimation);
+	}
+	
 }
 
-void Mexican1Sprite::HandleWallPlaced(int WallIndex)
+bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
 {
-	SDL_Rect CollisionRect = { Rect.x + 13, Rect.y - 22, 15, 90 };
+	SDL_Rect CollisionRect = { Rect.x + 18, Rect.y - 22, 30, 90 };
 	SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
 	SDL_Rect ResultRect;
 
-	if (PosY > WALL_TOP + 100)
+	/*if (PosY > WALL_TOP + 100)
 	{
 		return;
+	}*/
+
+	if (bPendingDelete)
+	{
+		return false;
 	}
 
 	if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
 	{
 		bPendingDelete = true;
+
+		return true;
 	}
 	else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
 	{
-		CollisionRect = { Rect.x + 13, Rect.y - 22, 15, 90 };
+		CollisionRect = { Rect.x + 18, Rect.y - 22, 30, 90 };
 		WallRect = { (WallIndex + 1) * 64, WALL_TOP, 64, 160 };
 		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
 		{
 			bPendingDelete = true;
+			return true;
 		}
 	}
 	else
@@ -150,6 +166,8 @@ void Mexican1Sprite::HandleWallPlaced(int WallIndex)
 			bPendingDelete = true;
 		}*/
 	}
+
+	return false;
 }
 
 SDL_Rect Mexican1Sprite::GetCollisionRect()

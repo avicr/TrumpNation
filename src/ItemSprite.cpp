@@ -1,20 +1,46 @@
 #include "../inc/ItemSprite.h"
 
-void ItemSprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
-{
-	SDL_Rect TrumpCollision = OtherSprite->GetCollisionRect();
-	SDL_Rect ResultRect;
+ItemSprite::ItemSprite(SDL_Texture *InTexture)
+{	
+	SetTexture(InTexture);
+	RandomizePosition();	
+}
 
-	if (SDL_IntersectRect(&TrumpCollision, &Rect, &ResultRect))
+ItemSprite::ItemSprite(int X, int Y) :
+	ItemSprite(NULL)
+{
+	SetPosition(X, Y);	
+}
+
+void ItemSprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
+{	
+	if (HitTest(OtherSprite))
 	{
 		Interact(OtherSprite);
 	}
 }
 
-BrickItem::BrickItem(int X, int Y)
+bool ItemSprite::HitTest(TrumpPlayerSprite *OtherSprite)
 {
-	SetPosition(X, Y);
-	SetTexture(ResourceManager::BrickTexture->Texture);
+	SDL_Rect TrumpCollision = OtherSprite->GetCollisionRect();
+	SDL_Rect ResultRect;
+
+	return SDL_IntersectRect(&TrumpCollision, &Rect, &ResultRect);
+}
+
+void ItemSprite::RandomizePosition()
+{
+	do
+	{
+		SetPosition((rand() % (1024 - Rect.w)), (rand() % ((600 - (HORIZON + 65)) - Rect.h)) + (HORIZON) + 65);
+	} while (HitTest(ThePlayer));
+
+	
+}
+
+BrickItem::BrickItem()
+	: ItemSprite(ResourceManager::BrickTexture->Texture)
+{		
 }
 
 void BrickItem::Interact(TrumpPlayerSprite *OtherSprite)

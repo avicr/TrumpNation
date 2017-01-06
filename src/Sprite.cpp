@@ -147,6 +147,8 @@ void Sprite::SetPosition(int NewX, int NewY)
 {
 	PosX = NewX;
 	PosY = NewY;
+	Rect.x = PosX;
+	Rect.y = PosY;
 }
 
 void Sprite::SetWidth(int NewWidth)

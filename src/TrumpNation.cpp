@@ -14,6 +14,8 @@
 #include "../inc/Mexican1Sprite.h"
 #include "../inc/ItemSprite.h"
 #include "../inc/SpriteList.h"
+#include "../inc/SwapItem.h"
+#include "../inc/ScoreSprite.h"
 
 struct Glyph
 {
@@ -37,13 +39,16 @@ Mix_Chunk *TitleConfirmFX = NULL;
 Mix_Chunk *TrumpDieFX = NULL;
 Mix_Music *TitleMusic = NULL;
 Mix_Music *BGMusic = NULL;
+Mix_Music *HatDanceMusic = NULL;
 Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
 Glyph Numerals36[10];
 Glyph Numerals20[10];
+Glyph NumeralsWhite20[10];
 SDL_Texture *BackBuffer;
 int WindowWidth;
 int WindowHeight;
+bool bSwapSprites = false;
 
 
 bool GameLoop();
@@ -53,8 +58,9 @@ void Render();
 void InitSDL();
 void CleanUp();
 void DrawHUD(SDL_Renderer *Renderer);
-void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10]);
+void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10], SDL_Color Color = { 0, 0, 0, 255 });
 void PresentBackBuffer();
+void SpawnRandomItem();
 
 int main(int argc, char ** argv)
 {
@@ -84,6 +90,7 @@ void CleanUp()
 {
 	delete GResourceManager;
 
+	Mix_FreeMusic(HatDanceMusic);
 	Mix_FreeMusic(BGMusic);
 	Mix_FreeChunk(PlaceWallFX);
 	Mix_FreeChunk(PickUpItemFX);	
@@ -121,8 +128,11 @@ bool GameLoop()
 		{
 			Mix_PlayMusic(BGMusic, -1);
 		}
+
 		ThePlayer->Reset();
-		Items.push_back(new BrickItem(470, 570));
+		BrickItem *FirstBrick = new BrickItem();		
+		FirstBrick->SetPosition(470, 570);
+		Items.push_back(FirstBrick);		
 		SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
 		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4));
 		Uint64 StartTime = SDL_GetPerformanceCounter();
@@ -149,8 +159,16 @@ bool GameLoop()
 			DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 			Tick(DeltaTime * (double)0.001);
 
+			// Handle swap item done
+			if (bSwapSprites && !Mix_PlayingMusic())
+			{
+				bSwapSprites = false;
+				TheGame->DoSwap();
+			}
+
 			if (ThePlayer->GetPlayerState() == StateDying && Mix_PlayingMusic())
 			{
+				bSwapSprites = false;
 				Mix_HaltMusic();
 				Mix_PlayChannel(3, TrumpDieFX, 0);
 			}
@@ -165,7 +183,7 @@ bool GameLoop()
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
-				SDL_Log("Event Type: %d", TheEvent.type);
+				//SDL_Log("Event Type: %d", TheEvent.type);
 				if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
 				{
 					ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
@@ -196,12 +214,31 @@ bool GameLoop()
 void Tick(double DeltaTime)
 {	
 	static double SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
+	static double ItemSpawnCountdown = ITEM_RATE;
+	static int ItemChance = ITEM_SPAWN_PERCENT;
+
+	ItemSpawnCountdown -= DeltaTime;
 	SpawnCountdown -= DeltaTime;
 
 	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
-	{
+	{						
 		Mexicans.push_back(new Mexican1Sprite());
 		SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
+	}
+
+	if (ItemSpawnCountdown <= 0)
+	{
+		ItemSpawnCountdown = ITEM_RATE;
+		if (rand() % (100 / ItemChance) == 0)
+		{
+			ItemChance = ITEM_SPAWN_PERCENT;
+			SpawnRandomItem();
+		}
+		else
+		{
+			ItemChance += 4;
+			SDL_Log("Item miss, chance is now: 1 in %d", 100 / ItemChance);
+		}
 	}
 
 	ThePlayer->Tick(DeltaTime);
@@ -246,7 +283,11 @@ void Render()
 			}*/
 		}
 	}
-
+	/*Rect = { 0, HORIZON + 65, 992, 600 - (600-HORIZON) - 21};
+	SDL_SetRenderDrawColor(GRenderer, 255, 0, 0, 100);
+	SDL_RenderFillRect(GRenderer, &Rect);*/
+	
+	//new BrickItem(rand() % 992, (rand() % (200) + HORIZON + 65)));
 	Items.Render(GRenderer);
 	Mexicans.Render(GRenderer);
 
@@ -359,7 +400,7 @@ void InitSDL()
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
@@ -367,10 +408,12 @@ void InitSDL()
 		SDL_Log("After create window");
 		LoadNumerals("resource/fonts/segoeuib.ttf", 36, Numerals36);
 		LoadNumerals("resource/fonts/segoeuib.ttf", 28, Numerals20);
+		LoadNumerals("resource/fonts/segoeuib.ttf", 28, NumeralsWhite20, { 255, 255, 255, 255 });
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
 		SDL_ShowCursor(SDL_DISABLE);
 		BGMusic = Mix_LoadMUS("resource/sounds/BGMusic.ogg");
+		HatDanceMusic = Mix_LoadMUS("resource/sounds/Trumphatdance.ogg");
 	}
 }
 
@@ -384,7 +427,7 @@ SDL_Renderer *GetRenderer()
 	return GRenderer;
 }
 
-void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10])
+void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10], float ScaleX, float ScaleY)
 {
 	for (int i = 0; i < Text.size(); i++)
 	{
@@ -392,7 +435,7 @@ void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Ren
 		if (CharToRender >= 0 && CharToRender < 10)
 		{
 			SDL_Rect SrcRect = { 0, 0, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
-			SDL_Rect DstRect = { X + i * Glyphs[CharToRender].Width, Y, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
+			SDL_Rect DstRect = { X + i * (Glyphs[CharToRender].Width * ScaleX), Y, Glyphs[CharToRender].Width * ScaleX, Glyphs[CharToRender].Height * ScaleY };
 
 			SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
 		}
@@ -408,9 +451,8 @@ void DrawHUD(SDL_Renderer *Renderer)
 	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, Numerals20);
 }
 
-void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10])
-{
-	SDL_Color Black = { 0, 0, 0, 0 };	
+void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10], SDL_Color Color)
+{	
 	TTF_Font *Font = TTF_OpenFont(FontName, Point);
 	
 	for (int i = 0; i < 10; i++)
@@ -418,7 +460,7 @@ void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10])
 		Uint32 OutFormat;
 		int OutAccess;
 
-		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, '0' + i, Black);
+		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, '0' + i, Color);
 		Glyphs[i].Texture = SDL_CreateTextureFromSurface(GRenderer, NumeralSurface);
 		SDL_QueryTexture(Glyphs[i].Texture, &OutFormat, &OutAccess, &Glyphs[i].Width, &Glyphs[i].Height);
 		SDL_FreeSurface(NumeralSurface);
@@ -435,4 +477,10 @@ void PresentBackBuffer()
 	SDL_RenderCopy(GRenderer, BackBuffer, &BackBufferRect, &BackBufferDstRect);
 	SDL_RenderPresent(GRenderer);
 	SDL_SetRenderTarget(GRenderer, BackBuffer);
+}
+
+void SpawnRandomItem()
+{
+	
+	Items.push_back(new SwapItem());
 }

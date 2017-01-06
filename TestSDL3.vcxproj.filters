@@ -50,6 +50,9 @@
     <ClCompile Include="src\SwapItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScoreSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Sprite.h">
@@ -74,6 +77,12 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\SwapItem.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ItemSprite.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ScoreSprite.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

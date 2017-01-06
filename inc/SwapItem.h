@@ -5,6 +5,8 @@
 
 class SwapItem : public ItemSprite
 {
-
+public: 	
+	SwapItem();
+	virtual void Interact(TrumpPlayerSprite *OtherSprite);
 };
 #endif

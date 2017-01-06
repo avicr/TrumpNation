@@ -9,13 +9,21 @@
 #include "SDL2/SDL_mixer.h"
 #endif
 
+
 #include "../inc/Game.h"
 #include <vector>
+#include <string>
 #define TEXTURE_PATH "resource/textures/"
 #define HORIZON 264
 #define WALL_TOP HORIZON - 104
 #define MEXICAN_SPAWN_RATE 0.25
 #define WALL_PLACE_ZONE 140
+#define ITEM_RATE 5;
+#define ITEM_SPAWN_PERCENT 5
+#define SCORE_LIFE_TIME 1
+
+#define PLACE_WALL_SCORE 1500
+#define MEXICAN_BLOCK_SCORE 100
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;
@@ -25,15 +33,21 @@ extern class SpriteList Mexicans;
 extern class SpriteList Items;
 extern class TrumpPlayerSprite *ThePlayer;
 
-
 extern Mix_Chunk *PickUpItemFX;
 extern Mix_Chunk *PlaceWallFX;
 extern Mix_Chunk *StepFX;
+extern Mix_Music *BGMusic;
 extern Mix_Music *TitleMusic;
+extern Mix_Music *HatDanceMusic;
 extern Game *TheGame;
 
 extern bool bFreezeSpawn;
+extern bool bSwapSprites;
 
+extern struct Glyph Numerals36[10];
+extern struct Glyph Numerals20[10];
+extern struct Glyph NumeralsWhite20[10];
 
 SDL_Renderer *GetRenderer();
+extern void DrawText(std::string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, struct Glyph Glyphs[10], float ScaleX = 1, float ScaleY = 1);
 #endif

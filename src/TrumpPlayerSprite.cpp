@@ -2,6 +2,7 @@
 #include "../inc/Mexican1Sprite.h"
 #include "../inc/ItemSprite.h"
 #include "../inc/SpriteList.h"
+#include "../inc/ScoreSprite.h"
 
 TrumpPlayerSprite::TrumpPlayerSprite()
 {
@@ -108,7 +109,7 @@ int TrumpPlayerSprite::GetScore()
 }
 
 void TrumpPlayerSprite::HandleInput(double DeltaTime)
-{
+{	
 	if (PlayerState == StateDying || PlayerState == StateDead)
 	{		
 		Mix_HaltChannel(0);
@@ -168,14 +169,14 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 
 	if (bHasWall && (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
 	{
+		int TotalScore = PLACE_WALL_SCORE;
 		//bFreezeSpawn = true;
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 		{
 			int WallIndex = (int)round((PosX - Rect.w / 2) / 128);
 
 			if (TheGame->WallArray[WallIndex * 2] < 1)
-			{
-				Score += 1500;
+			{				
 				Mix_PlayChannel(-1, PlaceWallFX, 0);
 				TheGame->WallArray[WallIndex * 2]++;
 
@@ -185,14 +186,24 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 				}
 				TheGame->WallArray[WallIndex * 2 + 1] = TheGame->WallArray[WallIndex * 2];
 
-				bHasWall = false;
-				Items.push_back(new BrickItem(rand() % 992, (rand() % (200) + HORIZON + 65)));
+				bHasWall = false;								
+				Items.push_back(new BrickItem());
 
 				for (int i = 0; i < Mexicans.size(); i++)
 				{
-					Mexicans[i]->HandleWallPlaced(WallIndex * 2);
-					Mexicans[i]->HandleWallPlaced(WallIndex * 2 + 1);
+					if (Mexicans[i]->HandleWallPlaced(WallIndex * 2) || Mexicans[i]->HandleWallPlaced(WallIndex * 2 + 1))
+					{
+						TotalScore += MEXICAN_BLOCK_SCORE;
+					}					
 				}
+
+				if (bSwapSprites)
+				{
+					TotalScore *= 2;
+				}
+
+				Mexicans.push_back(new ScoreSprite(WallIndex * 128 + 36, WALL_TOP - 38, TotalScore));
+				Score += TotalScore;
 			}
 		}
 	}
@@ -219,7 +230,14 @@ void TrumpPlayerSprite::Reset()
 	bHasWall = false;
 	SetPosition(445, 340);
 	PlayerState = StatePlaying;
-	PlayAnimation(ResourceManager::TrumpAnimation);
+	if (!bSwapSprites)
+	{
+		PlayAnimation(ResourceManager::TrumpAnimation);
+	}
+	else
+	{
+		PlayAnimation(ResourceManager::Mexican1Animation);
+	}
 }
 
 ePlayerState TrumpPlayerSprite::GetPlayerState()

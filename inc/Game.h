@@ -10,6 +10,7 @@ public:
 	int GetLevelNumber();
 	void SetLevel(int Level);
 	bool LevelComplete();
+	void DoSwap();
 
 	int WallArray[16];
 

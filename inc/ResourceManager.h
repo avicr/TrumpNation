@@ -69,6 +69,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(ShadowTexture, "Shadow.bmp");
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
+	DECLARE_TEXTURE_RESOURCE(HatTexture, "Hat.bmp");
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(FontTexture, "Font512x512.bmp");
