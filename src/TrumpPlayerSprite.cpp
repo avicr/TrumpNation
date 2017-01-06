@@ -213,7 +213,7 @@ void TrumpPlayerSprite::Reset()
 	bHasWall = false;
 	SetPosition(445, 340);
 	PlayerState = StatePlaying;
-	PlayAnimation(ResourceManager::Mexican1Animation);
+	PlayAnimation(ResourceManager::TrumpAnimation);
 }
 
 ePlayerState TrumpPlayerSprite::GetPlayerState()

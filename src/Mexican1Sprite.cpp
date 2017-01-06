@@ -113,7 +113,7 @@ Mexican1Sprite::Mexican1Sprite()
 	}
 
 	MovingFlags = 0;
-	PlayAnimation(ResourceManager::TrumpAnimation);
+	PlayAnimation(ResourceManager::Mexican1Animation);
 }
 
 void Mexican1Sprite::HandleWallPlaced(int WallIndex)
