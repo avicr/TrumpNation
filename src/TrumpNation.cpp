@@ -32,7 +32,10 @@ SpriteList Mexicans;
 Mix_Chunk *PickUpItemFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
 Mix_Chunk *StepFX = NULL;
+Mix_Chunk *TitleConfirmFX = NULL;
+Mix_Chunk *TrumpDieFX = NULL;
 Mix_Music *TitleMusic = NULL;
+Mix_Music *BGMusic = NULL;
 Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
 Glyph Numerals36[10];
@@ -42,8 +45,8 @@ int WindowWidth;
 int WindowHeight;
 
 
-void GameLoop();
-void DoTitleScreen();
+bool GameLoop();
+bool DoTitleScreen();
 void Tick(double DeltaTime);
 void Render();
 void InitSDL();
@@ -63,8 +66,13 @@ int main(int argc, char ** argv)
 	
 	GResourceManager = new ResourceManager;
 
-	DoTitleScreen();
-	GameLoop();
+	do
+	{
+		if (!DoTitleScreen())
+		{
+			break;
+		}
+	} while (GameLoop());
 	
 	CleanUp();	
 
@@ -75,9 +83,12 @@ void CleanUp()
 {
 	delete GResourceManager;
 
+	Mix_FreeMusic(BGMusic);
 	Mix_FreeChunk(PlaceWallFX);
 	Mix_FreeChunk(PickUpItemFX);	
 	Mix_FreeChunk(StepFX);
+	Mix_FreeChunk(TitleConfirmFX);
+	Mix_FreeChunk(TrumpDieFX);
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -92,8 +103,9 @@ void CleanUp()
 	SDL_Quit();
 }
 
-void GameLoop()
+bool GameLoop()
 {
+	bool bUserQuit = false;
 	SDL_Event TheEvent;
 	TickFreq = SDL_GetPerformanceFrequency();
 	bool bGameComplete = false;
@@ -104,6 +116,10 @@ void GameLoop()
 
 	while (!bGameComplete)
 	{
+		if (!Mix_PlayingMusic())
+		{
+			Mix_PlayMusic(BGMusic, -1);
+		}
 		ThePlayer->Reset();
 		Items.push_back(new BrickItem(470, 570));
 		SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
@@ -111,14 +127,14 @@ void GameLoop()
 		Uint64 StartTime = SDL_GetPerformanceCounter();
 		Uint64 CurrentTime = SDL_GetPerformanceCounter();
 		double DeltaTime;
-		bool bDone = false;
+		bool bLevelComplete = false;
 
-		while (!bGameComplete && !bDone)
+		while (!bGameComplete && !bLevelComplete)
 		{
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
 			{
 				bGameComplete = true;
-				
+				bUserQuit = true;
 			}
 
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A])
@@ -132,9 +148,15 @@ void GameLoop()
 			DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 			Tick(DeltaTime * (double)0.001);
 
+			if (ThePlayer->GetPlayerState() == StateDying && Mix_PlayingMusic())
+			{
+				Mix_HaltMusic();
+				Mix_PlayChannel(3, TrumpDieFX, 0);
+			}
+
 			if (TheGame->LevelComplete() || ThePlayer->GetPlayerState() == StateDead)
 			{
-				bDone = true;
+				bLevelComplete = true;
 			}
 
 			Render();
@@ -166,6 +188,8 @@ void GameLoop()
 	delete TheGame;
 	ThePlayer = NULL;
 	TheGame = NULL;
+
+	return !bUserQuit;
 }
 
 void Tick(double DeltaTime)
@@ -180,7 +204,7 @@ void Tick(double DeltaTime)
 	}
 
 	ThePlayer->Tick(DeltaTime);
-
+	
 	if (ThePlayer->GetPlayerState() != StateDead && ThePlayer->GetPlayerState() != StateDying)
 	{
 		Mexicans.Tick(DeltaTime);
@@ -222,8 +246,9 @@ void Render()
 	PresentBackBuffer();
 }
 
-void DoTitleScreen()
+bool DoTitleScreen()
 {
+	bool bUserQuit = false;
 	bool bDone = false;
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
@@ -239,6 +264,12 @@ void DoTitleScreen()
 	double DeltaTime;
 	while (!bDone)
 	{
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+		{
+			bDone = true;
+			bUserQuit = true;
+		}
+
 		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_RETURN] || SDL_GetKeyboardState(NULL)[SDL_SCANCODE_SPACE])
 		{
 			bDone = true;
@@ -269,9 +300,34 @@ void DoTitleScreen()
 		}
 	}
 
+	
 	Mix_HaltMusic();	
 	Mix_FreeMusic(TitleMusic);
+
 	delete TrumpIntroSprite;
+
+	int PlayingChannel = Mix_PlayChannel(-1, TitleConfirmFX, 0);
+
+	while (Mix_Playing(PlayingChannel) && !bUserQuit)
+	{
+		while (SDL_PollEvent(&TheEvent) != 0)
+		{
+			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+			{
+				bDone = true;
+				bUserQuit = true;
+				break;
+			}
+			if (TheEvent.type == SDL_QUIT)
+			{
+				bDone = true;
+				bUserQuit = true;
+				break;
+			}
+		}
+	}
+	
+	return !bUserQuit;
 }
 
 void InitSDL()
@@ -291,6 +347,8 @@ void InitSDL()
 			PickUpItemFX = Mix_LoadWAV("resource/sounds/Pickupitem.wav");
 			PlaceWallFX = Mix_LoadWAV("resource/sounds/Placewall.wav");
 			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
+			TitleConfirmFX = Mix_LoadWAV("resource/sounds/Titleconfirm.wav");
+			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -303,6 +361,8 @@ void InitSDL()
 		LoadNumerals("resource/fonts/segoeuib.ttf", 28, Numerals20);
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
+		SDL_ShowCursor(SDL_DISABLE);
+		BGMusic = Mix_LoadMUS("resource/sounds/BGMusic.ogg");
 	}
 }
 

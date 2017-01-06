@@ -210,9 +210,10 @@ void TrumpPlayerSprite::TakeDamage()
 
 void TrumpPlayerSprite::Reset()
 {
+	bHasWall = false;
 	SetPosition(445, 340);
 	PlayerState = StatePlaying;
-	PlayAnimation(ResourceManager::TrumpAnimation);
+	PlayAnimation(ResourceManager::Mexican1Animation);
 }
 
 ePlayerState TrumpPlayerSprite::GetPlayerState()
@@ -235,5 +236,12 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 	}
 
 	Sprite::Render(Renderer);
+
+	/*if (bHasWall)
+	{
+		SDL_Rect BrickDstRect = { PosX + 22, PosY + 35, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };
+		SDL_RenderCopy(Renderer, ResourceManager::BrickTexture->Texture, &ResourceManager::BrickTexture->SrcRect, &BrickDstRect);
+	}*/
+	
 
 }
