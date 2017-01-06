@@ -11,7 +11,7 @@ public:
 	void SetLevel(int Level);
 	bool LevelComplete();
 
-	bool WallArray[16];
+	int WallArray[16];
 
 protected:
 	int NumMexicansEscaped;

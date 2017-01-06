@@ -3,7 +3,7 @@
 
 Mexican1Sprite::Mexican1Sprite()
 {
-	float scale = 0.58;
+	float scale = 0.58f;
 	SDL_Rect WallRect;
 	SDL_Rect CollisionRect;
 	SDL_Rect ResultRect;
@@ -11,8 +11,8 @@ Mexican1Sprite::Mexican1Sprite()
 	bool bGood = false;
 	int WallIndex = 0;
 
-	SetWidth(128 * scale);
-	SetHeight(136 * scale);
+	SetWidth(int(128 * scale));
+	SetHeight(int(136 * scale));
 	
 	MoveRate = 444;
 	MaxVelocity = 222;
@@ -21,7 +21,7 @@ Mexican1Sprite::Mexican1Sprite()
 	PosY = HORIZON;	
 	VelX = 0;
 	VelY = 0;
-	Growth = 0;
+	Growth = 0.1;
 	
 
 	do
@@ -30,8 +30,8 @@ Mexican1Sprite::Mexican1Sprite()
 		bClimbingWall = false;
 		CollisionRect = { 0, 0, 0, 0 };
 		bBehindWall = false;		
-		Rect.x = PosX;
-		Rect.y = PosY;
+		Rect.x = (int)PosX;
+		Rect.y = (int)PosY;
 		bGood = false;
 
 		WallIndex = (int)round(PosX / 64);
@@ -100,7 +100,7 @@ Mexican1Sprite::Mexican1Sprite()
 
 	if (bBehindWall)
 	{
-		if (rand() % 4 != 0)
+		if (TheGame->WallArray[WallIndex] > 1 || rand() % 4 != 0)
 		{
 			bPendingDelete = true;
 			SDL_Log("Abort spawn");
@@ -118,7 +118,7 @@ Mexican1Sprite::Mexican1Sprite()
 
 void Mexican1Sprite::HandleWallPlaced(int WallIndex)
 {
-	SDL_Rect CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 40, Rect.h };
+	SDL_Rect CollisionRect = { Rect.x + 13, Rect.y - 22, 15, 90 };
 	SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
 	SDL_Rect ResultRect;
 
@@ -133,7 +133,7 @@ void Mexican1Sprite::HandleWallPlaced(int WallIndex)
 	}
 	else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
 	{
-		CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 40, Rect.h };
+		CollisionRect = { Rect.x + 13, Rect.y - 22, 15, 90 };
 		WallRect = { (WallIndex + 1) * 64, WALL_TOP, 64, 160 };
 		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
 		{

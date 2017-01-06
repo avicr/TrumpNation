@@ -168,16 +168,22 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 
 	if (bHasWall && (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
 	{
+		//bFreezeSpawn = true;
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 		{
 			int WallIndex = (int)round((PosX - Rect.w / 2) / 128);
 
-			if (!TheGame->WallArray[WallIndex * 2])
+			if (TheGame->WallArray[WallIndex * 2] < 1)
 			{
 				Score += 1500;
 				Mix_PlayChannel(-1, PlaceWallFX, 0);
-				TheGame->WallArray[WallIndex * 2] = true;
-				TheGame->WallArray[WallIndex * 2 + 1] = true;
+				TheGame->WallArray[WallIndex * 2]++;
+
+				if (TheGame->WallArray[WallIndex * 2] > 2)
+				{
+					TheGame->WallArray[WallIndex * 2] = 2;
+				}
+				TheGame->WallArray[WallIndex * 2 + 1] = TheGame->WallArray[WallIndex * 2];
 
 				bHasWall = false;
 				Items.push_back(new BrickItem(rand() % 992, (rand() % (200) + HORIZON + 65)));
@@ -226,7 +232,13 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 	if (bHasWall && PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 	{
 		int WallIndex = (int)round((PosX - Rect.w/2) / 128);
-		SDL_Rect DstRect = { WallIndex * 128, WALL_TOP,ResourceManager::WallTexture->SrcRect.w, ResourceManager::WallTexture->SrcRect.h };
+		WallIndex *= 2;
+		SDL_Rect DstRect = { WallIndex * 64, WALL_TOP,ResourceManager::WallTexture->SrcRect.w, ResourceManager::WallTexture->SrcRect.h };
+
+		/*if (TheGame->WallArray[WallIndex] > 0)
+		{
+			DstRect.y -= 160;
+		}*/
 
 		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 64);
 		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);

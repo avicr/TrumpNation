@@ -47,6 +47,9 @@
     <ClCompile Include="src\SpriteList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SwapItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Sprite.h">
@@ -68,6 +71,9 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="inc\TrumpPlayerSprite.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SwapItem.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

@@ -32,6 +32,8 @@ extern Mix_Chunk *StepFX;
 extern Mix_Music *TitleMusic;
 extern Game *TheGame;
 
+extern bool bFreezeSpawn;
+
 
 SDL_Renderer *GetRenderer();
 #endif

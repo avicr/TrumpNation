@@ -22,6 +22,7 @@ struct Glyph
 	SDL_Texture *Texture;
 };
 
+bool bFreezeSpawn = false;
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
@@ -197,7 +198,7 @@ void Tick(double DeltaTime)
 	static double SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
 	SpawnCountdown -= DeltaTime;
 
-	if (SpawnCountdown <= 0)
+	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
 	{
 		Mexicans.push_back(new Mexican1Sprite());
 		SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
@@ -225,6 +226,8 @@ void Render()
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
 	SDL_RenderFillRect(GRenderer, &Rect);
 
+	DrawHUD(GRenderer);
+
 	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
 	{
 		Rect.x = WallIndex * 64;
@@ -235,14 +238,19 @@ void Render()
 		if (TheGame->WallArray[WallIndex])
 		{
 			SDL_RenderCopy(GRenderer, ResourceManager::WallTexture->Texture, NULL, &Rect);
+			
+			/*if (TheGame->WallArray[WallIndex] > 1)
+			{				
+				Rect.y -= 160;				
+				SDL_RenderCopy(GRenderer, ResourceManager::WallTexture->Texture, NULL, &Rect);				
+			}*/
 		}
 	}
 
 	Items.Render(GRenderer);
 	Mexicans.Render(GRenderer);
 
-	ThePlayer->Render(GRenderer);
-	DrawHUD(GRenderer);
+	ThePlayer->Render(GRenderer);	
 	PresentBackBuffer();
 }
 
@@ -351,7 +359,7 @@ void InitSDL()
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
