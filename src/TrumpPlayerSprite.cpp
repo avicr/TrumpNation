@@ -237,7 +237,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 					TotalScore *= 2;
 				}
 
-				Mexicans.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
+				Items.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
 				Score += TotalScore;
 			}
 		}

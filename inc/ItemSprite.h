@@ -3,6 +3,7 @@
 #include "../inc/Sprite.h"
 #include "../inc/TrumpPlayerSprite.h"
 #include "../inc/SpriteList.h"
+#include "../inc/ScoreSprite.h"
 
 class ItemSprite : public Sprite
 {
@@ -63,8 +64,19 @@ public:
 	}
 	virtual void Interact(TrumpPlayerSprite *OtherSprite)
 	{
-		Mix_PlayChannel(-1, PickUpItemFX, 0);		
-		bPendingDelete = true;
+		int ScorePerMexican = MEXICAN_BLOCK_SCORE * (bSwapSprites ? 2 : 1);
+		BombCountDown = BOMB_FLASH_TIME;
+		Mix_PlayChannel(-1, TrumpDieFX, 0);		
+		bPendingDelete = true;		
+
+		for (int i = 0; i < Mexicans.size(); i++)
+		{
+			SDL_Rect MexiRect = Mexicans[i]->GetCollisionRect();
+
+			Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, ScorePerMexican));
+		}
+
+		ThePlayer->AddToScore(ScorePerMexican * Mexicans.size());
 		Mexicans.DeleteAll();
 	}
 	

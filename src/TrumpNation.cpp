@@ -49,7 +49,7 @@ SDL_Texture *BackBuffer;
 int WindowWidth;
 int WindowHeight;
 bool bSwapSprites = false;
-
+double BombCountDown = 0;
 
 bool GameLoop();
 bool DoTitleScreen();
@@ -218,6 +218,11 @@ void Tick(double DeltaTime)
 	static double ItemSpawnCountdown = ITEM_RATE;
 	static int ItemChance = ITEM_SPAWN_PERCENT;
 
+	if (BombCountDown >= 0)
+	{
+		BombCountDown -= DeltaTime;
+	}
+
 	if (ItemSprite::NumNonBrickItems == 0)
 	{
 		ItemSpawnCountdown -= DeltaTime;
@@ -300,6 +305,12 @@ void Render()
 	Mexicans.Render(GRenderer);
 
 	ThePlayer->Render(GRenderer);	
+
+	if (BombCountDown > 0 && (int)round(BombCountDown * 100) % 4 >= 2)
+	{
+		SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
+		SDL_RenderClear(GRenderer);
+	}
 	PresentBackBuffer();
 }
 

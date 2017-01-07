@@ -29,6 +29,7 @@
 #define PLACE_WALL_SCORE 500
 #define MEXICAN_BLOCK_SCORE 50
 
+#define BOMB_FLASH_TIME 0.20;
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;
@@ -38,6 +39,7 @@ extern class SpriteList Mexicans;
 extern class SpriteList Items;
 extern class TrumpPlayerSprite *ThePlayer;
 
+extern Mix_Chunk *TrumpDieFX;
 extern Mix_Chunk *PickUpItemFX;
 extern Mix_Chunk *PlaceWallFX;
 extern Mix_Chunk *StepFX;
@@ -52,6 +54,8 @@ extern bool bSwapSprites;
 extern struct Glyph Numerals36[10];
 extern struct Glyph Numerals20[10];
 extern struct Glyph NumeralsWhite20[10];
+
+extern double BombCountDown;
 
 SDL_Renderer *GetRenderer();
 extern void DrawText(std::string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, struct Glyph Glyphs[10], float ScaleX = 1, float ScaleY = 1);
