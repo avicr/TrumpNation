@@ -102,15 +102,14 @@ Mexican1Sprite::Mexican1Sprite()
 	{
 		if (TheGame->WallArray[WallIndex] > 1 || rand() % 4 != 0)
 		{
-			bPendingDelete = true;
-			SDL_Log("Abort spawn");
+			bPendingDelete = true;	
 			return;
 		}
 
 		bClimbingWall = true;
 		MoveRate = 333;
 		//PosX = WallIndex * 64;
-	}
+	}	
 
 	MovingFlags = 0;
 	if (!bSwapSprites)
@@ -126,10 +125,10 @@ Mexican1Sprite::Mexican1Sprite()
 
 bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
 {
-	SDL_Rect CollisionRect = { Rect.x + 10, Rect.y + 60, 35, 20 };
+	SDL_Rect CollisionRect = { Rect.x + 10, Rect.y + 58, 35, 20 };
 	SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
 	SDL_Rect ResultRect;
-
+	
 	/*if (PosY > WALL_TOP + 100)
 	{
 		return;

@@ -205,6 +205,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	{
 		int TotalScore = PLACE_WALL_SCORE;
 		//bFreezeSpawn = true;
+		
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 		{
 			int WallIndex = (int)round((PosX - Rect.w / 2) / 128);
