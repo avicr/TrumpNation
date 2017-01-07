@@ -73,27 +73,3 @@ bool Game::LevelComplete()
 	SetLevel(CurrentLevel + 1);
 	return true;
 }
-
-void Game::DoSwap()
-{
-	if (bSwapSprites)
-	{
-		Mix_PlayMusic(HatDanceMusic, 0);
-		for (int i = 0; i < Mexicans.size(); i++)
-		{
-			Mexicans[i]->PlayAnimation(ResourceManager::TrumpAnimation);
-		}
-
-		ThePlayer->PlayAnimation(ResourceManager::Mexican1Animation);
-	}
-	else
-	{
-		Mix_FadeInMusic(BGMusic, -1, 500);
-		for (int i = 0; i < Mexicans.size(); i++)
-		{
-			Mexicans[i]->PlayAnimation(ResourceManager::Mexican1Animation);
-		}
-
-		ThePlayer->PlayAnimation(ResourceManager::TrumpAnimation);
-	}
-}

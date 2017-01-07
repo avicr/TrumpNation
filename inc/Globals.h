@@ -18,12 +18,16 @@
 #define WALL_TOP HORIZON - 104
 #define MEXICAN_SPAWN_RATE 0.25
 #define WALL_PLACE_ZONE 140
-#define ITEM_RATE 5;
+#define ITEM_RATE 5
 #define ITEM_SPAWN_PERCENT 5
 #define SCORE_LIFE_TIME 1
+#define TRUMP_DEFAULT_MAX_VELOCITY 333
+#define TRUMP_RED_HAT_MAX_VELOCITY 500
+#define RED_HAT_TIME 8
 
-#define PLACE_WALL_SCORE 1500
-#define MEXICAN_BLOCK_SCORE 100
+#define PLACE_WALL_SCORE 500
+#define MEXICAN_BLOCK_SCORE 50
+
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;

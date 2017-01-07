@@ -11,7 +11,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 
 	NumLives = 2;
 	MoveRate = 444;
-	MaxVelocity = 333;
+	MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
 	TransitionSpeed = 7;
 	
 	StopSpeed = 16;
@@ -23,19 +23,22 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	PosY = 340;
 	Joy = SDL_JoystickOpen(0);
 	bHasWall = false;
+	bHasRedHat = false;
 	bPlayingStepFX = false;
 }
 
 void TrumpPlayerSprite::Tick(double DeltaTime)
 {
 	Sprite::Tick(DeltaTime);
-
+	
 	if (PlayerState == StateDying)
 	{
 		DyingCountDown -= DeltaTime;
 
 		if (DyingCountDown <= 0)
 		{
+			bHasRedHat = false;
+			MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
 			DyingCountDown = 2;
 			NumLives--;
 			SDL_Log("Lives: %d", NumLives);
@@ -43,6 +46,37 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 			PlayerState = StateDead;
 		}
 	}
+	else if(bHasRedHat)
+	{
+		RedHatCountDown -= DeltaTime;
+
+		if (RedHatCountDown <= 0)
+		{
+			MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;			
+
+			bHasRedHat = false;
+
+			if (!bSwapSprites)
+			{
+				PlayAnimation(ResourceManager::TrumpAnimation);
+			}
+			else
+			{
+				PlayAnimation(ResourceManager::Mexican1Animation);
+			}
+		}
+	}
+
+	if (VelX > MaxVelocity)
+	{
+		VelX += DeltaTime * -TransitionSpeed;
+	}
+
+	if (VelY > MaxVelocity)
+	{
+		VelY += DeltaTime * -TransitionSpeed;
+	}
+
 
 	if (PosX < 0 - 20)
 	{
@@ -202,7 +236,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 					TotalScore *= 2;
 				}
 
-				Mexicans.push_back(new ScoreSprite(WallIndex * 128 + 36, WALL_TOP - 38, TotalScore));
+				Mexicans.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
 				Score += TotalScore;
 			}
 		}
@@ -226,13 +260,17 @@ void TrumpPlayerSprite::TakeDamage()
 }
 
 void TrumpPlayerSprite::Reset()
-{
+{	
 	bHasWall = false;
 	SetPosition(445, 340);
 	PlayerState = StatePlaying;
-	if (!bSwapSprites)
+	if (!bSwapSprites && !bHasRedHat)
 	{
 		PlayAnimation(ResourceManager::TrumpAnimation);
+	}
+	else if (bHasRedHat)
+	{
+		PlayAnimation(ResourceManager::TrumpRedHatAnimation);
 	}
 	else
 	{
@@ -274,4 +312,49 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 	}*/
 	
 
+}
+
+void TrumpPlayerSprite::DoSwap(bool bSwap)
+{
+	
+	if (bSwap)
+	{
+		RedHatCountDown = 0;
+		Mix_PlayMusic(HatDanceMusic, 0);
+		MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
+		for (int i = 0; i < Mexicans.size(); i++)
+		{
+			Mexicans[i]->PlayAnimation(ResourceManager::TrumpAnimation);
+		}
+
+		ThePlayer->PlayAnimation(ResourceManager::Mexican1Animation);
+	}
+	else if (bSwapSprites)
+	{
+		Mix_FadeInMusic(BGMusic, -1, 500);
+		for (int i = 0; i < Mexicans.size(); i++)
+		{
+			Mexicans[i]->PlayAnimation(ResourceManager::Mexican1Animation);
+		}
+
+		if (!bHasRedHat)
+		{
+			ThePlayer->PlayAnimation(ResourceManager::TrumpAnimation);
+		}
+		else
+		{
+			ThePlayer->PlayAnimation(ResourceManager::TrumpRedHatAnimation);
+		}
+	}
+	bSwapSprites = bSwap;
+}
+
+void TrumpPlayerSprite::PickupRedHat()
+{
+	DoSwap(false);
+	
+	bHasRedHat = true;
+	RedHatCountDown = RED_HAT_TIME;
+	PlayAnimation(ResourceManager::TrumpRedHatAnimation);
+	MaxVelocity = TRUMP_RED_HAT_MAX_VELOCITY;
 }

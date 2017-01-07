@@ -162,13 +162,12 @@ bool GameLoop()
 			// Handle swap item done
 			if (bSwapSprites && !Mix_PlayingMusic())
 			{
-				bSwapSprites = false;
-				TheGame->DoSwap();
+				ThePlayer->DoSwap(false);
 			}
 
 			if (ThePlayer->GetPlayerState() == StateDying && Mix_PlayingMusic())
 			{
-				bSwapSprites = false;
+				ThePlayer->DoSwap(false);
 				Mix_HaltMusic();
 				Mix_PlayChannel(3, TrumpDieFX, 0);
 			}
@@ -217,7 +216,10 @@ void Tick(double DeltaTime)
 	static double ItemSpawnCountdown = ITEM_RATE;
 	static int ItemChance = ITEM_SPAWN_PERCENT;
 
-	ItemSpawnCountdown -= DeltaTime;
+	if (ItemSprite::NumNonBrickItems == 0)
+	{
+		ItemSpawnCountdown -= DeltaTime;
+	}
 	SpawnCountdown -= DeltaTime;
 
 	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
@@ -400,7 +402,7 @@ void InitSDL()
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
@@ -481,6 +483,17 @@ void PresentBackBuffer()
 
 void SpawnRandomItem()
 {
-	
-	Items.push_back(new SwapItem());
+	int Roll = rand() % 100;
+	ItemSprite *NewItem;
+
+	if (Roll >= 25)
+	{
+		NewItem = new RedHatItem();
+	}
+	else
+	{
+		NewItem = new SwapItem();
+	}
+
+	Items.push_back(NewItem);
 }

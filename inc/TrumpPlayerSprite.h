@@ -25,6 +25,8 @@ public:
 	void TakeDamage();
 	void Reset();
 	ePlayerState GetPlayerState();
+	void PickupRedHat();
+	void DoSwap(bool bSwap);
 	void Render(SDL_Renderer *Renderer);
 
 protected:
@@ -34,6 +36,8 @@ protected:
 	int Score;
 	bool bPlayingStepFX;
 	bool bHasWall;
+	bool bHasRedHat;
+	double RedHatCountDown;
 	SDL_Joystick *Joy;
 
 	void HandleInput(double DeltaTime);

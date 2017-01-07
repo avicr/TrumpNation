@@ -52,6 +52,7 @@ protected:
 
 public:
 	Sprite();
+	virtual ~Sprite() {};
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);
 	virtual void HandleInput(double DeltaTime);

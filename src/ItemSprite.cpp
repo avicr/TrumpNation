@@ -1,5 +1,7 @@
 #include "../inc/ItemSprite.h"
 
+int ItemSprite::NumNonBrickItems = 0;
+
 ItemSprite::ItemSprite(SDL_Texture *InTexture)
 {	
 	SetTexture(InTexture);

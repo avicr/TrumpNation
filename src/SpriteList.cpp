@@ -10,7 +10,7 @@ void SpriteList::Tick(double DeltaTime)
 
 		if ((*this)[i]->GetPendingDelete())
 		{
-			delete (*this)[i];
+			delete ((*this)[i]);
 			(*this).erase(begin() + i);
 			i--;
 		}
