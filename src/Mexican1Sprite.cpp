@@ -125,7 +125,7 @@ Mexican1Sprite::Mexican1Sprite()
 
 bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
 {
-	SDL_Rect CollisionRect = { Rect.x + 10, Rect.y + 58, 35, 20 };
+	SDL_Rect CollisionRect = { Rect.x + 10, Rect.y + 50, 35, 20 };
 	SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
 	SDL_Rect ResultRect;
 	

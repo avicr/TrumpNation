@@ -71,6 +71,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
 	DECLARE_TEXTURE_RESOURCE(HatTexture, "Hat.bmp");
+	DECLARE_TEXTURE_RESOURCE(BombTexture, "Bomb.bmp");
 	DECLARE_TEXTURE_RESOURCE(RedHatTexture, "Redhat.bmp");
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");

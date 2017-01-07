@@ -61,6 +61,7 @@ void DrawHUD(SDL_Renderer *Renderer);
 void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10], SDL_Color Color = { 0, 0, 0, 255 });
 void PresentBackBuffer();
 void SpawnRandomItem();
+double GetSpawnTime();
 
 int main(int argc, char ** argv)
 {
@@ -134,7 +135,7 @@ bool GameLoop()
 		FirstBrick->SetPosition(470, 570);
 		Items.push_back(FirstBrick);		
 		SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
-		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4));
+		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
 		Uint64 StartTime = SDL_GetPerformanceCounter();
 		Uint64 CurrentTime = SDL_GetPerformanceCounter();
 		double DeltaTime;
@@ -152,6 +153,7 @@ bool GameLoop()
 			{
 				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
 				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A]) { SDL_PollEvent(&TheEvent); }
+				SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
 			}
 
 			StartTime = CurrentTime;
@@ -212,7 +214,7 @@ bool GameLoop()
 
 void Tick(double DeltaTime)
 {	
-	static double SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
+	static double SpawnCountdown = GetSpawnTime();
 	static double ItemSpawnCountdown = ITEM_RATE;
 	static int ItemChance = ITEM_SPAWN_PERCENT;
 
@@ -225,7 +227,7 @@ void Tick(double DeltaTime)
 	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
 	{						
 		Mexicans.push_back(new Mexican1Sprite());
-		SpawnCountdown = MEXICAN_SPAWN_RATE / (TheGame->GetLevelNumber() / (double)4);// 0.15;
+		SpawnCountdown = GetSpawnTime();
 	}
 
 	if (ItemSpawnCountdown <= 0)
@@ -406,7 +408,7 @@ void InitSDL()
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
@@ -490,14 +492,54 @@ void SpawnRandomItem()
 	int Roll = rand() % 100;
 	ItemSprite *NewItem;
 
-	if (Roll >= 25)
-	{
-		NewItem = new RedHatItem();
-	}
-	else
+	if (Roll < 20)
 	{
 		NewItem = new SwapItem();
 	}
+	else if (Roll < 55)
+	{
+		NewItem = new BombItem();
+	}
+	else 
+	{
+		NewItem = new RedHatItem();
+	}	
 
 	Items.push_back(NewItem);
+}
+
+double GetSpawnTime()
+{
+	if (TheGame->GetLevelNumber() == 1)
+	{
+		return 1;
+	}
+	else if (TheGame->GetLevelNumber() == 2)
+	{
+		return 0.85;
+	}
+	else if (TheGame->GetLevelNumber() == 3)
+	{
+		return 0.75;
+	}
+	else if (TheGame->GetLevelNumber() == 4)
+	{
+		return 0.65;
+	}
+	else if (TheGame->GetLevelNumber() == 5)
+	{
+		return 0.50;
+	}
+	else if (TheGame->GetLevelNumber() == 6)
+	{
+		return 0.35;
+	}
+	else if (TheGame->GetLevelNumber() == 7)
+	{
+		return 0.20;
+	}
+	else
+	{
+		return 1 / log1p(TheGame->GetLevelNumber() * TheGame->GetLevelNumber() * TheGame->GetLevelNumber());
+	}
 }

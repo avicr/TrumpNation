@@ -2,6 +2,7 @@
 #define ITEMSPRITE_H
 #include "../inc/Sprite.h"
 #include "../inc/TrumpPlayerSprite.h"
+#include "../inc/SpriteList.h"
 
 class ItemSprite : public Sprite
 {
@@ -44,6 +45,29 @@ public:
 		ThePlayer->PickupRedHat();
 		bPendingDelete = true;
 	}
+};
+
+class BombItem : public ItemSprite
+{
+
+public:
+	BombItem() :
+		ItemSprite(ResourceManager::BombTexture->Texture)
+	{
+		NumNonBrickItems++;
+	}
+
+	virtual ~BombItem()
+	{
+		NumNonBrickItems--;
+	}
+	virtual void Interact(TrumpPlayerSprite *OtherSprite)
+	{
+		Mix_PlayChannel(-1, PickUpItemFX, 0);		
+		bPendingDelete = true;
+		Mexicans.DeleteAll();
+	}
+	
 };
 
 #endif
