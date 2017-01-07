@@ -76,6 +76,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(FontTexture, "Font512x512.bmp");
+	DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
 	{

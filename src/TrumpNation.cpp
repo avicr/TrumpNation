@@ -16,6 +16,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/SwapItem.h"
 #include "../inc/ScoreSprite.h"
+#include <algorithm>
 
 struct Glyph
 {
@@ -318,6 +319,10 @@ bool DoTitleScreen()
 {
 	bool bUserQuit = false;
 	bool bDone = false;
+	double PosY = 0;
+	double ScrollCountDown = TITLE_SCROLL_TIME;
+	int NumIntrosPlayed = 0;
+
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
 	Mix_PlayMusic(TitleMusic, -1);
@@ -345,12 +350,40 @@ bool DoTitleScreen()
 		StartTime = CurrentTime;
 		CurrentTime = SDL_GetPerformanceCounter();
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+		DeltaTime *= (double)0.001;
 
+		TrumpIntroSprite->Tick(DeltaTime);
+		
+		ScrollCountDown -= DeltaTime;
 
-		TrumpIntroSprite->Tick(DeltaTime * (double)0.001);
+		if (NumIntrosPlayed == 0 && ScrollCountDown <= TITLE_SCROLL_TIME - 21.25)
+		{	
+			PosY += DeltaTime * 80;
+		}
 
-		SDL_Rect TitleRect = { 0, 0, 1024, 600 };
-		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, &TitleRect, &TitleRect);
+		if (NumIntrosPlayed == 0 && PosY >= ResourceManager::InfoTexture->SrcRect.h)
+		{
+			Mix_FadeOutMusic(250);
+			PosY = 0;
+		}
+
+		if (ScrollCountDown <= 0)
+		{
+			NumIntrosPlayed++;
+
+			if (NumIntrosPlayed > TITLE_NUM_INTROS_TO_PLAY)
+			{
+				Mix_PlayMusic(TitleMusic, -1);
+				NumIntrosPlayed = 0;
+			}
+			
+			ScrollCountDown = TITLE_SCROLL_TIME;
+		}
+
+		TrumpIntroSprite->SetPosition(445, 300 - PosY);
+		SDL_Rect TitleRect = { 0, PosY, 1024, 600 };
+		SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::InfoTexture->SrcRect.h - PosY) };
+		SDL_RenderCopy(GRenderer, ResourceManager::InfoTexture->Texture, &TitleRect, &BackBufferRect);
 		TrumpIntroSprite->Render(GRenderer);
 		PresentBackBuffer();
 
@@ -368,7 +401,13 @@ bool DoTitleScreen()
 		}
 	}
 
-	
+	TrumpIntroSprite->SetPosition(445, 300);
+	SDL_Rect TitleRect = { 0, 0, 1024, 600 };
+	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+	SDL_RenderCopy(GRenderer, ResourceManager::InfoTexture->Texture, &TitleRect, &BackBufferRect);
+	TrumpIntroSprite->Render(GRenderer);
+	PresentBackBuffer();
+
 	Mix_HaltMusic();	
 	Mix_FreeMusic(TitleMusic);
 
@@ -419,7 +458,7 @@ void InitSDL()
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
