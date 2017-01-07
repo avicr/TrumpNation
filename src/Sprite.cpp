@@ -3,6 +3,7 @@
 Sprite::Sprite() :
 	Texture(NULL)
 {	
+	CountDown = -1;
 	Flip = SDL_FLIP_NONE;
 	Rect.x = 0;
 	Rect.y = 0;

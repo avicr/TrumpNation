@@ -25,6 +25,7 @@ enum eMovingFlags
 class Sprite
 {
 protected:
+	double CountDown;
 	SDL_RendererFlip Flip;
 	// Screen region to render the sprite to
 	SDL_Rect Rect;
@@ -32,7 +33,7 @@ protected:
 	// Pointer to the current frame in the animation
 	SDL_Texture* Texture;
 
-	AnimInfo AnimData;
+	AnimInfo AnimData;	
 
 	bool bPendingDelete;
 	double VelX;

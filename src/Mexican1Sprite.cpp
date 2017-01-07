@@ -126,7 +126,7 @@ Mexican1Sprite::Mexican1Sprite()
 
 bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
 {
-	SDL_Rect CollisionRect = { Rect.x + 18, Rect.y - 22, 30, 90 };
+	SDL_Rect CollisionRect = { Rect.x + 10, Rect.y + 60, 35, 20 };
 	SDL_Rect WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
 	SDL_Rect ResultRect;
 
@@ -146,16 +146,16 @@ bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
 
 		return true;
 	}
-	else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
+	/*else if (WallIndex < 15)
 	{
-		CollisionRect = { Rect.x + 18, Rect.y - 22, 30, 90 };
-		WallRect = { (WallIndex + 1) * 64, WALL_TOP, 64, 160 };
+		CollisionRect = { Rect.x + 18, Rect.y + 60, 20, 20 };
+		WallRect = { (WallIndex+1) * 64, WALL_TOP, 64, 160 };
 		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
 		{
 			bPendingDelete = true;
 			return true;
 		}
-	}
+	}*/
 	else
 	{
 		/*CollisionRect = { Rect.x + 10, Rect.y - 22, Rect.w, Rect.h };

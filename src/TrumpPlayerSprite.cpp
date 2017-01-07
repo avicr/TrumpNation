@@ -69,12 +69,12 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 
 	if (VelX > MaxVelocity)
 	{
-		VelX += DeltaTime * -TransitionSpeed;
+		VelX += DeltaTime * -5;
 	}
 
 	if (VelY > MaxVelocity)
 	{
-		VelY += DeltaTime * -TransitionSpeed;
+		VelY += DeltaTime * -5;
 	}
 
 

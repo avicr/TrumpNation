@@ -239,6 +239,10 @@ void Tick(double DeltaTime)
 		else
 		{
 			ItemChance += 4;
+			if (ItemChance > 100)
+			{
+				ItemChance == 100;
+			}
 			SDL_Log("Item miss, chance is now: 1 in %d", 100 / ItemChance);
 		}
 	}

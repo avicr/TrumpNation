@@ -11,7 +11,6 @@ public:
 	void Tick(double DeltaTime);
 
 protected:
-	int Score;
-	double CountDown;
+	int Score;	
 };
 #endif

@@ -14,6 +14,8 @@ public:
 	virtual void Interact(TrumpPlayerSprite *OtherSprite) {};
 	virtual void RandomizePosition();
 	virtual bool HitTest(TrumpPlayerSprite *OtherSprite);
+	virtual void Render(SDL_Renderer *Renderer);
+	virtual void Tick(double DeltaTime);
 };
 
 class BrickItem : public ItemSprite

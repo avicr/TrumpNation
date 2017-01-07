@@ -35,8 +35,7 @@ void SpriteList::DeleteAll()
 		for (int i = size() - 1; i >= 0; i--)
 		{
 			delete (*this)[i];
-			(*this).erase(begin() + i);
-			i--;
+			(*this).erase(begin() + i);			
 		}
 		resize(0);
 	}

@@ -6,6 +6,7 @@ ItemSprite::ItemSprite(SDL_Texture *InTexture)
 {	
 	SetTexture(InTexture);
 	RandomizePosition();	
+	CountDown = ITEM_LIFE_TIME;
 }
 
 ItemSprite::ItemSprite(int X, int Y) :
@@ -40,9 +41,35 @@ void ItemSprite::RandomizePosition()
 	
 }
 
+void ItemSprite::Render(SDL_Renderer *Renderer)
+{
+	if (CountDown <= ITEM_LIFE_TIME * 0.25 && (int)round(CountDown * 100) % 8 >= 4)
+	{
+
+	}
+	else
+	{
+		Sprite::Render(Renderer);
+	}
+}
+
+void ItemSprite::Tick(double DeltaTime)
+{
+	if (CountDown > -1)
+	{
+		CountDown -= DeltaTime;
+
+		if (CountDown <= 0)
+		{
+			bPendingDelete = true;
+		}
+	}
+}
+
 BrickItem::BrickItem()
 	: ItemSprite(ResourceManager::BrickTexture->Texture)
 {		
+	CountDown = -1;
 }
 
 void BrickItem::Interact(TrumpPlayerSprite *OtherSprite)
