@@ -64,20 +64,10 @@ public:
 	}
 	virtual void Interact(TrumpPlayerSprite *OtherSprite)
 	{
-		int ScorePerMexican = MEXICAN_BLOCK_SCORE * (bSwapSprites ? 2 : 1);
-		BombCountDown = BOMB_FLASH_TIME;
-		Mix_PlayChannel(-1, TrumpDieFX, 0);		
-		bPendingDelete = true;		
-
-		for (int i = 0; i < Mexicans.size(); i++)
-		{
-			SDL_Rect MexiRect = Mexicans[i]->GetCollisionRect();
-
-			Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, ScorePerMexican));
-		}
-
-		ThePlayer->AddToScore(ScorePerMexican * Mexicans.size());
-		Mexicans.DeleteAll();
+		//Mix_PlayChannel(-1, PickUpItemFX, 0);
+		bPendingDelete = true;
+		//OtherSprite->AddBombs(1);
+		OtherSprite->KillEverything();
 	}
 	
 };

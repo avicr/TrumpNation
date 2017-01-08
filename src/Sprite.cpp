@@ -67,12 +67,12 @@ void Sprite::Tick(double DeltaTime)
 
 	if (fabs(VelX) > MaxVelocity)
 	{
-		VelX = MaxVelocity;
+		VelX += 5 * DeltaTime * VelX > 1 ? 1 : -1;
 	}
 
 	if (fabs(VelY) > MaxVelocity)
 	{
-		VelY = MaxVelocity;
+		VelY += 5 * MaxVelocity * VelY > 1 ? 1 : -1;
 	}
 
 	PosX += VelX * DeltaTime;

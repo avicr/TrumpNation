@@ -70,6 +70,7 @@ bool Game::LevelComplete()
 		}
 	}
 
+	ThePlayer->KillEverything(false);
 	SetLevel(CurrentLevel + 1);
 	return true;
 }

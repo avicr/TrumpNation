@@ -28,9 +28,14 @@ public:
 	void PickupRedHat();
 	void DoSwap(bool bSwap);
 	void Render(SDL_Renderer *Renderer);
+	void AddBombs(int NumToAdd);
+	void KillEverything(bool bBecauseBomb = true);
+	int GetNumBombs();
 
 protected:
+	bool bButtonPreviouslyPressed[3];
 	ePlayerState PlayerState;
+	int NumBombs;
 	double DyingCountDown;
 	int NumLives;
 	int Score;

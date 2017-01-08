@@ -6,9 +6,12 @@
 
 TrumpPlayerSprite::TrumpPlayerSprite()
 {
+	memset(bButtonPreviouslyPressed, 0, sizeof(bButtonPreviouslyPressed));
+
 	SetWidth(80);
 	SetHeight(80);
 
+	NumBombs = 2;
 	NumLives = 2;
 	MoveRate = 444;
 	MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
@@ -44,6 +47,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 			SDL_Log("Lives: %d", NumLives);
 			TheGame->SetLevel(TheGame->GetLevelNumber());
 			PlayerState = StateDead;
+			NumBombs = 2;
 		}
 	}
 	else if(bHasRedHat)
@@ -65,16 +69,6 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 				PlayAnimation(ResourceManager::Mexican1Animation);
 			}
 		}
-	}
-
-	if (VelX > MaxVelocity)
-	{
-		VelX += DeltaTime * -5;
-	}
-
-	if (VelY > MaxVelocity)
-	{
-		VelY += DeltaTime * -5;
 	}
 
 
@@ -201,7 +195,13 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		bPlayingStepFX = false;
 	}
 
-	if (bHasWall && (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
+	/*if (!bButtonPreviouslyPressed[1] && NumBombs > 0 && (state[SDL_SCANCODE_LALT] || (Joy && SDL_JoystickGetButton(Joy, 1))))
+	{
+		KillEverything();
+		NumBombs--;
+	}*/
+
+	if (!bButtonPreviouslyPressed[0] && bHasWall && (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
 	{
 		int TotalScore = PLACE_WALL_SCORE;
 		//bFreezeSpawn = true;
@@ -242,6 +242,24 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 			}
 		}
 	}
+
+	if (state[SDL_SCANCODE_LALT] || (Joy && SDL_JoystickGetButton(Joy, 1)))
+	{
+		bButtonPreviouslyPressed[1] = true;
+	}
+	else
+	{
+		bButtonPreviouslyPressed[1] = false;
+	}
+
+	if (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0)))
+	{
+		bButtonPreviouslyPressed[0] = true;
+	}
+	else
+	{
+		bButtonPreviouslyPressed[0] = false;
+	}
 }
 
 int TrumpPlayerSprite::GetNumLives()
@@ -265,6 +283,7 @@ void TrumpPlayerSprite::Reset()
 	bHasWall = false;
 	SetPosition(445, 340);
 	PlayerState = StatePlaying;
+
 	if (!bSwapSprites && !bHasRedHat)
 	{
 		PlayAnimation(ResourceManager::TrumpAnimation);
@@ -317,7 +336,6 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 
 void TrumpPlayerSprite::DoSwap(bool bSwap)
 {
-	
 	if (bSwap)
 	{
 		RedHatCountDown = 0;
@@ -358,4 +376,36 @@ void TrumpPlayerSprite::PickupRedHat()
 	RedHatCountDown = RED_HAT_TIME;
 	PlayAnimation(ResourceManager::TrumpRedHatAnimation);
 	MaxVelocity = TRUMP_RED_HAT_MAX_VELOCITY;
+}
+
+void TrumpPlayerSprite::AddBombs(int NumToAdd)
+{
+	NumBombs += NumToAdd;
+}
+
+void TrumpPlayerSprite::KillEverything(bool bBecauseBomb)
+{
+	int ScorePerMexican = MEXICAN_BLOCK_SCORE * (bSwapSprites ? 2 : 1);
+	BombCountDown = BOMB_FLASH_TIME;
+
+	if (bBecauseBomb)
+	{
+		Mix_PlayChannel(-1, TrumpDieFX, 0);
+	}
+	bPendingDelete = true;
+
+	for (int i = 0; i < Mexicans.size(); i++)
+	{
+		SDL_Rect MexiRect = Mexicans[i]->GetCollisionRect();
+
+		Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, ScorePerMexican));
+	}
+
+	AddToScore(ScorePerMexican * Mexicans.size());
+	Mexicans.DeleteAll();
+}
+
+int TrumpPlayerSprite::GetNumBombs()
+{
+	return NumBombs;
 }

@@ -504,6 +504,7 @@ void DrawHUD(SDL_Renderer *Renderer)
 	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, Numerals36);
 	DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, Numerals20);
 	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, Numerals20);
+	//DrawText(std::to_string(ThePlayer->GetNumBombs()), 98, 33, 18, 32, Renderer, Numerals20);
 }
 
 void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10], SDL_Color Color)
