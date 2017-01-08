@@ -40,6 +40,7 @@ extern class SpriteList Mexicans;
 extern class SpriteList Items;
 extern class TrumpPlayerSprite *ThePlayer;
 
+extern Mix_Chunk *LevelClearFX;
 extern Mix_Chunk *TrumpDieFX;
 extern Mix_Chunk *PickUpItemFX;
 extern Mix_Chunk *PlaceWallFX;

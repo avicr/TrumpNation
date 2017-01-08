@@ -38,6 +38,7 @@ Mix_Chunk *PlaceWallFX = NULL;
 Mix_Chunk *StepFX = NULL;
 Mix_Chunk *TitleConfirmFX = NULL;
 Mix_Chunk *TrumpDieFX = NULL;
+Mix_Chunk *LevelClearFX = NULL;
 Mix_Music *TitleMusic = NULL;
 Mix_Music *BGMusic = NULL;
 Mix_Music *HatDanceMusic = NULL;
@@ -99,6 +100,7 @@ void CleanUp()
 	Mix_FreeChunk(StepFX);
 	Mix_FreeChunk(TitleConfirmFX);
 	Mix_FreeChunk(TrumpDieFX);
+	Mix_FreeChunk(LevelClearFX);
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -453,6 +455,7 @@ void InitSDL()
 			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
 			TitleConfirmFX = Mix_LoadWAV("resource/sounds/Titleconfirm.wav");
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
+			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");
 		}
 
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);

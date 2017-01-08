@@ -71,6 +71,7 @@ bool Game::LevelComplete()
 	}
 
 	ThePlayer->KillEverything(false);
+	Mix_PlayChannel(-1, LevelClearFX, 0);
 	SetLevel(CurrentLevel + 1);
 	return true;
 }
