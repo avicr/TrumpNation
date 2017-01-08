@@ -211,6 +211,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 	if (Rect.y > 600)
 	{
+		TheGame->OnMexicanEscaped();
 		bPendingDelete = true;
 		return;
 		/*Rect.y = 0;

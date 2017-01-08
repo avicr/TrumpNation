@@ -201,7 +201,8 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		NumBombs--;
 	}*/
 
-	if (!bButtonPreviouslyPressed[0] && bHasWall && (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0))))
+	bool bPressingButton1 = state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0));
+	if (!bButtonPreviouslyPressed[0] && bHasWall && bPressingButton1)
 	{
 		int TotalScore = PLACE_WALL_SCORE;
 		//bFreezeSpawn = true;
@@ -252,7 +253,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		bButtonPreviouslyPressed[1] = false;
 	}
 
-	if (state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0)))
+	if (bPressingButton1)
 	{
 		bButtonPreviouslyPressed[0] = true;
 	}
