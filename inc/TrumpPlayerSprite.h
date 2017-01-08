@@ -19,7 +19,7 @@ public:
 	SDL_Rect GetCollisionRect();
 	void SetHasWall(bool bInHasWall);
 	void AddToScore(int Amount);
-	int GetScore();
+	long GetScore();
 	int GetNumLives();
 	void SetNumLives(int Amount);
 	void TakeDamage();
@@ -38,7 +38,7 @@ protected:
 	int NumBombs;
 	double DyingCountDown;
 	int NumLives;
-	int Score;
+	long Score;
 	bool bPlayingStepFX;
 	bool bHasWall;
 	bool bHasRedHat;

@@ -44,9 +44,10 @@ Mix_Music *BGMusic = NULL;
 Mix_Music *HatDanceMusic = NULL;
 Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
-Glyph Numerals36[10];
-Glyph Numerals20[10];
-Glyph NumeralsWhite20[10];
+Glyph FontSeg36[94];
+Glyph FontSeg20[94];
+Glyph FontSeg36White[94];
+Glyph FontSeg20White[94];
 SDL_Texture *BackBuffer;
 int WindowWidth;
 int WindowHeight;
@@ -60,10 +61,11 @@ void Render();
 void InitSDL();
 void CleanUp();
 void DrawHUD(SDL_Renderer *Renderer);
-void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10], SDL_Color Color = { 0, 0, 0, 255 });
+void LoadFont(const char *FontName, int Point, Glyph Glyphs[94], SDL_Color Color = { 0, 0, 0, 255 });
 void PresentBackBuffer();
 void SpawnRandomItem();
 double GetSpawnTime();
+void DoGameOver();
 
 int main(int argc, char ** argv)
 {
@@ -102,10 +104,12 @@ void CleanUp()
 	Mix_FreeChunk(TrumpDieFX);
 	Mix_FreeChunk(LevelClearFX);
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 94; i++)
 	{
-		SDL_DestroyTexture(Numerals20[i].Texture);
-		SDL_DestroyTexture(Numerals36[i].Texture);
+		SDL_DestroyTexture(FontSeg20[i].Texture);
+		SDL_DestroyTexture(FontSeg36[i].Texture);
+		SDL_DestroyTexture(FontSeg20White[i].Texture);
+		SDL_DestroyTexture(FontSeg36White[i].Texture);
 	}
 
 	TTF_Quit();
@@ -207,6 +211,12 @@ bool GameLoop()
 		Mexicans.DeleteAll();
 		Items.DeleteAll();
 	}
+
+	if (!bUserQuit)
+	{
+		DoGameOver();
+	}
+
 	delete ThePlayer;
 	delete TheGame;
 	ThePlayer = NULL;
@@ -458,15 +468,16 @@ void InitSDL()
 			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
 		SDL_SetRenderTarget(GRenderer, BackBuffer);
 		SDL_Log("After create window");
-		LoadNumerals("resource/fonts/segoeuib.ttf", 36, Numerals36);
-		LoadNumerals("resource/fonts/segoeuib.ttf", 28, Numerals20);
-		LoadNumerals("resource/fonts/segoeuib.ttf", 28, NumeralsWhite20, { 255, 255, 255, 255 });
+		LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36);
+		LoadFont("resource/fonts/segoeuib.ttf", 28, FontSeg20);
+		LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36White, { 255, 255, 255, 255 });
+		LoadFont("resource/fonts/segoeuib.ttf", 28, FontSeg20White, { 255, 255, 255, 255 });
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
 		SDL_ShowCursor(SDL_DISABLE);
@@ -485,17 +496,40 @@ SDL_Renderer *GetRenderer()
 	return GRenderer;
 }
 
-void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10], float ScaleX, float ScaleY)
+void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10], float ScaleX, float ScaleY, bool bRightJustify)
 {
-	for (int i = 0; i < Text.size(); i++)
-	{
-		char CharToRender = Text.at(i) - '0';
-		if (CharToRender >= 0 && CharToRender < 10)
-		{
-			SDL_Rect SrcRect = { 0, 0, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
-			SDL_Rect DstRect = { X + i * (Glyphs[CharToRender].Width * ScaleX), Y, Glyphs[CharToRender].Width * ScaleX, Glyphs[CharToRender].Height * ScaleY };
+	double PosX = X;
 
-			SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
+	if (!bRightJustify)
+	{
+		for (int i = 0; i < Text.size(); i++)
+		{
+			char CharToRender = Text.at(i) - 32;
+			if (CharToRender >= 0 && CharToRender < 94)
+			{
+				SDL_Rect SrcRect = { 0, 0, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
+				SDL_Rect DstRect = { PosX, Y, Glyphs[CharToRender].Width * ScaleX, Glyphs[CharToRender].Height * ScaleY };
+
+				SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
+
+				PosX += Glyphs[CharToRender].Width * ScaleX;
+			}
+		}
+	}
+	else
+	{
+		for (int i = Text.size() - 1; i >= 0; i--)
+		{
+			char CharToRender = Text.at(i) - 32;
+			if (CharToRender >= 0 && CharToRender < 94)
+			{
+				SDL_Rect SrcRect = { 0, 0, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
+				SDL_Rect DstRect = { PosX - Glyphs[CharToRender].Width * ScaleX, Y, Glyphs[CharToRender].Width * ScaleX, Glyphs[CharToRender].Height * ScaleY };
+
+				SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
+
+				PosX -= Glyphs[CharToRender].Width * ScaleX;
+			}
 		}
 	}
 }
@@ -504,22 +538,21 @@ void DrawHUD(SDL_Renderer *Renderer)
 {
 	SDL_Rect HUDRect = { 0, 0, 1024, 86 };
 	SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
-	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, Numerals36);
-	DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, Numerals20);
-	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, Numerals20);
-	//DrawText(std::to_string(ThePlayer->GetNumBombs()), 98, 33, 18, 32, Renderer, Numerals20);
+	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, FontSeg36);
+	DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, FontSeg20);
+	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, FontSeg20);	
 }
 
-void LoadNumerals(const char *FontName, int Point, Glyph Glyphs[10], SDL_Color Color)
+void LoadFont(const char *FontName, int Point, Glyph Glyphs[94], SDL_Color Color)
 {	
 	TTF_Font *Font = TTF_OpenFont(FontName, Point);
 	
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 94; i++)
 	{
 		Uint32 OutFormat;
 		int OutAccess;
 
-		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, '0' + i, Color);
+		SDL_Surface *NumeralSurface = TTF_RenderGlyph_Blended(Font, 32 + i, Color);
 		Glyphs[i].Texture = SDL_CreateTextureFromSurface(GRenderer, NumeralSurface);
 		SDL_QueryTexture(Glyphs[i].Texture, &OutFormat, &OutAccess, &Glyphs[i].Width, &Glyphs[i].Height);
 		SDL_FreeSurface(NumeralSurface);
@@ -593,4 +626,116 @@ double GetSpawnTime()
 	{
 		return 1 / log1p(TheGame->GetLevelNumber() * TheGame->GetLevelNumber() * TheGame->GetLevelNumber());
 	}
+}
+
+void DoGameOver()
+{
+	enum eGameOverState {GameOverInit = 0, GameOverPlayerScore, GameOverMiles, GameOverMexicans, GameOverTotal} 
+	GameOverState = GameOverInit;
+
+	bool bUserQuit = false;
+	bool bDone = false;
+	double GameOverCountDown = 10;
+
+	SDL_Event TheEvent;	
+
+	Uint64 StartTime = SDL_GetPerformanceCounter();
+	Uint64 CurrentTime = SDL_GetPerformanceCounter();
+	double DeltaTime;
+	while (!bDone)
+	{		
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+		{
+			bDone = true;
+			bUserQuit = true;
+		}
+		
+		StartTime = CurrentTime;
+		CurrentTime = SDL_GetPerformanceCounter();
+		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+		DeltaTime *= (double)0.001;
+
+		GameOverCountDown -= DeltaTime;
+
+		if (GameOverCountDown < 0)
+		{
+			bDone = true;
+		}
+		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+		SDL_RenderClear(GRenderer);
+
+		DrawText("GAME OVER", 420, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);		
+
+		if (GameOverCountDown <= 9.5)
+		{
+			if (GameOverState == GameOverInit)
+			{
+				GameOverState = GameOverPlayerScore;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+			DrawText("Player Score", 174, 183, 0, 0, GRenderer, FontSeg20White);
+			DrawText(std::to_string(ThePlayer->GetScore()), 874, 183, 0, 0, GRenderer, FontSeg20White, 1, 1, true);
+		}
+		
+		if (GameOverCountDown <= 8.5)
+		{
+			if (GameOverState == GameOverPlayerScore)
+			{
+				GameOverState = GameOverMiles;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+			DrawText("Miles Completed       5000 x", 174, 223, 0, 0, GRenderer, FontSeg20White);
+			DrawText(std::to_string(TheGame->GetLevelNumber() - 1), 874, 223, 0, 0, GRenderer, FontSeg20White, 1, 1, true);
+		}
+
+		if (GameOverCountDown <= 7.5)
+		{
+			if (GameOverState == GameOverMiles)
+			{
+				GameOverState = GameOverMexicans;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+
+			SDL_Rect DstRect = { 174, 268, ResourceManager::MexicanFaceTexture->SrcRect.w, ResourceManager::MexicanFaceTexture->SrcRect.h };
+			SDL_RenderCopy(GRenderer, ResourceManager::MexicanFaceTexture->Texture, NULL, &DstRect);
+			DrawText("     's Crossed Border      -5 x", 174, 263, 0, 0, GRenderer, FontSeg20White);
+			DrawText(std::to_string(TheGame->GetNumMexicansEscaped()), 874, 263, 0, 0, GRenderer, FontSeg20White, 1, 1, true);
+		}
+
+		if (GameOverCountDown <= 6)
+		{
+			if (GameOverState == GameOverMexicans)
+			{
+				GameOverState = GameOverTotal;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+
+			SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
+			SDL_RenderDrawLine(GRenderer, 155, 312, 894, 312);
+			SDL_RenderDrawLine(GRenderer, 155, 313, 894, 313);
+			SDL_RenderDrawLine(GRenderer, 155, 314, 894, 314);
+
+			long TotalScore = ThePlayer->GetScore() + (TheGame->GetLevelNumber() - 1) * LEVEL_CLEAR_POINTS + TheGame->GetNumMexicansEscaped() * MEXICAN_ESCAPED_POINTS;
+			DrawText("Total", 188, 325, 0, 0, GRenderer, FontSeg20White);
+			DrawText(std::to_string(TotalScore), 874, 325, 0, 0, GRenderer, FontSeg20White, 1, 1, true);			
+		}
+		/*if (GameOverCountDown > 0 && (int)round(GameOverCountDown * 100) % 40 >= 20)
+		{
+			DrawText("GAME OVER", 0, 0, 0, 0, GRenderer, FontSeg20White);
+		}				*/
+		PresentBackBuffer();
+
+		while (SDL_PollEvent(&TheEvent) != 0)
+		{
+			////User requests quit
+			//if (TheEvent.type == SDL_KEYDOWN)
+			//{
+			//	bDone = true;
+			//}
+			if (TheEvent.type == SDL_QUIT)
+			{
+				bDone = true;
+			}
+		}
+	}	
 }

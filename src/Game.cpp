@@ -75,3 +75,9 @@ bool Game::LevelComplete()
 	SetLevel(CurrentLevel + 1);
 	return true;
 }
+
+int Game::GetNumMexicansEscaped()
+{
+
+	return NumMexicansEscaped;
+}

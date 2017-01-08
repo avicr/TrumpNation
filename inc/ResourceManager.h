@@ -77,6 +77,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(FontTexture, "Font512x512.bmp");
 	DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");
+	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
 	{

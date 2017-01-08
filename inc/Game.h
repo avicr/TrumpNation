@@ -10,7 +10,7 @@ public:
 	int GetLevelNumber();
 	void SetLevel(int Level);
 	bool LevelComplete();
-	void DoSwap();
+	int GetNumMexicansEscaped();
 
 	int WallArray[16];
 

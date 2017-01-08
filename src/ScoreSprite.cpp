@@ -9,7 +9,7 @@ ScoreSprite::ScoreSprite(int X, int Y, int InScore)
 
 void ScoreSprite::Render(SDL_Renderer *Renderer)
 {
-	DrawText(std::to_string(Score), PosX, PosY, 0, 0, Renderer, NumeralsWhite20);
+	DrawText(std::to_string(Score), PosX, PosY, 0, 0, Renderer, FontSeg20White);
 }
 
 void ScoreSprite::Tick(double DeltaTime)

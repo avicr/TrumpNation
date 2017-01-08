@@ -29,6 +29,8 @@
 
 #define PLACE_WALL_SCORE 500
 #define MEXICAN_BLOCK_SCORE 50
+#define LEVEL_CLEAR_POINTS 5000
+#define MEXICAN_ESCAPED_POINTS -5
 
 #define BOMB_FLASH_TIME 0.20;
 
@@ -53,12 +55,12 @@ extern Game *TheGame;
 extern bool bFreezeSpawn;
 extern bool bSwapSprites;
 
-extern struct Glyph Numerals36[10];
-extern struct Glyph Numerals20[10];
-extern struct Glyph NumeralsWhite20[10];
+extern struct Glyph FontSeg36[94];
+extern struct Glyph FontSeg20[94];
+extern struct Glyph FontSeg20White[94];
 
 extern double BombCountDown;
 
 SDL_Renderer *GetRenderer();
-extern void DrawText(std::string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, struct Glyph Glyphs[10], float ScaleX = 1, float ScaleY = 1);
+extern void DrawText(std::string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, struct Glyph Glyphs[10], float ScaleX = 1, float ScaleY = 1, bool bRightJustify = false);
 #endif

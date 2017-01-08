@@ -12,7 +12,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	SetHeight(80);
 
 	NumBombs = 2;
-	NumLives = 2;
+	NumLives = 0;// 2;
 	MoveRate = 444;
 	MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
 	TransitionSpeed = 7;
@@ -131,7 +131,7 @@ void TrumpPlayerSprite::AddToScore(int Amount)
 	Score += Amount;
 }
 
-int TrumpPlayerSprite::GetScore()
+long TrumpPlayerSprite::GetScore()
 {
 	return Score;
 }
