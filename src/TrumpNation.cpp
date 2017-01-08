@@ -319,13 +319,14 @@ bool DoTitleScreen()
 {
 	bool bUserQuit = false;
 	bool bDone = false;
+	bool bScrollDone = false;
 	double PosY = 0;
 	double ScrollCountDown = TITLE_SCROLL_TIME;
 	int NumIntrosPlayed = 0;
 
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
-	Mix_PlayMusic(TitleMusic, -1);
+	Mix_PlayMusic(TitleMusic, 0);
 	Sprite *TrumpIntroSprite = new Sprite();
 	TrumpIntroSprite->SetPosition(445, 300);
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
@@ -356,28 +357,24 @@ bool DoTitleScreen()
 		
 		ScrollCountDown -= DeltaTime;
 
-		if (NumIntrosPlayed == 0 && ScrollCountDown <= TITLE_SCROLL_TIME - 21.25)
+		if (!bScrollDone && ScrollCountDown <= TITLE_SCROLL_TIME - 21.25)
 		{	
 			PosY += DeltaTime * 80;
 		}
 
-		if (NumIntrosPlayed == 0 && PosY >= ResourceManager::InfoTexture->SrcRect.h)
-		{
-			Mix_FadeOutMusic(250);
+		if (PosY >= ResourceManager::InfoTexture->SrcRect.h - 100)
+		{			
 			PosY = 0;
+			bScrollDone = true;
 		}
 
 		if (ScrollCountDown <= 0)
-		{
-			NumIntrosPlayed++;
+		{	
 
-			if (NumIntrosPlayed > TITLE_NUM_INTROS_TO_PLAY)
-			{
-				Mix_PlayMusic(TitleMusic, -1);
-				NumIntrosPlayed = 0;
-			}
+			Mix_PlayMusic(TitleMusic, 0);
+			bScrollDone = false;
 			
-			ScrollCountDown = TITLE_SCROLL_TIME;
+			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
 
 		TrumpIntroSprite->SetPosition(445, 300 - PosY);
@@ -458,7 +455,7 @@ void InitSDL()
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
