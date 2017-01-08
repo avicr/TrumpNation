@@ -12,6 +12,7 @@ public:
 	void Render(SDL_Renderer *Renderer);
 	void CheckCollision(TrumpPlayerSprite *OtherSprite);
 	void Interact(TrumpPlayerSprite *OtherSprite);
+	int GetScoreWorth();
 
 protected:
 	double Growth;

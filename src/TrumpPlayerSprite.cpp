@@ -204,7 +204,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	bool bPressingButton1 = state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0));
 	if (!bButtonPreviouslyPressed[0] && bHasWall && bPressingButton1)
 	{
-		int TotalScore = PLACE_WALL_SCORE;
+		int TotalScore = PLACE_WALL_SCORE * (bSwapSprites ? 2 : 1);
 		//bFreezeSpawn = true;
 		
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
@@ -229,14 +229,9 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 				{
 					if (Mexicans[i]->HandleWallPlaced(WallIndex * 2) || Mexicans[i]->HandleWallPlaced(WallIndex * 2 + 1))
 					{
-						TotalScore += MEXICAN_BLOCK_SCORE;
+						TotalScore += Mexicans[i]->GetScoreWorth();
 					}					
-				}
-
-				if (bSwapSprites)
-				{
-					TotalScore *= 2;
-				}
+				}				
 
 				Items.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
 				Score += TotalScore;
@@ -399,10 +394,10 @@ void TrumpPlayerSprite::KillEverything(bool bBecauseBomb)
 	{
 		SDL_Rect MexiRect = Mexicans[i]->GetCollisionRect();
 
-		Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, ScorePerMexican));
+		Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, Mexicans[i]->GetScoreWorth()));
+		AddToScore(Mexicans[i]->GetScoreWorth());
 	}
-
-	AddToScore(ScorePerMexican * Mexicans.size());
+	
 	Mexicans.DeleteAll();
 }
 

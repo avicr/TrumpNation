@@ -15,7 +15,32 @@ Mexican1Sprite::Mexican1Sprite()
 	SetHeight(int(136 * scale));
 	
 	MoveRate = 444;
-	MaxVelocity = 222;
+	if (rand() % 100 == 0)
+	{
+		MaxVelocity = 120;
+		if (!bSwapSprites)
+		{
+			PlayAnimation(ResourceManager::Mexican1PinkAnimation);
+		}
+		else
+		{
+			PlayAnimation(ResourceManager::TrumpAnimation);
+		}
+
+	}
+	else
+	{
+		MaxVelocity = 222;
+		if (!bSwapSprites)
+		{
+			PlayAnimation(ResourceManager::Mexican1Animation);
+		}
+		else
+		{
+			PlayAnimation(ResourceManager::TrumpAnimation);
+		}
+	}
+	
 	TransitionSpeed = 2;
 	StopSpeed = 4;
 	PosY = HORIZON;	
@@ -111,15 +136,7 @@ Mexican1Sprite::Mexican1Sprite()
 		//PosX = WallIndex * 64;
 	}	
 
-	MovingFlags = 0;
-	if (!bSwapSprites)
-	{
-		PlayAnimation(ResourceManager::Mexican1Animation);
-	}
-	else
-	{
-		PlayAnimation(ResourceManager::TrumpAnimation);
-	}
+	MovingFlags = 0;	
 	
 }
 
@@ -273,4 +290,18 @@ void Mexican1Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
 
 void Mexican1Sprite::Interact(TrumpPlayerSprite *OtherSprite)
 {
+}
+
+int Mexican1Sprite::GetScoreWorth()
+{
+	int Score = MEXICAN_BLOCK_SCORE;
+
+	if (AnimData.Anim == ResourceManager::Mexican1PinkAnimation)
+	{
+		Score *= 100;
+	}
+
+	Score *= bSwapSprites ? 2 : 1;
+
+	return Score;
 }

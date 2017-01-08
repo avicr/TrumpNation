@@ -468,7 +468,7 @@ void InitSDL()
 			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
@@ -642,6 +642,8 @@ void DoGameOver()
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
+	Mix_PlayChannel(-1, PlaceWallFX, 0);
+
 	while (!bDone)
 	{		
 		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
@@ -666,7 +668,7 @@ void DoGameOver()
 
 		DrawText("GAME OVER", 420, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);		
 
-		if (GameOverCountDown <= 9.5)
+		if (GameOverCountDown <= 9)
 		{
 			if (GameOverState == GameOverInit)
 			{
@@ -677,18 +679,18 @@ void DoGameOver()
 			DrawText(std::to_string(ThePlayer->GetScore()), 874, 183, 0, 0, GRenderer, FontSeg20White, 1, 1, true);
 		}
 		
-		if (GameOverCountDown <= 8.5)
+		if (GameOverCountDown <= 8)
 		{
 			if (GameOverState == GameOverPlayerScore)
 			{
 				GameOverState = GameOverMiles;
 				Mix_PlayChannel(-1, PlaceWallFX, 0);
 			}
-			DrawText("Miles Completed       5000 x", 174, 223, 0, 0, GRenderer, FontSeg20White);
+			DrawText("Miles Completed        2000 x", 174, 223, 0, 0, GRenderer, FontSeg20White);
 			DrawText(std::to_string(TheGame->GetLevelNumber() - 1), 874, 223, 0, 0, GRenderer, FontSeg20White, 1, 1, true);
 		}
 
-		if (GameOverCountDown <= 7.5)
+		if (GameOverCountDown <= 7)
 		{
 			if (GameOverState == GameOverMiles)
 			{
@@ -698,11 +700,11 @@ void DoGameOver()
 
 			SDL_Rect DstRect = { 174, 268, ResourceManager::MexicanFaceTexture->SrcRect.w, ResourceManager::MexicanFaceTexture->SrcRect.h };
 			SDL_RenderCopy(GRenderer, ResourceManager::MexicanFaceTexture->Texture, NULL, &DstRect);
-			DrawText("     's Crossed Border      -5 x", 174, 263, 0, 0, GRenderer, FontSeg20White);
+			DrawText("     's Crossed Border     -50 x", 174, 263, 0, 0, GRenderer, FontSeg20White);
 			DrawText(std::to_string(TheGame->GetNumMexicansEscaped()), 874, 263, 0, 0, GRenderer, FontSeg20White, 1, 1, true);
 		}
 
-		if (GameOverCountDown <= 6)
+		if (GameOverCountDown <= 5.5)
 		{
 			if (GameOverState == GameOverMexicans)
 			{

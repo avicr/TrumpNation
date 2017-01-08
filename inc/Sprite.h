@@ -72,6 +72,8 @@ public:
 	void StopAnimation();
 	bool GetPendingDelete();
 	void Delete();
+	virtual int GetScoreWorth() { return 0; }
+
 };
 
 #endif
