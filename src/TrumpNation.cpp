@@ -18,6 +18,13 @@
 #include "../inc/ScoreSprite.h"
 #include <algorithm>
 
+struct HighScoreEntry
+{
+	long Score;
+	int Mile;
+	char Name[4];
+};
+
 struct Glyph
 {
 	int Width;
@@ -30,6 +37,7 @@ struct Glyph
 	}
 };
 
+HighScoreEntry HighScores[10];
 bool bFreezeSpawn = false;
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
@@ -76,7 +84,10 @@ void PresentBackBuffer();
 void SpawnRandomItem();
 double GetSpawnTime();
 void DoGameOver();
-void DoDisplayHighScore(int EnterPosition = -1);
+int GetHighScorePosition(long Score);
+void DoDisplayHighScore(int EnterPosition = -1, long Score = 0, int Mile = 0);
+void ReadHighScores();
+void WriteHighScores();
 
 int main(int argc, char ** argv)
 {
@@ -88,7 +99,7 @@ int main(int argc, char ** argv)
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
 	
 	GResourceManager = new ResourceManager;
-	DoDisplayHighScore(2);
+
 	do
 	{
 		if (!DoTitleScreen())
@@ -558,7 +569,15 @@ void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Ren
 
 				SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
 
-				PosX -= Glyphs[CharToRender].Width * ScaleX;
+				if (SizeX)
+				{
+					PosX -= SizeX;
+				}
+				else
+				{
+					PosX -= Glyphs[CharToRender].Width * ScaleX;
+				}
+				
 			}
 		}
 	}
@@ -662,7 +681,7 @@ void DoGameOver()
 {
 	enum eGameOverState {GameOverInit = 0, GameOverPlayerScore, GameOverMiles, GameOverMexicans, GameOverTotal} 
 	GameOverState = GameOverInit;
-
+	long TotalScore = 0;
 	bool bUserQuit = false;
 	bool bDone = false;
 	double GameOverCountDown = 10;
@@ -747,7 +766,7 @@ void DoGameOver()
 			SDL_RenderDrawLine(GRenderer, 155, 313, 894, 313);
 			SDL_RenderDrawLine(GRenderer, 155, 314, 894, 314);
 
-			long TotalScore = ThePlayer->GetScore() + (TheGame->GetLevelNumber() - 1) * LEVEL_CLEAR_POINTS + TheGame->GetNumMexicansEscaped() * MEXICAN_ESCAPED_POINTS;
+			TotalScore = ThePlayer->GetScore() + (TheGame->GetLevelNumber() - 1) * LEVEL_CLEAR_POINTS + TheGame->GetNumMexicansEscaped() * MEXICAN_ESCAPED_POINTS;
 			DrawText("Total", 188, 325, 0, 0, GRenderer, FontSeg20White);
 			DrawText(std::to_string(TotalScore), 874, 325, 0, 0, GRenderer, FontSeg20White, 1, 1, true);			
 		}
@@ -770,24 +789,61 @@ void DoGameOver()
 			}
 		}
 	}	
+
+	ReadHighScores();
+	DoDisplayHighScore(GetHighScorePosition(TotalScore), TotalScore, TheGame->GetLevelNumber()-1);
 }
 
-void DoDisplayHighScore(int EnterPosition)
+int GetHighScorePosition(long Score)
 {
+	for (int i = 0; i < 10; i++)
+	{
+		if (Score > HighScores[i].Score)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void DoDisplayHighScore(int EnterRank, long Score, int Mile)
+{
+	bool bInputtingName = EnterRank != -1;
 	bool bUserQuit = false;
 	bool bDone = false;
-	double HighScoreCountDown = 110;
+	double HighScoreCountDown = 5;
 	int BrickX = 57;
 	int BrickY = 134;
 	int MoveY = 0;
 	int MoveX = 0;
+	int NamePos = 0;
+	int CharIndex = 0;
+	char *CharArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/\?!@$&*+_\1";
 
 	SDL_Event TheEvent;
 
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;	
+	bool bButtonPressed = false;
 	SDL_Joystick *Joy = SDL_JoystickOpen(0);
+
+	ReadHighScores();
+
+	if (EnterRank != -1)
+	{
+		for (int i = 9; i > EnterRank; i--)
+		{
+			HighScores[i] = HighScores[i - 1];
+
+			strcpy(HighScores[i].Name, HighScores[i - 1].Name);
+		}
+
+		strcpy(HighScores[EnterRank].Name, "AAA");
+		HighScores[EnterRank].Mile = Mile;
+		HighScores[EnterRank].Score = Score;
+		HighScores[EnterRank].Name[3] = 0;
+	}
 
 	while (!bDone)
 	{
@@ -806,8 +862,16 @@ void DoDisplayHighScore(int EnterPosition)
 
 		if (HighScoreCountDown < 0)
 		{
-			bDone = true;
+			if (!bInputtingName)
+			{
+				bDone = true;
+			}
+			else
+			{
+				HighScoreCountDown = 5;
+			}
 		}
+
 		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
 		SDL_RenderClear(GRenderer);
 		DrawText("GREATEST AMERICANS", 314, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);
@@ -816,7 +880,7 @@ void DoDisplayHighScore(int EnterPosition)
 		
 		DrawText("RANK", 330, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
 		DrawText("SCORE", 438, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
-		DrawText("MILE", 536, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
+		DrawText("MILES", 536, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
 		DrawText("NAME", 636, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
 
 		Glyph *Font;
@@ -824,11 +888,6 @@ void DoDisplayHighScore(int EnterPosition)
 		{
 			int PosY = i * 34;
 			
-			if (i == EnterPosition && ((int)round(HighScoreCountDown * 100) % 30) >= 15 )
-			{
-				continue;
-			}
-
 			if (i == 0)
 			{
 				Font = FontSegSmallRed;
@@ -842,14 +901,39 @@ void DoDisplayHighScore(int EnterPosition)
 				Font = FontSegSmallBlue;
 			}
 
+			if (bInputtingName && i == EnterRank && ((int)round(HighScoreCountDown * 100) % 70) >= 60 )
+			{
+				continue;
+			}
+
+			/*if (i == EnterRank)
+			{
+				SDL_SetRenderDrawColor(GRenderer, 255, 255, 0, 255);
+				SDL_RenderDrawLine(GRenderer, 647, 195 + PosY, 658, 195 + PosY);
+				SDL_RenderDrawLine(GRenderer, 647, 196 + PosY, 658, 196 + PosY);
+				SDL_RenderDrawLine(GRenderer, 647, 197 + PosY, 658, 197 + PosY);
+			}*/
+
 			if (i != 0)
 			{
 				DrawText(std::to_string(i + 1), 335, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
 			}
 
-			DrawText("100000", 433, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
-			DrawText("32", 567, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
-			DrawText("AAA", 687, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
+			DrawText(std::to_string(HighScores[i].Score), 433, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
+			DrawText(std::to_string(HighScores[i].Mile), 567, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
+
+			if (i == EnterRank && bInputtingName)
+			{
+				char Name[4];
+				strcpy(Name, HighScores[i].Name);
+				Name[NamePos + 1] = 0;
+				DrawText(Name, 647, 170 + PosY, 16, 0, GRenderer, Font);
+				
+			}
+			else
+			{
+				DrawText(HighScores[i].Name, 647, 170 + PosY, 16, 0, GRenderer, Font);
+			}
 		}
 
 		//SDL_Rect Rect = { BrickX, BrickY, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };
@@ -862,74 +946,136 @@ void DoDisplayHighScore(int EnterPosition)
 
 		while (SDL_PollEvent(&TheEvent) != 0)
 		{
-			MoveY = 0;
-			MoveX = 0;
-			if (TheEvent.type == SDL_KEYDOWN)
+			if (bInputtingName)
 			{
-				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_8 || TheEvent.key.keysym.scancode == SDL_SCANCODE_UP))
+				MoveY = 0;
+				MoveX = 0;
+				bButtonPressed = false;
+				if (TheEvent.type == SDL_KEYDOWN)
 				{
-					MoveY = -1;
-				}
-
-				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_2 || TheEvent.key.keysym.scancode == SDL_SCANCODE_DOWN))
-				{
-					MoveY = 1;
-				}
-
-				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_4 || TheEvent.key.keysym.scancode == SDL_SCANCODE_LEFT))
-				{
-					MoveX = -1;
-				}
-
-				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_6 || TheEvent.key.keysym.scancode == SDL_SCANCODE_RIGHT))
-				{
-					MoveX = 1;
-				}
-			}
-
-			if (TheEvent.type == SDL_JOYAXISMOTION)
-			{
-				if (TheEvent.jaxis.axis == 0)
-				{
-					if (TheEvent.jaxis.value > 3200)
+					if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE || TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN))
 					{
-						MoveY = 1;
+						bButtonPressed = true;
 					}
-					else if(TheEvent.jaxis.value < -3200)
+
+					if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_8 || TheEvent.key.keysym.scancode == SDL_SCANCODE_UP))
 					{
 						MoveY = -1;
 					}
+
+					if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_2 || TheEvent.key.keysym.scancode == SDL_SCANCODE_DOWN))
+					{
+						MoveY = 1;
+					}
+
+					if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_4 || TheEvent.key.keysym.scancode == SDL_SCANCODE_LEFT))
+					{
+						MoveX = -1;
+					}
+
+					if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_6 || TheEvent.key.keysym.scancode == SDL_SCANCODE_RIGHT))
+					{
+						MoveX = 1;
+					}
 				}
-			}
 
-			if (MoveY != 0)
-			{
-				BrickY += MoveY * 50;
-
-				if (BrickY < 134)
+				if (TheEvent.type == SDL_JOYBUTTONDOWN)
 				{
-					BrickY = 134 + 50 * 3;
+					if (TheEvent.jbutton.button == 0)
+					{
+						bButtonPressed = true;
+					}
 				}
 
-				if (BrickY > 134 + 50 * 3)
+				if (TheEvent.type == SDL_JOYAXISMOTION)
 				{
-					BrickY = 134;
+					if (TheEvent.jaxis.axis == 0)
+					{
+						if (TheEvent.jaxis.value > 3200)
+						{
+							MoveY = 1;
+						}
+						else if (TheEvent.jaxis.value < -3200)
+						{
+							MoveY = -1;
+						}
+					}
 				}
-			}
 
-			if (MoveX != 0)
-			{
-				BrickX += MoveX * 50;
-
-				if (BrickX < 57)
+				if (bButtonPressed)
 				{
-					BrickX = 57 + 50 * 9;
+					if (CharArray[CharIndex] == '\1')
+					{
+						HighScores[EnterRank].Name[NamePos] = 'A';
+						NamePos--;
+						CharIndex = 0;
+						HighScores[EnterRank].Name[NamePos] = 'A';
+					}
+					else
+					{
+						CharIndex = 0;
+						NamePos++;
+
+						if (NamePos < 3)
+						{
+							HighScores[EnterRank].Name[NamePos] = 'A';
+						}
+					}
+					SDL_Log("NamePos: %d", NamePos);
+
+					if (NamePos > 2)
+					{
+						bInputtingName = false;
+						HighScoreCountDown = 5;
+					}
 				}
 
-				if (BrickX > 57 + 50 * 9)
+				if (MoveY != 0)
 				{
-					BrickX = 57;
+					CharIndex += MoveY;
+
+					if (CharIndex < 0)
+					{
+						CharIndex = strlen(CharArray) - 1;
+					}
+
+					if (CharIndex >= strlen(CharArray))
+					{
+						CharIndex = 0;
+					}
+
+					HighScores[EnterRank].Name[NamePos] = CharArray[CharIndex];
 				}
+
+				/*if (MoveY != 0)
+				{
+					BrickY += MoveY * 50;
+
+					if (BrickY < 134)
+					{
+						BrickY = 134 + 50 * 3;
+					}
+
+					if (BrickY > 134 + 50 * 3)
+					{
+						BrickY = 134;
+					}
+				}
+
+				if (MoveX != 0)
+				{
+					BrickX += MoveX * 50;
+
+					if (BrickX < 57)
+					{
+						BrickX = 57 + 50 * 9;
+					}
+
+					if (BrickX > 57 + 50 * 9)
+					{
+						BrickX = 57;
+					}
+				}*/
 			}
 
 			if (TheEvent.type == SDL_QUIT)
@@ -939,5 +1085,30 @@ void DoDisplayHighScore(int EnterPosition)
 		}
 	}
 
+	WriteHighScores();
 	SDL_JoystickClose(Joy);
+}
+
+void ReadHighScores()
+{
+	FILE *HighScoreFile = fopen("data.dat", "r");
+
+	for (int i = 0; i < 10; i++)
+	{
+		fscanf(HighScoreFile, "%ld %d %s", &HighScores[i].Score, &HighScores[i].Mile, &HighScores[i].Name);
+	}
+
+	fclose(HighScoreFile);
+}
+
+void WriteHighScores()
+{
+	FILE *HighScoreFile = fopen("data.dat", "w");
+
+	for (int i = 0; i < 10; i++)
+	{
+		fprintf(HighScoreFile, "%ld\n%d\n%s\n", HighScores[i].Score, HighScores[i].Mile, HighScores[i].Name);
+	}
+
+	fclose(HighScoreFile);
 }
