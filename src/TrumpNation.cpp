@@ -88,7 +88,7 @@ int main(int argc, char ** argv)
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
 	
 	GResourceManager = new ResourceManager;
-	DoDisplayHighScore();
+	DoDisplayHighScore(2);
 	do
 	{
 		if (!DoTitleScreen())
@@ -824,6 +824,11 @@ void DoDisplayHighScore(int EnterPosition)
 		{
 			int PosY = i * 34;
 			
+			if (i == EnterPosition && ((int)round(HighScoreCountDown * 100) % 30) >= 15 )
+			{
+				continue;
+			}
+
 			if (i == 0)
 			{
 				Font = FontSegSmallRed;
@@ -841,6 +846,7 @@ void DoDisplayHighScore(int EnterPosition)
 			{
 				DrawText(std::to_string(i + 1), 335, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
 			}
+
 			DrawText("100000", 433, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
 			DrawText("32", 567, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
 			DrawText("AAA", 687, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
