@@ -23,6 +23,11 @@ struct Glyph
 	int Width;
 	int Height;
 	SDL_Texture *Texture;
+
+	~Glyph()
+	{
+		SDL_DestroyTexture(Texture);
+	}
 };
 
 bool bFreezeSpawn = false;
@@ -48,6 +53,11 @@ Glyph FontSeg36[94];
 Glyph FontSeg20[94];
 Glyph FontSeg36White[94];
 Glyph FontSeg20White[94];
+Glyph FontSegSmallRed[94];
+Glyph FontSegSmallWhite[94];
+Glyph FontSegSmallBlue[94];
+Glyph FontSegSmallYellow[94];
+
 SDL_Texture *BackBuffer;
 int WindowWidth;
 int WindowHeight;
@@ -66,6 +76,7 @@ void PresentBackBuffer();
 void SpawnRandomItem();
 double GetSpawnTime();
 void DoGameOver();
+void DoDisplayHighScore(int EnterPosition = -1);
 
 int main(int argc, char ** argv)
 {
@@ -77,7 +88,7 @@ int main(int argc, char ** argv)
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
 	
 	GResourceManager = new ResourceManager;
-
+	DoDisplayHighScore();
 	do
 	{
 		if (!DoTitleScreen())
@@ -102,15 +113,7 @@ void CleanUp()
 	Mix_FreeChunk(StepFX);
 	Mix_FreeChunk(TitleConfirmFX);
 	Mix_FreeChunk(TrumpDieFX);
-	Mix_FreeChunk(LevelClearFX);
-
-	for (int i = 0; i < 94; i++)
-	{
-		SDL_DestroyTexture(FontSeg20[i].Texture);
-		SDL_DestroyTexture(FontSeg36[i].Texture);
-		SDL_DestroyTexture(FontSeg20White[i].Texture);
-		SDL_DestroyTexture(FontSeg36White[i].Texture);
-	}
+	Mix_FreeChunk(LevelClearFX);	
 
 	TTF_Quit();
 
@@ -478,6 +481,11 @@ void InitSDL()
 		LoadFont("resource/fonts/segoeuib.ttf", 28, FontSeg20);
 		LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36White, { 255, 255, 255, 255 });
 		LoadFont("resource/fonts/segoeuib.ttf", 28, FontSeg20White, { 255, 255, 255, 255 });
+		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallRed, { 255, 0, 0, 255 });
+		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallWhite, { 255, 255, 255, 255 });
+		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallBlue, { 0, 0, 255, 255 });
+		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallYellow, { 255, 255, 0, 255 });
+
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
 		SDL_ShowCursor(SDL_DISABLE);
@@ -499,20 +507,42 @@ SDL_Renderer *GetRenderer()
 void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10], float ScaleX, float ScaleY, bool bRightJustify)
 {
 	double PosX = X;
+	double PosY = Y;
 
 	if (!bRightJustify)
 	{
 		for (int i = 0; i < Text.size(); i++)
 		{
 			char CharToRender = Text.at(i) - 32;
-			if (CharToRender >= 0 && CharToRender < 94)
+
+			if (CharToRender == '\n' - 32)
 			{
+				if (SizeY)
+				{
+					PosY += SizeY;
+				}
+				else
+				{
+					PosY += Glyphs[CharToRender].Height * ScaleY;					
+				}
+
+				PosX = X;
+			}
+			else if (CharToRender >= 0 && CharToRender < 94)
+			{				
 				SDL_Rect SrcRect = { 0, 0, Glyphs[CharToRender].Width, Glyphs[CharToRender].Height };
-				SDL_Rect DstRect = { PosX, Y, Glyphs[CharToRender].Width * ScaleX, Glyphs[CharToRender].Height * ScaleY };
+				SDL_Rect DstRect = { PosX, PosY, Glyphs[CharToRender].Width * ScaleX, Glyphs[CharToRender].Height * ScaleY };
 
 				SDL_RenderCopy(Renderer, Glyphs[CharToRender].Texture, &SrcRect, &DstRect);
 
-				PosX += Glyphs[CharToRender].Width * ScaleX;
+				if (SizeX)
+				{
+					PosX += SizeX;
+				}
+				else
+				{
+					PosX += Glyphs[CharToRender].Width * ScaleX;
+				}
 			}
 		}
 	}
@@ -740,4 +770,168 @@ void DoGameOver()
 			}
 		}
 	}	
+}
+
+void DoDisplayHighScore(int EnterPosition)
+{
+	bool bUserQuit = false;
+	bool bDone = false;
+	double HighScoreCountDown = 110;
+	int BrickX = 57;
+	int BrickY = 134;
+	int MoveY = 0;
+	int MoveX = 0;
+
+	SDL_Event TheEvent;
+
+	Uint64 StartTime = SDL_GetPerformanceCounter();
+	Uint64 CurrentTime = SDL_GetPerformanceCounter();
+	double DeltaTime;	
+	SDL_Joystick *Joy = SDL_JoystickOpen(0);
+
+	while (!bDone)
+	{
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+		{
+			bDone = true;
+			bUserQuit = true;
+		}
+
+		StartTime = CurrentTime;
+		CurrentTime = SDL_GetPerformanceCounter();
+		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+		DeltaTime *= (double)0.001;
+
+		HighScoreCountDown -= DeltaTime;
+
+		if (HighScoreCountDown < 0)
+		{
+			bDone = true;
+		}
+		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+		SDL_RenderClear(GRenderer);
+		DrawText("GREATEST AMERICANS", 314, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);
+		
+		//DrawText("ABCDEFGHIJ\nKLMNOPQRST\nUVWXYZ.-/?\n!@$&*+_ ", 64, 100, 50, 50, GRenderer, FontSeg20White, 1, 1);
+		
+		DrawText("RANK", 330, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
+		DrawText("SCORE", 438, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
+		DrawText("MILE", 536, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
+		DrawText("NAME", 636, 128, 0, 0, GRenderer, FontSegSmallYellow, 1, 1);
+
+		Glyph *Font;
+		for (int i = 0; i < 10; i++)
+		{
+			int PosY = i * 34;
+			
+			if (i == 0)
+			{
+				Font = FontSegSmallRed;
+			}
+			else if (i > 0 && i < 5)
+			{
+				Font = FontSegSmallWhite;
+			}
+			else if (i > 5 && i < 10)
+			{
+				Font = FontSegSmallBlue;
+			}
+
+			if (i != 0)
+			{
+				DrawText(std::to_string(i + 1), 335, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
+			}
+			DrawText("100000", 433, 170 + PosY, 0, 0, GRenderer, Font, 1, 1);
+			DrawText("32", 567, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
+			DrawText("AAA", 687, 170 + PosY, 0, 0, GRenderer, Font, 1, 1, true);
+		}
+
+		//SDL_Rect Rect = { BrickX, BrickY, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };
+		//SDL_RenderCopy(GRenderer, ResourceManager::BrickTexture->Texture, NULL, &Rect);
+
+		SDL_Rect Rect = { 335, 178, ResourceManager::RedHatTexture->SrcRect.w, ResourceManager::RedHatTexture->SrcRect.h };
+		SDL_RenderCopy(GRenderer, ResourceManager::RedHatTexture->Texture, NULL, &Rect);
+		
+		PresentBackBuffer();
+
+		while (SDL_PollEvent(&TheEvent) != 0)
+		{
+			MoveY = 0;
+			MoveX = 0;
+			if (TheEvent.type == SDL_KEYDOWN)
+			{
+				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_8 || TheEvent.key.keysym.scancode == SDL_SCANCODE_UP))
+				{
+					MoveY = -1;
+				}
+
+				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_2 || TheEvent.key.keysym.scancode == SDL_SCANCODE_DOWN))
+				{
+					MoveY = 1;
+				}
+
+				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_4 || TheEvent.key.keysym.scancode == SDL_SCANCODE_LEFT))
+				{
+					MoveX = -1;
+				}
+
+				if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_KP_6 || TheEvent.key.keysym.scancode == SDL_SCANCODE_RIGHT))
+				{
+					MoveX = 1;
+				}
+			}
+
+			if (TheEvent.type == SDL_JOYAXISMOTION)
+			{
+				if (TheEvent.jaxis.axis == 0)
+				{
+					if (TheEvent.jaxis.value > 3200)
+					{
+						MoveY = 1;
+					}
+					else if(TheEvent.jaxis.value < -3200)
+					{
+						MoveY = -1;
+					}
+				}
+			}
+
+			if (MoveY != 0)
+			{
+				BrickY += MoveY * 50;
+
+				if (BrickY < 134)
+				{
+					BrickY = 134 + 50 * 3;
+				}
+
+				if (BrickY > 134 + 50 * 3)
+				{
+					BrickY = 134;
+				}
+			}
+
+			if (MoveX != 0)
+			{
+				BrickX += MoveX * 50;
+
+				if (BrickX < 57)
+				{
+					BrickX = 57 + 50 * 9;
+				}
+
+				if (BrickX > 57 + 50 * 9)
+				{
+					BrickX = 57;
+				}
+			}
+
+			if (TheEvent.type == SDL_QUIT)
+			{
+				bDone = true;
+			}
+		}
+	}
+
+	SDL_JoystickClose(Joy);
 }
