@@ -394,6 +394,11 @@ bool DoTitleScreen()
 			bScrollDone = true;
 		}
 
+		if (bScrollDone && ((long)round(ScrollCountDown * 1000) % 30000) == 0)
+		{
+			DoDisplayHighScore();
+		}
+
 		if (ScrollCountDown <= 0)
 		{	
 
@@ -811,7 +816,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 	bool bInputtingName = EnterRank != -1;
 	bool bUserQuit = false;
 	bool bDone = false;
-	double HighScoreCountDown = 5;
+	double HighScoreCountDown = HIGH_SCORE_DISPLAY_COUNT;
 	int BrickX = 57;
 	int BrickY = 134;
 	int MoveY = 0;
@@ -868,7 +873,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 			}
 			else
 			{
-				HighScoreCountDown = 5;
+				HighScoreCountDown = HIGH_SCORE_DISPLAY_COUNT;
 			}
 		}
 
@@ -1026,7 +1031,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 					if (NamePos > 2)
 					{
 						bInputtingName = false;
-						HighScoreCountDown = 5;
+						HighScoreCountDown = HIGH_SCORE_DISPLAY_COUNT;
 					}
 				}
 
