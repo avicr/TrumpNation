@@ -406,7 +406,7 @@ bool DoTitleScreen()
 			
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
-
+		SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
 		TrumpIntroSprite->SetPosition(445, 300 - PosY);
 		SDL_Rect TitleRect = { 0, PosY, 1024, 600 };
 		SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::InfoTexture->SrcRect.h - PosY) };
