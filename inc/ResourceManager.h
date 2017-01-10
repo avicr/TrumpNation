@@ -42,7 +42,9 @@ public:
 	TextureResource(const TextureResource &Other) :
 		AssetResource(Other.FileName)
 	{		
+		SDL_Log("About to load: %s", Other.FileName.c_str());
 		SDL_Surface * Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
+		SDL_Log("Loaded: %d", Image);
 		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
 		Texture = SDL_CreateTextureFromSurface(GetRenderer(), Image);
 		SrcRect = { 0, 0, Image->w, Image->h };
