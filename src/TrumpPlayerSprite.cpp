@@ -156,7 +156,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 
 	if (state[SDL_SCANCODE_KP_8] || state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) < -JOYSTICK_DEAD_ZONE))
 	{
-		if ((Joy && SDL_JoystickGetAxis(Joy, 1) < -JOYSTICK_DEAD_ZONE))
+		if (Joy)
 		{
 			SDL_Log("Joy up: %d", SDL_JoystickGetAxis(Joy, 1));
 		}
