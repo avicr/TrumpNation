@@ -154,12 +154,12 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	bool bPlayerMoving = false;
 	bPlayerMoving = false;
 
-	if (state[SDL_SCANCODE_KP_8] || state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) <= -32767))
+	if (state[SDL_SCANCODE_KP_8] || state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) <= -JOYSTICK_DEAD_ZONE))
 	{
 		MovingFlags |= MOVING_UP;
 		bPlayerMoving = true;
 	}
-	else if (state[SDL_SCANCODE_KP_2] || state[SDL_SCANCODE_DOWN] || (Joy && SDL_JoystickGetAxis(Joy, 1) == 32767))
+	else if (state[SDL_SCANCODE_KP_2] || state[SDL_SCANCODE_DOWN] || (Joy && SDL_JoystickGetAxis(Joy, 1) == JOYSTICK_DEAD_ZONE))
 	{
 		MovingFlags |= MOVING_DOWN;
 		bPlayerMoving = true;
@@ -169,12 +169,12 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		VelY = VelY * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);		
 	}
 	
-	if (state[SDL_SCANCODE_KP_6] || state[SDL_SCANCODE_RIGHT] || (Joy && SDL_JoystickGetAxis(Joy, 0) == 32767))
+	if (state[SDL_SCANCODE_KP_6] || state[SDL_SCANCODE_RIGHT] || (Joy && SDL_JoystickGetAxis(Joy, 0) == JOYSTICK_DEAD_ZONE))
 	{
 		MovingFlags |= MOVING_RIGHT;
 		bPlayerMoving = true;
 	}
-	else if (state[SDL_SCANCODE_KP_4] || state[SDL_SCANCODE_LEFT] || (Joy && SDL_JoystickGetAxis(Joy, 0) <= -32767))
+	else if (state[SDL_SCANCODE_KP_4] || state[SDL_SCANCODE_LEFT] || (Joy && SDL_JoystickGetAxis(Joy, 0) <= -JOYSTICK_DEAD_ZONE))
 	{
 		MovingFlags |= MOVING_LEFT;
 		bPlayerMoving = true;

@@ -996,11 +996,11 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 				{
 					if (TheEvent.jaxis.axis == 0)
 					{
-						if (TheEvent.jaxis.value > 3200)
+						if (TheEvent.jaxis.value > JOYSTICK_DEAD_ZONE)
 						{
 							MoveY = 1;
 						}
-						else if (TheEvent.jaxis.value < -3200)
+						else if (TheEvent.jaxis.value < -JOYSTICK_DEAD_ZONE)
 						{
 							MoveY = -1;
 						}
