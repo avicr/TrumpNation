@@ -155,20 +155,20 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	bPlayerMoving = false;
 
 
-	if (Joy)
+	/*if (Joy)
 	{
 		SDL_Log("Joy axis 2: %d", SDL_JoystickGetAxis(Joy, 2));
 		SDL_Log("Joy axis 1: %d", SDL_JoystickGetAxis(Joy, 1));
 		SDL_Log("Joy axis 0: %d", SDL_JoystickGetAxis(Joy, 0));
-	}
+	}*/
 
 
-	if (state[SDL_SCANCODE_KP_8] || state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, 1) < -JOYSTICK_DEAD_ZONE))
+	if (state[SDL_SCANCODE_KP_8] || state[SDL_SCANCODE_UP] || (Joy && SDL_JoystickGetAxis(Joy, JOY_Y_AXIS) < -JOYSTICK_DEAD_ZONE))
 	{		
 		MovingFlags |= MOVING_UP;
 		bPlayerMoving = true;
 	}
-	else if (state[SDL_SCANCODE_KP_2] || state[SDL_SCANCODE_DOWN] || (Joy && SDL_JoystickGetAxis(Joy, 1) > JOYSTICK_DEAD_ZONE))
+	else if (state[SDL_SCANCODE_KP_2] || state[SDL_SCANCODE_DOWN] || (Joy && SDL_JoystickGetAxis(Joy, JOY_Y_AXIS) > JOYSTICK_DEAD_ZONE))
 	{
 		MovingFlags |= MOVING_DOWN;
 		bPlayerMoving = true;

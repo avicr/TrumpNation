@@ -29,6 +29,11 @@
 #define HIGH_SCORE_DISPLAY_COUNT 8
 #define FACT_TIME 7
 
+#ifdef _WIN32
+#define JOY_Y_AXIS 1
+#else
+#define JOY_Y_AXIS 3
+#endif
 #define JOYSTICK_DEAD_ZONE 8000
 
 #define PLACE_WALL_SCORE 500

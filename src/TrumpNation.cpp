@@ -102,7 +102,7 @@ int main(int argc, char ** argv)
 	InitSDL();
 	srand(SDL_GetTicks());
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
-	//ReadGreatFacts();
+	ReadGreatFacts();
 	GResourceManager = new ResourceManager;
 
 	do
