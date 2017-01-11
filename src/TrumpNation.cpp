@@ -1153,17 +1153,20 @@ void ReadGreatFacts()
 {
 	fstream FactFile;
 
+	SDL_Log("Before open fact file");
 	FactFile.open("data2.dat");
-
+	SDL_Log("After open fact file");
 	while (!FactFile.eof())
 	{
 		string NewString;
 		getline(FactFile, NewString);
-
+		SDL_Log("Read line");
 		GreatFacts.push_back(NewString);
 	}
 	
+	SDL_Log("Before fact file close");
 	FactFile.close();
+	SDL_Log("After open fact file");
 }
 
 void DisplayGreatFact()
