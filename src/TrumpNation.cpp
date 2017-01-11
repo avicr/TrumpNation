@@ -174,6 +174,11 @@ bool GameLoop()
 				bUserQuit = true;
 			}
 
+			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_5])
+			{
+				SpawnRandomItem();
+			}
+
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A])
 			{
 				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
@@ -404,7 +409,7 @@ bool DoTitleScreen()
 			bScrollDone = true;
 		}
 
-		if (bScrollDone && ((long)round(ScrollCountDown * 1000) % 30000) == 0)
+		if (bScrollDone && ((long)round(ScrollCountDown * 1000) % 30000) <= 1000)
 		{
 			if (rand() % 4 != 0)
 			{
@@ -1025,7 +1030,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 
 				if (TheEvent.type == SDL_JOYAXISMOTION)
 				{
-					if (TheEvent.jaxis.axis == 0)
+					if (TheEvent.jaxis.axis == JOY_Y_AXIS)
 					{
 						if (TheEvent.jaxis.value > JOYSTICK_DEAD_ZONE)
 						{
