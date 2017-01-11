@@ -211,7 +211,8 @@ bool GameLoop()
 			{
 				if (TheEvent.type == SDL_JOYAXISMOTION)
 				{
-					SDL_Log("Axis: %d, %d", TheEvent.jaxis.axis, TheEvent.jaxis.value);
+					int Axis = TheEvent.jaxis.axis;
+					SDL_Log("Axis: %d, %d", Axis, TheEvent.jaxis.value);
 				}
 				//SDL_Log("Event Type: %d", TheEvent.type);
 				if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
@@ -423,7 +424,7 @@ bool DoTitleScreen()
 			
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
-		SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
+		//SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
 		TrumpIntroSprite->SetPosition(445, 300 - PosY);
 		SDL_Rect TitleRect = { 0, PosY, 1024, 600 };
 		SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::InfoTexture->SrcRect.h - PosY) };
