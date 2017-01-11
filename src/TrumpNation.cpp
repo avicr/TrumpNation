@@ -167,16 +167,11 @@ bool GameLoop()
 		bool bLevelComplete = false;
 
 		while (!bGameComplete && !bLevelComplete)
-		{
+		{			
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
 			{
 				bGameComplete = true;
 				bUserQuit = true;
-			}
-
-			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_5])
-			{
-				SpawnRandomItem();
 			}
 
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A])
@@ -214,6 +209,14 @@ bool GameLoop()
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
+				if (TheEvent.type == SDL_KEYDOWN)
+				{
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
+					{
+						Mix_PlayChannel(-1, LevelClearFX, 0);
+						SpawnRandomItem();
+					}
+				}
 				if (TheEvent.type == SDL_JOYAXISMOTION)
 				{
 					int Axis = TheEvent.jaxis.axis;
