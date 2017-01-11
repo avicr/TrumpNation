@@ -209,6 +209,10 @@ bool GameLoop()
 			//Handle events on queue
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
+				if (TheEvent.type == SDL_JOYAXISMOTION)
+				{
+					SDL_Log("Axis: %d, %d", TheEvent.jaxis.axis, TheEvent.jaxis.value);
+				}
 				//SDL_Log("Event Type: %d", TheEvent.type);
 				if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
 				{
