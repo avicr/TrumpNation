@@ -1161,6 +1161,10 @@ void ReadGreatFacts()
 		string NewString;
 		getline(FactFile, NewString);
 		SDL_Log("Read line");
+		if (NewString == "")
+		{
+			break;
+		}
 		GreatFacts.push_back(NewString);
 	}
 	
