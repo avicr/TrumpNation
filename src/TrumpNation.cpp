@@ -160,7 +160,6 @@ bool GameLoop()
 		BrickItem *FirstBrick = new BrickItem();		
 		FirstBrick->SetPosition(470, 570);
 		Items.push_back(FirstBrick);		
-		SDL_SetTextureAlphaMod(ResourceManager::ShadowTexture->Texture, 128);
 		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
 		Uint64 StartTime = SDL_GetPerformanceCounter();
 		Uint64 CurrentTime = SDL_GetPerformanceCounter();
@@ -420,7 +419,7 @@ bool DoTitleScreen()
 			
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
-
+		SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
 		TrumpIntroSprite->SetPosition(445, 300 - PosY);
 		SDL_Rect TitleRect = { 0, PosY, 1024, 600 };
 		SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::InfoTexture->SrcRect.h - PosY) };
@@ -1023,11 +1022,11 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 				{
 					if (TheEvent.jaxis.axis == 0)
 					{
-						if (TheEvent.jaxis.value > 3200)
+						if (TheEvent.jaxis.value > JOYSTICK_DEAD_ZONE)
 						{
 							MoveY = 1;
 						}
-						else if (TheEvent.jaxis.value < -3200)
+						else if (TheEvent.jaxis.value < -JOYSTICK_DEAD_ZONE)
 						{
 							MoveY = -1;
 						}

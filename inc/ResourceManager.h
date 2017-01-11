@@ -42,7 +42,9 @@ public:
 	TextureResource(const TextureResource &Other) :
 		AssetResource(Other.FileName)
 	{		
+		SDL_Log("About to load: %s", Other.FileName.c_str());
 		SDL_Surface * Image = SDL_LoadBMP((TEXTURE_PATH + FileName).c_str());
+		SDL_Log("Loaded: %d", Image);
 		SDL_SetColorKey(Image, SDL_TRUE, SDL_MapRGB(Image->format, 0xFF, 0, 0xFF));
 		Texture = SDL_CreateTextureFromSurface(GetRenderer(), Image);
 		SrcRect = { 0, 0, Image->w, Image->h };
@@ -66,9 +68,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(TrumpDamageSpriteSheet, "TrumpDamage512x256.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "TrumpTie512x256.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "MexicanGreen.bmp");
-	DECLARE_TEXTURE_RESOURCE(Mexican1PinkSpriteSheet, "MexicanPink.bmp");
-	DECLARE_TEXTURE_RESOURCE(BackgroundTexture, "BG3.bmp");
-	DECLARE_TEXTURE_RESOURCE(ShadowTexture, "Shadow.bmp");
+	DECLARE_TEXTURE_RESOURCE(Mexican1PinkSpriteSheet, "MexicanPink.bmp");		
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
 	DECLARE_TEXTURE_RESOURCE(HatTexture, "Hat.bmp");
@@ -76,7 +76,6 @@ public:
 	DECLARE_TEXTURE_RESOURCE(RedHatTexture, "Redhat.bmp");
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
-	DECLARE_TEXTURE_RESOURCE(FontTexture, "Font512x512.bmp");
 	DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 
