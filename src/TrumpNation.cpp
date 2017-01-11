@@ -17,6 +17,7 @@
 #include "../inc/SwapItem.h"
 #include "../inc/ScoreSprite.h"
 #include <algorithm>
+#include <fstream>
 
 struct HighScoreEntry
 {
@@ -65,6 +66,8 @@ Glyph FontSegSmallRed[94];
 Glyph FontSegSmallWhite[94];
 Glyph FontSegSmallBlue[94];
 Glyph FontSegSmallYellow[94];
+vector <string> GreatFacts;
+
 
 SDL_Texture *BackBuffer;
 int WindowWidth;
@@ -88,6 +91,8 @@ int GetHighScorePosition(long Score);
 void DoDisplayHighScore(int EnterPosition = -1, long Score = 0, int Mile = 0);
 void ReadHighScores();
 void WriteHighScores();
+void DisplayGreatFact();
+void ReadGreatFacts();
 
 int main(int argc, char ** argv)
 {
@@ -95,9 +100,9 @@ int main(int argc, char ** argv)
 
 	// init SDL	
 	InitSDL();
-
+	srand(SDL_GetTicks());
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
-	
+	ReadGreatFacts();
 	GResourceManager = new ResourceManager;
 
 	do
@@ -362,6 +367,7 @@ bool DoTitleScreen()
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
+
 	while (!bDone)
 	{
 		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
@@ -396,7 +402,14 @@ bool DoTitleScreen()
 
 		if (bScrollDone && ((long)round(ScrollCountDown * 1000) % 30000) == 0)
 		{
-			DoDisplayHighScore();
+			if (rand() % 4 != 0)
+			{
+				DoDisplayHighScore();
+			}
+			else
+			{
+				DisplayGreatFact();
+			}
 		}
 
 		if (ScrollCountDown <= 0)
@@ -558,6 +571,20 @@ void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Ren
 				else
 				{
 					PosX += Glyphs[CharToRender].Width * ScaleX;
+				}
+
+				if (PosX > WindowWidth)
+				{
+					PosX = X;
+					
+					if (SizeY)
+					{
+						PosY += SizeY;
+					}
+					else
+					{
+						PosY += Glyphs[0].Height * ScaleY;
+					}
 				}
 			}
 		}
@@ -834,7 +861,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 	SDL_Joystick *Joy = SDL_JoystickOpen(0);
 
 	ReadHighScores();
-
+	
 	if (EnterRank != -1)
 	{
 		for (int i = 9; i > EnterRank; i--)
@@ -1116,4 +1143,75 @@ void WriteHighScores()
 	}
 
 	fclose(HighScoreFile);
+}
+
+void ReadGreatFacts()
+{
+	fstream FactFile;
+
+	FactFile.open("data2.dat");
+
+	while (!FactFile.eof())
+	{
+		string NewString;
+		getline(FactFile, NewString);
+
+		GreatFacts.push_back(NewString);
+	}
+	
+	FactFile.close();
+}
+
+void DisplayGreatFact()
+{
+	bool bUserQuit = false;
+	bool bDone = false;
+	double FactCountDown = FACT_TIME;
+
+	SDL_Event TheEvent;
+	Uint64 StartTime = SDL_GetPerformanceCounter();
+	Uint64 CurrentTime = SDL_GetPerformanceCounter();
+	double DeltaTime;
+	int FactIndex = rand() % GreatFacts.size();
+
+	while (!bDone)
+	{
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+		{
+			bDone = true;
+			bUserQuit = true;
+		}
+
+		StartTime = CurrentTime;
+		CurrentTime = SDL_GetPerformanceCounter();
+		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+		DeltaTime *= (double)0.001;
+
+		FactCountDown -= DeltaTime;
+
+		if (FactCountDown < 0)
+		{
+			bDone = true;
+		}
+
+		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+		SDL_RenderClear(GRenderer);
+		DrawText("GREAT FACTS", 390, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);
+		DrawText(GreatFacts[FactIndex], 16, 160, 0, 0, GRenderer, FontSegSmallWhite, 1, 1);
+		PresentBackBuffer();
+
+		while (SDL_PollEvent(&TheEvent) != 0)
+		{
+			////User requests quit
+			//if (TheEvent.type == SDL_KEYDOWN)
+			//{
+			//	bDone = true;
+			//}
+			if (TheEvent.type == SDL_QUIT)
+			{
+				bUserQuit = true;
+				bDone = true;
+			}
+		}
+	}
 }
