@@ -310,17 +310,18 @@ void Tick(double DeltaTime)
 void Render()
 {
 	// Clear to ground color
-	SDL_SetRenderDrawColor(GRenderer, 217, 201, 124, 255);
-	SDL_RenderClear(GRenderer);
+	/*SDL_SetRenderDrawColor(GRenderer, 217, 201, 124, 255);
+	SDL_RenderClear(GRenderer);*/
 
-	//SDL_RenderCopy(GRenderer, ResourceManager::BackgroundTexture->Texture, &Rect, &Rect);
+	SDL_Rect Rect = { 0, 0, 1024, 600 };
+	SDL_RenderCopy(GRenderer, ResourceManager::BGTexture->Texture, &Rect, &Rect);
 
 	// Render sky
-	SDL_Rect Rect = { 0, 0, 1024, HORIZON };
+	/*SDL_Rect Rect = { 0, 0, 1024, HORIZON };
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
-	SDL_RenderFillRect(GRenderer, &Rect);
+	SDL_RenderFillRect(GRenderer, &Rect);*/
 
-	DrawHUD(GRenderer);
+	//DrawHUD(GRenderer);
 
 	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
 	{
@@ -362,7 +363,7 @@ bool DoTitleScreen()
 {
 	bool bUserQuit = false;
 	bool bDone = false;
-	bool bScrollDone = false;
+	bool bScrollDone = true;
 	double PosY = 0;
 	double ScrollCountDown = TITLE_SCROLL_TIME;
 	int NumIntrosPlayed = 0;
@@ -370,8 +371,7 @@ bool DoTitleScreen()
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
 	Mix_PlayMusic(TitleMusic, 0);
-	Sprite *TrumpIntroSprite = new Sprite();
-	TrumpIntroSprite->SetPosition(445, 300);
+	Sprite *TrumpIntroSprite = new Sprite();	
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
 	TrumpIntroSprite->SetWidth(128);
 	TrumpIntroSprite->SetHeight(128);
@@ -406,11 +406,11 @@ bool DoTitleScreen()
 			PosY += DeltaTime * 80;
 		}
 
-		if (PosY >= ResourceManager::InfoTexture->SrcRect.h - 100)
+		/*if (PosY >= ResourceManager::InfoTexture->SrcRect.h - 100)
 		{			
 			PosY = 0;
 			bScrollDone = true;
-		}
+		}*/
 
 		if (bScrollDone && ((long)round(ScrollCountDown * 1000) % 30000) <= 1000)
 		{
@@ -433,10 +433,11 @@ bool DoTitleScreen()
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
 		//SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
-		TrumpIntroSprite->SetPosition(445, 300 - PosY);
-		SDL_Rect TitleRect = { 0, PosY, 1024, 600 };
-		SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::InfoTexture->SrcRect.h - PosY) };
-		SDL_RenderCopy(GRenderer, ResourceManager::InfoTexture->Texture, &TitleRect, &BackBufferRect);
+		TrumpIntroSprite->SetPosition(454, 255 - PosY);
+		
+		//SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::TitleScreenTexture->SrcRect.h - PosY) };
+		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
 		TrumpIntroSprite->Render(GRenderer);
 		PresentBackBuffer();
 
@@ -454,10 +455,10 @@ bool DoTitleScreen()
 		}
 	}
 
-	TrumpIntroSprite->SetPosition(445, 300);
-	SDL_Rect TitleRect = { 0, 0, 1024, 600 };
+	TrumpIntroSprite->SetPosition(454, 255);
+	//SDL_Rect TitleRect = { 0, 0, 1024, 600 };
 	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
-	SDL_RenderCopy(GRenderer, ResourceManager::InfoTexture->Texture, &TitleRect, &BackBufferRect);
+	SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
 	TrumpIntroSprite->Render(GRenderer);
 	PresentBackBuffer();
 
@@ -916,8 +917,8 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 			}
 		}
 
-		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
-		SDL_RenderClear(GRenderer);
+		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+		SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, NULL, &BackBufferRect);		
 		DrawText("GREATEST AMERICANS", 314, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);
 		
 		//DrawText("ABCDEFGHIJ\nKLMNOPQRST\nUVWXYZ.-/?\n!@$&*+_ ", 64, 100, 50, 50, GRenderer, FontSeg20White, 1, 1);

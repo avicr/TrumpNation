@@ -28,7 +28,7 @@
 #define TITLE_SCROLL_TIME 740
 #define HIGH_SCORE_DISPLAY_COUNT 8
 #define FACT_TIME 7
-#define GLOBAL_SCALE 2.5
+#define GLOBAL_SCALE 2.25
 
 #ifdef _WIN32
 #define JOY_Y_AXIS 1

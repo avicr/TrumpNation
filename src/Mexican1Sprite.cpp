@@ -15,7 +15,7 @@ Mexican1Sprite::Mexican1Sprite()
 	SetHeight(int(32 * GLOBAL_SCALE));
 	
 	MoveRate = 444;
-	if (rand() % 100 == 0)
+	if (rand() % 100 == 101)
 	{
 		MaxVelocity = 120;
 		if (!bSwapSprites)

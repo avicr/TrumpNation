@@ -63,10 +63,11 @@ class ResourceManager
 	friend AssetResource;
 
 public:
+	DECLARE_TEXTURE_RESOURCE(BGTexture, "BG.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "trump.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpRedHatSpriteSheet, "Trump_Hat.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpDamageSpriteSheet, "TrumpDamage512x256.bmp");
-	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "TrumpTie512x256.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "large trump.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "mexican.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1PinkSpriteSheet, "MexicanPink.bmp");		
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
@@ -76,7 +77,8 @@ public:
 	DECLARE_TEXTURE_RESOURCE(RedHatTexture, "Redhat.bmp");
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
-	DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");
+	DECLARE_TEXTURE_RESOURCE(StarBGTexture, "starBG.bmp");
+	//DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");	
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
@@ -107,11 +109,11 @@ public:
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpIntroAnimation)
 	{
-		for (int i = 0; i < 8; i++)
+		for (int i = 0; i < 6; i++)
 		{
-			int SpriteWidth = 128;
-			int SpriteHeight = 128;
-			SDL_Rect SrcRect = { i % 4 * SpriteWidth, i / 4 * SpriteHeight, SpriteWidth, SpriteHeight };
+			int SpriteWidth = 64;
+			int SpriteHeight = 64;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
 
 			Frames.push_back(new Frame(ResourceManager::TrumpIntroSpriteSheet->Texture, SrcRect, 0.03));
 		}
