@@ -16,6 +16,7 @@
 #include "../inc/SpriteList.h"
 #include "../inc/SwapItem.h"
 #include "../inc/ScoreSprite.h"
+#include "../inc/CloudSprite.h"
 #include <algorithm>
 #include <fstream>
 
@@ -68,6 +69,7 @@ Glyph FontSegSmallBlue[94];
 Glyph FontSegSmallYellow[94];
 vector <string> GreatFacts;
 
+float StarScroll = 0;
 
 SDL_Texture *BackBuffer;
 int WindowWidth;
@@ -93,6 +95,7 @@ void ReadHighScores();
 void WriteHighScores();
 void DisplayGreatFact();
 void ReadGreatFacts();
+void RenderStars(float DeltaTime);
 
 int main(int argc, char ** argv)
 {
@@ -166,6 +169,10 @@ bool GameLoop()
 		double DeltaTime;
 		bool bLevelComplete = false;
 
+		for (int i = 0; i < 5; i++)
+		{
+			Items.push_back(new CloudSprite());
+		}
 		while (!bGameComplete && !bLevelComplete)
 		{			
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
@@ -432,6 +439,10 @@ bool DoTitleScreen()
 			
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
+
+
+		RenderStars(DeltaTime);
+
 		//SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
 		TrumpIntroSprite->SetPosition(454, 255 - PosY);
 		
@@ -494,7 +505,9 @@ bool DoTitleScreen()
 void InitSDL()
 {
 	if (!bSDLInitialized)
-	{
+	{		
+		
+
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
 		SDL_Log("SDL INIT");
 		TTF_Init();
@@ -757,8 +770,8 @@ void DoGameOver()
 		{
 			bDone = true;
 		}
-		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
-		SDL_RenderClear(GRenderer);
+		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+		SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, NULL, &BackBufferRect);		
 
 		DrawText("GAME OVER", 420, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);		
 
@@ -904,6 +917,12 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		DeltaTime *= (double)0.001;
 
 		HighScoreCountDown -= DeltaTime;
+				
+
+		if (StarScroll > 512)
+		{
+			StarScroll = 0;
+		}
 
 		if (HighScoreCountDown < 0)
 		{
@@ -917,8 +936,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 			}
 		}
 
-		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
-		SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, NULL, &BackBufferRect);		
+		RenderStars(DeltaTime);
 		DrawText("GREATEST AMERICANS", 314, 16, 0, 0, GRenderer, FontSeg36White, 1, 1);
 		
 		//DrawText("ABCDEFGHIJ\nKLMNOPQRST\nUVWXYZ.-/?\n!@$&*+_ ", 64, 100, 50, 50, GRenderer, FontSeg20White, 1, 1);
@@ -984,7 +1002,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		//SDL_Rect Rect = { BrickX, BrickY, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };
 		//SDL_RenderCopy(GRenderer, ResourceManager::BrickTexture->Texture, NULL, &Rect);
 
-		SDL_Rect Rect = { 335, 178, ResourceManager::RedHatTexture->SrcRect.w, ResourceManager::RedHatTexture->SrcRect.h };
+		SDL_Rect Rect = { 335, 178, ResourceManager::RedHatTexture->SrcRect.w * 2, ResourceManager::RedHatTexture->SrcRect.h * 2};
 		SDL_RenderCopy(GRenderer, ResourceManager::RedHatTexture->Texture, NULL, &Rect);
 		
 		PresentBackBuffer();
@@ -1234,4 +1252,23 @@ void DisplayGreatFact()
 			}
 		}
 	}
+}
+
+void RenderStars(float DeltaTime)
+{
+	StarScroll += DeltaTime * 150;
+
+	if (StarScroll > 512)
+	{
+		StarScroll = 0;
+	}
+
+	SDL_Rect StarSrcRect = { StarScroll, 0, 512 - StarScroll, 300 };
+	SDL_Rect StarDstRect = { 0, 0, StarSrcRect.w * 2, 600 };
+	SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, &StarSrcRect, &StarDstRect);
+
+	StarSrcRect = { 0, 0, (int)round(StarScroll), 300 };
+	StarDstRect = { (int)round(1024 - StarScroll * 2), 0, (int)round(StarSrcRect.w * 2), 600 };
+
+	SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, &StarSrcRect, &StarDstRect);
 }

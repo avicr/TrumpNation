@@ -43,12 +43,13 @@ protected:
 
 	double PosX;
 	double PosY;
+	double Scale;
 
 	double MoveRate;
 	double MaxVelocity;
 	double TransitionSpeed;
-	double StopSpeed;
-	
+	double StopSpeed;	
+
 	int MovingFlags;
 
 public:

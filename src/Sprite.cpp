@@ -3,6 +3,7 @@
 Sprite::Sprite() :
 	Texture(NULL)
 {	
+	Scale = 1;
 	CountDown = -1;
 	Flip = SDL_FLIP_NONE;
 	Rect.x = 0;
@@ -164,7 +165,7 @@ void Sprite::SetHeight(int NewHeight)
 
 void Sprite::Render(SDL_Renderer* Renderer)
 {
-	SDL_Rect SrcRect = { 0, 0, Rect.w, Rect.h };
+	SDL_Rect SrcRect = { 0, 0, Rect.w, Rect.h};
 	if (AnimData.Anim)
 	{
 		Frame *CurFrame = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex);
@@ -184,7 +185,10 @@ void Sprite::Render(SDL_Renderer* Renderer)
 	}
 	else if (Texture)
 	{
-		SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &Rect, 0, NULL, Flip);
+		SDL_Rect DstRect = Rect;
+		DstRect.w *= Scale;
+		DstRect.h *= Scale;
+		SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
 	}
 }
 

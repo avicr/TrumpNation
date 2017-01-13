@@ -54,6 +54,23 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 	{
 		RedHatCountDown -= DeltaTime;
 
+		if (RedHatCountDown < 1 && (int)round(RedHatCountDown * 1000) % 40 >= 20)
+		{
+			int FrameIndex = AnimData.CurrentFrameIndex;
+			double FrameCountDown = AnimData.CountDown;
+			PlayAnimation(ResourceManager::TrumpAnimation);
+			AnimData.CurrentFrameIndex = FrameIndex;
+			AnimData.CountDown = FrameCountDown;
+		}
+		else
+		{
+			int FrameIndex = AnimData.CurrentFrameIndex;
+			double FrameCountDown = AnimData.CountDown;
+			PlayAnimation(ResourceManager::TrumpRedHatAnimation);
+			AnimData.CurrentFrameIndex = FrameIndex;
+			AnimData.CountDown = FrameCountDown;
+		}
+
 		if (RedHatCountDown <= 0)
 		{
 			MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;			
@@ -117,7 +134,7 @@ void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 
 SDL_Rect TrumpPlayerSprite::GetCollisionRect()
 {
-	SDL_Rect CollisionRect = { Rect.x + 14, Rect.y + 27, 48, 48 };
+	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 30, 30, 39 };
 	return CollisionRect;
 }
 
@@ -331,8 +348,8 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 
 	Sprite::Render(Renderer);
 	/*SDL_SetRenderDrawColor(Renderer, 255, 0, 0, 255);
-	SDL_RenderDrawRect(Renderer, &GetCollisionRect());
-*/
+	SDL_RenderDrawRect(Renderer, &GetCollisionRect());*/
+
 	/*if (bHasWall)
 	{
 		SDL_Rect BrickDstRect = { PosX + 22, PosY + 35, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };

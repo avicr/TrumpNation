@@ -78,6 +78,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "MockupHUD.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(StarBGTexture, "starBG.bmp");
+	DECLARE_TEXTURE_RESOURCE(CloudTexture, "cloud.bmp");
 	//DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");	
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 

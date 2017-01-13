@@ -13,6 +13,7 @@
 #include "../inc/Game.h"
 #include <vector>
 #include <string>
+
 #define TEXTURE_PATH "resource/textures/"
 #define HORIZON 264
 #define WALL_TOP HORIZON - 104
@@ -30,6 +31,13 @@
 #define FACT_TIME 7
 #define GLOBAL_SCALE 2.25
 
+#define CLOUD_SCALE_MIN 0.5
+#define CLOUD_SCALE_MAX 2
+#define CLOUD_Y_MIN 8
+#define CLOUD_Y_MAX 40
+#define CLOUD_SPEED_MIN 2
+#define CLOUD_SPEED_MAX 4
+
 #ifdef _WIN32
 #define JOY_Y_AXIS 1
 #else
@@ -43,6 +51,8 @@
 #define MEXICAN_ESCAPED_POINTS -50
 
 #define BOMB_FLASH_TIME 0.20;
+
+using namespace std;
 
 extern class ResourceManager *GResourceManager;
 extern SDL_Window *GWindow;
