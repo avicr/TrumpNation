@@ -5,6 +5,8 @@ int ItemSprite::NumNonBrickItems = 0;
 ItemSprite::ItemSprite(SDL_Texture *InTexture)
 {	
 	SetTexture(InTexture);
+	Rect.w *= GLOBAL_SCALE;
+	Rect.h *= GLOBAL_SCALE;
 	RandomizePosition();	
 	CountDown = ITEM_LIFE_TIME;
 }

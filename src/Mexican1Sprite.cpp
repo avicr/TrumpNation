@@ -3,7 +3,7 @@
 
 Mexican1Sprite::Mexican1Sprite()
 {
-	float scale = 0.58f;
+	//float scale = 2.58;//0.58f;
 	SDL_Rect WallRect;
 	SDL_Rect CollisionRect;
 	SDL_Rect ResultRect;
@@ -11,8 +11,8 @@ Mexican1Sprite::Mexican1Sprite()
 	bool bGood = false;
 	int WallIndex = 0;
 
-	SetWidth(int(128 * scale));
-	SetHeight(int(136 * scale));
+	SetWidth(int(32 * GLOBAL_SCALE));
+	SetHeight(int(32 * GLOBAL_SCALE));
 	
 	MoveRate = 444;
 	if (rand() % 100 == 0)

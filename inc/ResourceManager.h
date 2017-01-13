@@ -63,11 +63,11 @@ class ResourceManager
 	friend AssetResource;
 
 public:
-	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "Trump512x256.bmp");
-	DECLARE_TEXTURE_RESOURCE(TrumpRedHatSpriteSheet, "TrumpHat512x256.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "trump.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpRedHatSpriteSheet, "Trump_Hat.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpDamageSpriteSheet, "TrumpDamage512x256.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "TrumpTie512x256.bmp");
-	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "MexicanGreen.bmp");
+	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "mexican.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1PinkSpriteSheet, "MexicanPink.bmp");		
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
@@ -83,9 +83,9 @@ public:
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			int SpriteWidth = 128;
-			int SpriteHeight = 128;
-			SDL_Rect SrcRect = { i % 4 * SpriteWidth, i / 4 * SpriteHeight, SpriteWidth, SpriteHeight };
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
 
 			Frames.push_back(new Frame(ResourceManager::TrumpSpriteSheet->Texture, SrcRect, 0.05));
 		}
@@ -96,11 +96,11 @@ public:
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			int SpriteWidth = 128;
-			int SpriteHeight = 128;
-			SDL_Rect SrcRect = { i % 4 * SpriteWidth, i / 4 * SpriteHeight, SpriteWidth, SpriteHeight };
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
 
-			Frames.push_back(new Frame(ResourceManager::TrumpRedHatSpriteSheet->Texture, SrcRect, 0.02));
+			Frames.push_back(new Frame(ResourceManager::TrumpRedHatSpriteSheet->Texture, SrcRect, 0.03));
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(TrumpRedHatAnimation)
@@ -133,13 +133,13 @@ public:
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(Mexican1Animation)
 	{
-		int SpriteWidth = 128;
-		int SpriteHeight = 136;
+		int SpriteWidth = 32;
+		int SpriteHeight = 32;
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
-			Frames.push_back(new Frame(ResourceManager::Mexican1SpriteSheet->Texture, SrcRect, 0.07));
+			Frames.push_back(new Frame(ResourceManager::Mexican1SpriteSheet->Texture, SrcRect, 0.03));
 		}
 
 	}

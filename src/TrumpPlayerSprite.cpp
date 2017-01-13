@@ -8,8 +8,8 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 {
 	memset(bButtonPreviouslyPressed, 0, sizeof(bButtonPreviouslyPressed));
 
-	SetWidth(80);
-	SetHeight(80);
+	SetWidth(32 * GLOBAL_SCALE);
+	SetHeight(32 * GLOBAL_SCALE);
 
 	NumBombs = 2;
 	NumLives = 2;
@@ -117,7 +117,7 @@ void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 
 SDL_Rect TrumpPlayerSprite::GetCollisionRect()
 {
-	SDL_Rect CollisionRect = { Rect.x + 26, Rect.y + 32, 30, 45 };
+	SDL_Rect CollisionRect = { Rect.x + 14, Rect.y + 27, 48, 48 };
 	return CollisionRect;
 }
 
@@ -320,16 +320,19 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 		{
 			DstRect.y -= 160;
 		}*/
-
+		
+		
 		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 64);
 		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);
-		DstRect.x += 64;;
+		DstRect.x += 64;
 		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);
 		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 255);
 	}
 
 	Sprite::Render(Renderer);
-
+	/*SDL_SetRenderDrawColor(Renderer, 255, 0, 0, 255);
+	SDL_RenderDrawRect(Renderer, &GetCollisionRect());
+*/
 	/*if (bHasWall)
 	{
 		SDL_Rect BrickDstRect = { PosX + 22, PosY + 35, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };
