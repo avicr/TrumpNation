@@ -65,7 +65,7 @@ class ResourceManager
 public:
 	DECLARE_TEXTURE_RESOURCE(BGTexture, "BG.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "Trump.bmp");
-	DECLARE_TEXTURE_RESOURCE(TrumpRedHatSpriteSheet, "Trump_Hat.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpRedHatSpriteSheet, "Trump_hat.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpDamageSpriteSheet, "TrumpDamage512x256.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "large trump.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "mexican.bmp");
