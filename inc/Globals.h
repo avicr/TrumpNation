@@ -31,12 +31,18 @@
 #define FACT_TIME 7
 #define GLOBAL_SCALE 2.25
 
+#define NUM_CLOUDS 5
 #define CLOUD_SCALE_MIN 0.5
 #define CLOUD_SCALE_MAX 2
-#define CLOUD_Y_MIN 8
-#define CLOUD_Y_MAX 40
+#define CLOUD_Y_MIN 40
+#define CLOUD_Y_MAX 85
 #define CLOUD_SPEED_MIN 2
 #define CLOUD_SPEED_MAX 4
+
+#define NUM_RANDOM_GROUND_TILES 10
+#define NUM_RANDOM_MOUNTAIN_TILES 2
+#define MOUNT_TILES_START NUM_RANDOM_GROUND_TILES
+
 
 #ifdef _WIN32
 #define JOY_Y_AXIS 1
@@ -50,7 +56,7 @@
 #define LEVEL_CLEAR_POINTS 2000
 #define MEXICAN_ESCAPED_POINTS -50
 
-#define BOMB_FLASH_TIME 0.20;
+#define BOMB_FLASH_TIME 0.20
 
 using namespace std;
 
@@ -70,7 +76,7 @@ extern Mix_Chunk *StepFX;
 extern Mix_Music *BGMusic;
 extern Mix_Music *TitleMusic;
 extern Mix_Music *HatDanceMusic;
-extern Game *TheGame;
+extern class Game *TheGame;
 
 extern bool bFreezeSpawn;
 extern bool bSwapSprites;
@@ -83,4 +89,5 @@ extern double BombCountDown;
 
 SDL_Renderer *GetRenderer();
 extern void DrawText(std::string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, struct Glyph Glyphs[10], float ScaleX = 1, float ScaleY = 1, bool bRightJustify = false);
+extern void DrawTextBitmap(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, bool bRightJustified = false);
 #endif

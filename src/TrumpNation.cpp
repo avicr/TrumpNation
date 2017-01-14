@@ -169,7 +169,7 @@ bool GameLoop()
 		double DeltaTime;
 		bool bLevelComplete = false;
 
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < NUM_CLOUDS; i++)
 		{
 			Items.push_back(new CloudSprite());
 		}
@@ -323,12 +323,16 @@ void Render()
 	SDL_Rect Rect = { 0, 0, 1024, 600 };
 	SDL_RenderCopy(GRenderer, ResourceManager::BGTexture->Texture, &Rect, &Rect);
 
+	Rect.x = 0;
+	Rect.y = 192;
+	Rect.w = 1024;
+	Rect.h = 448;
+	SDL_RenderCopy(GRenderer, TheGame->GetGroundTexture(), NULL, &Rect);
+
 	// Render sky
 	/*SDL_Rect Rect = { 0, 0, 1024, HORIZON };
 	SDL_SetRenderDrawColor(GRenderer, 0, 162, 232, 255);
-	SDL_RenderFillRect(GRenderer, &Rect);*/
-
-	//DrawHUD(GRenderer);
+	SDL_RenderFillRect(GRenderer, &Rect);*/	
 
 	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
 	{
@@ -357,6 +361,8 @@ void Render()
 	Mexicans.Render(GRenderer);
 
 	ThePlayer->Render(GRenderer);	
+
+	DrawHUD(GRenderer);
 
 	if (BombCountDown > 0 && (int)round(BombCountDown * 100) % 4 >= 2)
 	{
@@ -559,6 +565,40 @@ SDL_Renderer *GetRenderer()
 	return GRenderer;
 }
 
+void DrawTextBitmap(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, bool bRightJustified)
+{
+	int PosX = X;
+
+	if (!bRightJustified)
+	{
+		for (int i = 0; i < Text.size(); i++)
+		{
+			char CharToRender = Text.at(i) - '0';
+
+			SDL_Rect SrcRect = { CharToRender * 16, 0, 16, 16 };
+			SDL_Rect DstRect = { PosX, Y, SizeX, SizeY };
+
+			SDL_RenderCopy(Renderer, ResourceManager::BitmapFont->Texture, &SrcRect, &DstRect);
+
+			PosX += SizeX / 1.5;
+		}
+	}
+	else
+	{		
+		PosX = X + SizeX / 1.5;
+		for (int i = Text.size() - 1; i >= 0; i--)
+		{
+			char CharToRender = Text.at(i) - '0';			
+
+			SDL_Rect SrcRect = { CharToRender * 16, 0, 16, 16 };
+			SDL_Rect DstRect = { PosX, Y, SizeX, SizeY };
+
+			SDL_RenderCopy(Renderer, ResourceManager::BitmapFont->Texture, &SrcRect, &DstRect);			
+			PosX -= SizeX / 1.5;
+		}
+	}
+}
+
 void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[10], float ScaleX, float ScaleY, bool bRightJustify)
 {
 	double PosX = X;
@@ -643,12 +683,29 @@ void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Ren
 
 void DrawHUD(SDL_Renderer *Renderer)
 {
-	SDL_Rect HUDRect = { 0, 0, 1024, 86 };
+	SDL_Rect HUDRect = { 0, 0, 1024, 64 };
 	SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
-	DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, FontSeg36);
-	DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, FontSeg20);
-	DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, FontSeg20);	
+	//DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, FontSeg36);
+	
+
+	//DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, FontSeg20);
+	string ScoreString = std::to_string(ThePlayer->GetScore());
+	string PadString;
+	int NumZeros = 6 - ScoreString.size();
+	for (int i = 0; i < NumZeros; i++)
+	{
+		PadString += "0";
+	}
+	
+	DrawTextBitmap(std::to_string(TheGame->GetLevelNumber()), 500, 17, 32, 32, Renderer);
+	DrawTextBitmap(PadString, 878, 17, 32, 32, Renderer);
+	DrawTextBitmap(ScoreString, 967, 17, 32, 32, Renderer, true);
+	DrawTextBitmap(std::to_string(ThePlayer->GetNumLives()), 32, 17, 32, 32, Renderer, true);
+	
+	//DrawText(std::to_string(ThePlayer->GetNumLives()), 98, 3, 18, 32, Renderer, FontSeg20);	
 }
+
+
 
 void LoadFont(const char *FontName, int Point, Glyph Glyphs[94], SDL_Color Color)
 {	

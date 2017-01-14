@@ -14,9 +14,9 @@ CloudSprite::CloudSprite()
 
 void CloudSprite::Tick(double DeltaTime)
 {	
-	PosX += DeltaTime * Speed;
+	PosX += DeltaTime * Speed * (-(rand() % 2));
 
-	if (PosX > 1024)
+	if (PosX > 1024 || PosX < 0)
 	{
 		bPendingDelete = true;
 	}
