@@ -411,13 +411,7 @@ bool DoTitleScreen()
 	bool bScrollDone = true;
 	double PosY = 0;
 	double ScrollCountDown = TITLE_SCROLL_TIME;
-	int NumIntrosPlayed = 0;
-	
-	TheGame = new Game();
-	ThePlayer = new TrumpPlayerSprite();
-	DoGameOver();
-	delete ThePlayer;
-	delete TheGame;
+	int NumIntrosPlayed = 0;	
 
 	SDL_Event TheEvent;
 	//TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
@@ -813,8 +807,12 @@ void SpawnRandomItem()
 {
 	int Roll = rand() % 100;
 	ItemSprite *NewItem;
-
-	if (Roll < 20)
+	
+	if (Roll < 15)
+	{
+		NewItem = new ExtraLifeItem();
+	}
+	else if (Roll < 20)
 	{
 		NewItem = new SwapItem();
 	}

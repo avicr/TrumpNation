@@ -150,6 +150,11 @@ void TrumpPlayerSprite::AddToScore(int Amount)
 	Score += Amount;
 }
 
+void TrumpPlayerSprite::AddLives(int Amount)
+{
+	NumLives+= Amount;
+}
+
 long TrumpPlayerSprite::GetScore()
 {
 	return Score;

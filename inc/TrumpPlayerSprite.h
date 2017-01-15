@@ -19,6 +19,7 @@ public:
 	SDL_Rect GetCollisionRect();
 	void SetHasWall(bool bInHasWall);
 	void AddToScore(int Amount);
+	void AddLives(int Amount);
 	long GetScore();
 	int GetNumLives();
 	void SetNumLives(int Amount);

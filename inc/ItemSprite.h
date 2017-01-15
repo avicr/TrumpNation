@@ -85,4 +85,28 @@ public:
 	
 };
 
+class ExtraLifeItem : public ItemSprite
+{
+public:
+	ExtraLifeItem() :
+		ItemSprite(ResourceManager::TrumpFaceTexture->Texture)
+	{
+		CollisionRect = { 0, 0, 32, 32 };
+		SetWidth(32);
+		SetHeight(32);
+		RandomizePosition();
+	}
+
+	virtual ~ExtraLifeItem()
+	{
+		NumNonBrickItems--;
+	}
+	virtual void Interact(TrumpPlayerSprite *OtherSprite)
+	{
+		Mix_PlayChannel(-1, PickUpItemFX, 0);
+		ThePlayer->AddLives(1);
+		bPendingDelete = true;
+	}
+};
+
 #endif
