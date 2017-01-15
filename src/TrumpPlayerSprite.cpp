@@ -27,12 +27,12 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	DyingCountDown = 2;
 	PlayerState = StatePlaying;
 	Score = 0;
-	PosX = 445;
+	PosX = 500;
 	PosY = 340;
 	Joy = SDL_JoystickOpen(0);
 	NumBricks = 0;
-	bHasRedHat = false;
-	bPlayingStepFX = false;
+	bHasRedHat = false;	
+	StepChannel = -1;
 
 	CollisionRect = {20, 30, 30, 39 };
 }
@@ -54,6 +54,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 			SDL_Log("Lives: %d", NumLives);
 			TheGame->SetLevel(TheGame->GetLevelNumber());
 			PlayerState = StateDead;
+			NumBricks = 0;
 			NumBombs = 2;
 		}
 	}
@@ -174,8 +175,12 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 {	
 	if (PlayerState == StateDying || PlayerState == StateDead)
 	{		
-		Mix_HaltChannel(0);
-		bPlayingStepFX = false;
+		if (StepChannel != -1)
+		{
+			Mix_HaltChannel(StepChannel);
+			StepChannel = -1;
+		}		
+		
 		VelX = 0;
 		VelY = 0;
 		return;
@@ -227,15 +232,14 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		VelX = VelX * (1 - DeltaTime * StopSpeed) + 0 * (DeltaTime * StopSpeed);		
 	}
 
-	if (bPlayerMoving && !bPlayingStepFX)
+	if (bPlayerMoving && StepChannel == -1)
 	{
-		Mix_PlayChannel(0, StepFX, -1);
-		bPlayingStepFX = true;		
+		StepChannel = Mix_PlayChannel(-1, StepFX, -1);		
 	}
-	else if (!bPlayerMoving && bPlayingStepFX)
+	else if (!bPlayerMoving && StepChannel != -1)
 	{
-		Mix_HaltChannel(0);
-		bPlayingStepFX = false;
+		Mix_HaltChannel(StepChannel);
+		StepChannel = -1;		
 	}
 
 	/*if (!bButtonPreviouslyPressed[1] && NumBombs > 0 && (state[SDL_SCANCODE_LALT] || (Joy && SDL_JoystickGetButton(Joy, 1))))
@@ -271,6 +275,11 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 				if (NumBricks == 0 && Items.size() - ItemSprite::NumNonBrickItems == 0)
 				{
 					BrickSpawnCountDown -= BRICK_FORCE_TIME_BONUS;
+
+					if (BrickSpawnCountDown < 0.10)
+					{
+						BrickSpawnCountDown = 0.10;
+					}
 				}
 
 				for (int i = 0; i < Mexicans.size(); i++)
@@ -318,8 +327,8 @@ void TrumpPlayerSprite::SetNumLives(int Amount)
 
 void TrumpPlayerSprite::TakeDamage()
 {
-	PlayerState = StateDying;
-
+	PlayerState = StateDying;	
+	Mix_HaltChannel(-1);
 	if (!bHasRedHat)
 	{
 		PlayAnimation(ResourceManager::TrumpDamageAnimation);
@@ -332,8 +341,8 @@ void TrumpPlayerSprite::TakeDamage()
 
 void TrumpPlayerSprite::Reset()
 {	
-	NumBricks = 0; //MAX_BRICKS - 1;
-	SetPosition(445, 340);
+	//NumBricks = 0; //MAX_BRICKS - 1;
+	SetPosition(470, 340);
 	PlayerState = StatePlaying;
 
 	if (!bSwapSprites && !bHasRedHat)

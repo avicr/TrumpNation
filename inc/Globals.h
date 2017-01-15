@@ -19,8 +19,9 @@
 #define WALL_TOP HORIZON - 104
 #define MEXICAN_SPAWN_RATE 0.25
 #define WALL_PLACE_ZONE 140
+#define SPAWN_VARIABLE_TIME 0.45
 #define ITEM_RATE 4
-#define ITEM_SPAWN_PERCENT 5
+#define ITEM_SPAWN_PERCENT 25 //5
 #define SCORE_LIFE_TIME 1
 #define ITEM_LIFE_TIME 8
 #define TRUMP_DEFAULT_MAX_VELOCITY 333
@@ -46,6 +47,8 @@
 #define CLOUD_Y_MAX 85
 #define CLOUD_SPEED_MIN 2
 #define CLOUD_SPEED_MAX 4
+
+#define MAX_CLIMBING_SOUNDS 8
 
 #define NUM_RANDOM_GROUND_TILES 10
 #define NUM_RANDOM_MOUNTAIN_TILES 2
@@ -77,6 +80,11 @@ extern class SpriteList Items;
 extern class SpriteList DecoSprites;
 extern class TrumpPlayerSprite *ThePlayer;
 
+extern Mix_Chunk *MexicanSpawnedFX;
+extern Mix_Chunk *MexicanEscapedFX;
+extern Mix_Chunk *MexicanJumpFX;
+extern Mix_Chunk *MexicanClimbFX;
+extern Mix_Chunk *MexicanLandFX;
 extern Mix_Chunk *BrickSpawnFX;
 extern Mix_Chunk *ItemSpawnFX;
 extern Mix_Chunk *LevelClearFX;

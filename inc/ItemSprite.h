@@ -7,6 +7,9 @@
 
 class ItemSprite : public Sprite
 {
+protected:
+	double Growth;
+	bool bReachedMaxSize;
 public:
 	ItemSprite(SDL_Texture *InTexture);
 	virtual ~ItemSprite() {};

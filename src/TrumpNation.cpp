@@ -55,10 +55,19 @@ SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
 bool bSDLInitialized = false;
+double BrickSpawnCountDown;
 Uint64 TickFreq;
 SpriteList Items;
 SpriteList Mexicans;
 SpriteList DecoSprites;
+
+Mix_Chunk *MexicanSpawnedFX = NULL;
+Mix_Chunk *MexicanEscapedFX = NULL;
+Mix_Chunk *MexicanClimbFX = NULL;
+Mix_Chunk *MexicanLandFX = NULL;
+Mix_Chunk *BrickSpawnFX = NULL;
+Mix_Chunk *MexicanJumpFX = NULL;
+Mix_Chunk *ItemSpawnFX = NULL;
 Mix_Chunk *PickUpItemFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
 Mix_Chunk *StepFX = NULL;
@@ -158,6 +167,13 @@ void CleanUp()
 	Mix_FreeChunk(TitleConfirmFX);
 	Mix_FreeChunk(TrumpDieFX);
 	Mix_FreeChunk(LevelClearFX);	
+	Mix_FreeChunk(ItemSpawnFX);
+	Mix_FreeChunk(BrickSpawnFX);
+	Mix_FreeChunk(MexicanJumpFX);
+	Mix_FreeChunk(MexicanLandFX);
+	Mix_FreeChunk(MexicanClimbFX);
+	Mix_FreeChunk(MexicanEscapedFX);
+	Mix_FreeChunk(MexicanSpawnedFX);
 
 	TTF_Quit();
 
@@ -189,14 +205,21 @@ bool GameLoop()
 		}
 
 		ThePlayer->Reset();
-		BrickItem *FirstBrick = new BrickItem();		
-		FirstBrick->SetPosition(470, 570);
-		Items.push_back(FirstBrick);		
+		BrickItem *FirstBrick = NULL;
+		
+		if (ThePlayer->GetNumBricks() == 0)
+		{
+			FirstBrick = new BrickItem(true);
+			FirstBrick->SetPosition(490, 570);
+			Items.push_back(FirstBrick);
+		}
+		
 		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
 		Uint64 StartTime = SDL_GetPerformanceCounter();
 		Uint64 CurrentTime = SDL_GetPerformanceCounter();
 		double DeltaTime;
 		bool bLevelComplete = false;
+		BrickSpawnCountDown = BRICK_SPAWN_RATE + BRICK_FIRST_SPAWN_PENALITY;
 
 		for (int i = 0; i < NUM_CLOUDS; i++)
 		{
@@ -249,7 +272,7 @@ bool GameLoop()
 				{
 					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
 					{
-						Mix_PlayChannel(-1, LevelClearFX, 0);
+						//Mix_PlayChannel(-1, LevelClearFX, 0);
 						SpawnRandomItem();
 					}
 
@@ -302,7 +325,7 @@ bool GameLoop()
 void Tick(double DeltaTime)
 {	
 	static double SpawnCountdown = GetSpawnTime();
-	static double ItemSpawnCountdown = ITEM_RATE;
+	static double ItemSpawnCountdown = ITEM_RATE;		
 	static int ItemChance = ITEM_SPAWN_PERCENT;
 
 	if (BombCountDown >= 0)
@@ -310,16 +333,34 @@ void Tick(double DeltaTime)
 		BombCountDown -= DeltaTime;
 	}
 
-	if (ItemSprite::NumNonBrickItems == 0)
+	//if (ItemSprite::NumNonBrickItems == 0)
 	{
 		ItemSpawnCountdown -= DeltaTime;
 	}
+
 	SpawnCountdown -= DeltaTime;
+	BrickSpawnCountDown -= DeltaTime;
 
 	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
 	{						
-		Mexicans.push_back(new Mexican1Sprite());
+		Mexicans.push_back(new Mexican1Sprite());		
 		SpawnCountdown = GetSpawnTime();
+	}
+
+	if (BrickSpawnCountDown <= 0)
+	{
+		bool bForceBrickSpawn = ThePlayer->GetNumBricks() == 0 && Items.size() - ItemSprite::NumNonBrickItems == 0;
+		BrickSpawnCountDown = BRICK_SPAWN_RATE;
+		if (bForceBrickSpawn || (ThePlayer->GetNumBricks() + Items.size() - ItemSprite::NumNonBrickItems < MAX_BRICKS && rand() % (100 / BRICK_SPAWN_PERCENT) == 0))
+		{
+			Items.push_back(new BrickItem());
+
+			if (!bForceBrickSpawn)
+			{
+				ItemSpawnCountdown += ITEM_ON_BRICK_SPAWN_PENALITY;
+				BrickSpawnCountDown += BRICK_ON_BRICK_SPAWN_PENALITY;
+			}
+		}
 	}
 
 	if (ItemSpawnCountdown <= 0)
@@ -541,8 +582,9 @@ bool DoTitleScreen()
 				break;
 			}
 		}
+		
 	}
-	
+	SDL_Delay(500);
 	return !bUserQuit;
 }
 
@@ -563,10 +605,25 @@ void InitSDL()
 		{
 			PickUpItemFX = Mix_LoadWAV("resource/sounds/Pickupitem.wav");
 			PlaceWallFX = Mix_LoadWAV("resource/sounds/Placewall.wav");
-			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
+			StepFX = Mix_LoadWAV("resource/sounds/mexicanstep2.wav");
 			TitleConfirmFX = Mix_LoadWAV("resource/sounds/Titleconfirm.wav");
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");
+			ItemSpawnFX = Mix_LoadWAV("resource/sounds/itemspawn.wav");
+			BrickSpawnFX = Mix_LoadWAV("resource/sounds/brickspawn3.wav");
+			MexicanJumpFX = Mix_LoadWAV("resource/sounds/mexicanjump.wav");
+			MexicanLandFX = Mix_LoadWAV("resource/sounds/mexicanland.wav");
+			MexicanClimbFX = Mix_LoadWAV("resource/sounds/mexicanclimb.wav");
+			MexicanEscapedFX = Mix_LoadWAV("resource/sounds/step7.wav");
+			MexicanSpawnedFX = Mix_LoadWAV("resource/sounds/step3.wav");
+			
+			Mix_VolumeChunk(MexicanSpawnedFX, 48);
+			Mix_VolumeChunk(StepFX, 128);
+			Mix_VolumeChunk(BrickSpawnFX, 86);
+			Mix_VolumeChunk(MexicanJumpFX, 128);
+			Mix_VolumeChunk(MexicanLandFX, 128);
+			Mix_VolumeChunk(MexicanClimbFX, 128);
+			Mix_VolumeChunk(MexicanEscapedFX, 48);
 		}
 
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
@@ -713,6 +770,17 @@ void DrawHUD(SDL_Renderer *Renderer)
 	DrawText("X", 48, 22, 24, 24, Renderer, FontBlue, 0.75, 0.75);
 	DrawText(std::to_string(ThePlayer->GetNumLives()), 70, 15, 32, 32, Renderer, FontShadowedWhite, 0.75, 0.75);
 
+	for (int i = 0; i < ThePlayer->GetNumBricks(); i++)
+	{		
+		DstRect = ResourceManager::BrickTexture->SrcRect;
+		DstRect.x = 110 + i * 35;
+		DstRect.y = 24;
+		DstRect.w *= 2.25;
+		DstRect.h *= 2.25;
+
+		SDL_RenderCopy(GRenderer, ResourceManager::BrickTexture->Texture, NULL, &DstRect);
+	}
+
 	DrawText("MILE", 444, 17, 32, 32, Renderer, FontBlue, 0.75, 0.75);
 	DrawText(std::to_string(TheGame->GetLevelNumber()), 540, 15, 32, 32, Renderer, FontShadowedWhite, 0.75, 0.75);
 	
@@ -837,37 +905,38 @@ void SpawnRandomItem()
 
 double GetSpawnTime()
 {
+	float Variance = -SPAWN_VARIABLE_TIME + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (SPAWN_VARIABLE_TIME - -SPAWN_VARIABLE_TIME)));
 	if (TheGame->GetLevelNumber() == 1)
 	{
-		return 1;
+		return 1 + Variance;
 	}
 	else if (TheGame->GetLevelNumber() == 2)
 	{
-		return 0.85;
+		return 0.85 + Variance;
 	}
 	else if (TheGame->GetLevelNumber() == 3)
 	{
-		return 0.75;
+		return 0.75 + Variance;
 	}
 	else if (TheGame->GetLevelNumber() == 4)
 	{
-		return 0.65;
+		return 0.65 + Variance;
 	}
 	else if (TheGame->GetLevelNumber() == 5)
 	{
-		return 0.50;
+		return 0.50 + Variance;
 	}
 	else if (TheGame->GetLevelNumber() == 6)
 	{
-		return 0.35;
+		return 0.35 + Variance;
 	}
 	else if (TheGame->GetLevelNumber() == 7)
 	{
-		return 0.20;
+		return 0.20 + Variance;
 	}
 	else
 	{
-		return 1 / log1p(TheGame->GetLevelNumber() * TheGame->GetLevelNumber() * TheGame->GetLevelNumber());
+		return (1 / log1p(TheGame->GetLevelNumber() * TheGame->GetLevelNumber() * TheGame->GetLevelNumber())) + Variance;
 	}
 }
 
@@ -943,6 +1012,10 @@ void DoGameOver()
 			}
 
 			SDL_Rect DstRect = { 152, 255, ResourceManager::MexicanFaceTexture->SrcRect.w, ResourceManager::MexicanFaceTexture->SrcRect.h };
+
+			DstRect.w *= 1.25;
+			DstRect.h *= 1.25;
+
 			SDL_RenderCopy(GRenderer, ResourceManager::MexicanFaceTexture->Texture, NULL, &DstRect);
 			DrawText("  CROSSED BORDER   -50 X", 152, 260, 24, 24, GRenderer, FontShadowedYellow, 1, 1);
 			DrawText(std::to_string(TheGame->GetNumMexicansEscaped()), 869, 260, 24, 24, GRenderer, FontShadowedWhite, 1, 1, true);
@@ -1124,7 +1197,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 				char Name[4];
 				strcpy(Name, HighScores[i].Name);
 				Name[NamePos + 1] = 0;
-				DrawText(Name, 849, 190 + PosY, 32, 32, GRenderer, FontShadowedWhite, 0.75, 0.75);
+				DrawText(Name, 800, 190 + PosY, 32, 32, GRenderer, FontShadowedWhite, 0.75, 0.75);
 				
 			}
 			else

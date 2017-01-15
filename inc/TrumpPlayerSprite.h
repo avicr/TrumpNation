@@ -41,7 +41,7 @@ protected:
 	double DyingCountDown;
 	int NumLives;
 	long Score;
-	bool bPlayingStepFX;
+	int StepChannel;	
 	int NumBricks;
 	bool bHasRedHat;
 	double RedHatCountDown;

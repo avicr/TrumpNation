@@ -5,6 +5,9 @@ int ItemSprite::NumNonBrickItems = 0;
 ItemSprite::ItemSprite(SDL_Texture *InTexture)
 	: Sprite()
 {	
+	Growth = 0;
+	bReachedMaxSize = false;
+
 	CollisionRenderColor.a = 128;
 	CollisionRenderColor.r = 255;
 	CollisionRenderColor.g = 255;
@@ -21,7 +24,7 @@ ItemSprite::ItemSprite(SDL_Texture *InTexture)
 	RandomizePosition();	
 	CountDown = ITEM_LIFE_TIME;
 
-	Mix_PlayChannel(-1, ItemSpawnFX, 0);
+	Mix_PlayChannel(-1, BrickSpawnFX, 0);
 }
 
 ItemSprite::ItemSprite(int X, int Y) :
@@ -69,12 +72,60 @@ void ItemSprite::Render(SDL_Renderer *Renderer)
 	}
 	else
 	{
-		Sprite::Render(Renderer);
+		SDL_Rect SrcRect = { 0, 0, Rect.w, Rect.h };
+		SDL_Rect RenderRect = Rect;
+		SDL_Texture *TextureToUse = Texture;
+
+		if (Growth < 1 && Growth > 0.5)
+		{
+			SDL_Log("WHAT");
+		}
+
+		if (AnimData.Anim)
+		{
+			TextureToUse = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex)->GetTexture();
+			SrcRect = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex)->GetSrcRect();
+		}
+				
+		RenderRect.w *= Growth;
+		RenderRect.h *= Growth;
+
+		RenderRect.x += (Rect.w - RenderRect.w) / 2;
+		RenderRect.y += (Rect.h - RenderRect.h) / 2;
+		
+		SDL_RenderCopyEx(Renderer, TextureToUse, &SrcRect, &RenderRect, 0, NULL, Flip);
+
+		if (bRenderCollision)
+		{
+			RenderCollision(Renderer);
+		}
 	}
 }
 
 void ItemSprite::Tick(double DeltaTime)
 {
+	double GrowthRate = 5;	
+
+	if (Growth < 1.35 && !bReachedMaxSize)
+	{
+		Growth += DeltaTime * GrowthRate;
+
+		if (Growth > 1.35)
+		{
+			bReachedMaxSize = true;
+		}
+	}
+
+	if (bReachedMaxSize)
+	{
+		Growth -= DeltaTime * GrowthRate * 2;
+
+		if (Growth < 1)
+		{
+			Growth = 1;
+		}
+	}
+
 	Sprite::Tick(DeltaTime);
 	if (CountDown > -1)
 	{
@@ -92,7 +143,7 @@ BrickItem::BrickItem(bool bFirstBrick)
 {		
 	bIsFirstBrick = bFirstBrick;
 	CollisionRect = { -8, -16, 48, 48 };
-	CountDown = -1;
+	CountDown += 1;
 	
 	//Mix_PlayChannel(-1, BrickSpawnFX, 0);
 }

@@ -2,9 +2,16 @@
 #include "../inc/TrumpPlayerSprite.h"
 #include "../inc/Globals.h"
 
+int Mexican1Sprite::NumClimbingSoundsPlaying = 0;
+
 Mexican1Sprite::Mexican1Sprite()
 {
+	bIsJumping = false;
+	AttackCountDown = 0.5;
+	JumpCountDown = 0.15;
+	bHasPlayedSpawnSound = false;
 	//float scale = 2.58;//0.58f;
+	ClimbChannel = -1;
 	SDL_Rect WallRect;
 	SDL_Rect CollisionRect;
 	SDL_Rect ResultRect;
@@ -53,7 +60,6 @@ Mexican1Sprite::Mexican1Sprite()
 	VelX = 0;
 	VelY = 0;
 	Growth = 0;
-	
 
 	do
 	{
@@ -138,12 +144,23 @@ Mexican1Sprite::Mexican1Sprite()
 		}
 
 		bClimbingWall = true;
+		if (NumClimbingSoundsPlaying < MAX_CLIMBING_SOUNDS)
+		{			
+			ClimbChannel = Mix_PlayChannel(-1, MexicanClimbFX, -1);
+			Mix_Volume(ClimbChannel, 128 - 24 * NumClimbingSoundsPlaying);
+			NumClimbingSoundsPlaying++;
+		}
 		MoveRate = 333;
 		//PosX = WallIndex * 64;
 	}	
 
 	MovingFlags = 0;	
 	
+}
+
+Mexican1Sprite::~Mexican1Sprite()
+{
+	StopSounds();
 }
 
 bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
@@ -219,7 +236,15 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 			{
 				RenderRect.w *= Growth;
 				RenderRect.h *= Growth;
-				//RenderRect.x -= (Rect.w / 2) * Growth;
+				if (Growth > 0.5)
+				{
+					//RenderRect.x += (Rect.w - RenderRect.w) / 2;
+					//RenderRect.y += (Rect.h - RenderRect.h) / 2;
+				}
+				else
+				{
+					//RenderRect.x += (Rect.w - RenderRect.w) * Growth;
+				}
 			}
 			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &RenderRect, 0, NULL, Flip);
 		}
@@ -236,7 +261,12 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 void Mexican1Sprite::HandleInput(double DeltaTime)
 {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
-	const double GrowthRate = 0.5;
+	double GrowthRate = 0.5;
+
+	if (bHasPlayedSpawnSound)
+	{
+		GrowthRate *= 5.5;
+	}
 
 	if (Rect.y > 600)
 	{
@@ -254,20 +284,68 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 	if (PosY >= 280 && bClimbingWall)
 	{
-		MaxVelocity = 444;
+		TransitionSpeed = 0.5;
+		MoveRate = 0.5;
+		StopSpeed = 105;		
+		MaxVelocity = 500;
 		VelY = 0;
-		MovingFlags = MOVING_DOWN;
-		TransitionSpeed = 1;
+
+		MovingFlags = MOVING_DOWN;		
 		bClimbingWall = false;		
+		bIsJumping = false;
+		StopSounds();		
+		Mix_PlayChannel(-1, MexicanLandFX, 0);		
 	}
+
+
+	if (Growth == 1)
+	{
+		AttackCountDown -= DeltaTime;
+		
+		if (AttackCountDown <= 0)
+		{
+			AttackCountDown = 0;
+		}
+
+		if (AttackCountDown == 0 && MovingFlags != MOVING_DOWN)
+		{
+			if (!bIsJumping)
+			{
+				MovingFlags = MOVING_DOWN;
+			}
+
+			if (bIsJumping && MovingFlags != MOVING_UP)
+			{
+				Mix_PlayChannel(-1, MexicanJumpFX, 0);
+				SDL_Log("PLAYING SOUND");
+			}
+		}
+
+		if (bIsJumping && AttackCountDown == 0 && JumpCountDown > 0)
+		{
+			
+			TransitionSpeed = 20;
+			MaxVelocity = 333;
+			MoveRate = 333;
+			StopSpeed = 100;				
+
+			MovingFlags = MOVING_UP;
+			JumpCountDown -= DeltaTime;
+
+			if (JumpCountDown <= 0)
+			{				
+				MovingFlags = MOVING_DOWN;
+			}
+		}		
+	}
+
 	if (Growth < 1)
 	{
 		Growth += DeltaTime * GrowthRate;
-
+	
 		if (Growth > 1)
 		{
-			Growth = 1;
-			MovingFlags = MOVING_DOWN;			
+			Growth = 1;			
 		}
 
 		if (bClimbingWall)
@@ -275,15 +353,20 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 			PosY = WALL_TOP - Rect.h * Growth + 1;
 			StopSpeed = 0.5;
 			TransitionSpeed = 33;
-			MaxVelocity = 500;
-
+			MaxVelocity = 500;						
+			bIsJumping = true;
 			if (Growth == 1)
 			{
-				Mix_PlayChannel(-1, BrickSpawnFX, 0);
+				StopSounds();				
 			}
 		}
 		else
-		{
+		{			
+			if (Growth >= 0.50 && !bHasPlayedSpawnSound)
+			{
+				Mix_PlayChannel(-1, MexicanSpawnedFX, 0);
+				bHasPlayedSpawnSound = true;				
+			}
 			PosY = HORIZON - Rect.h * Growth + 1;
 		}
 	}
@@ -321,4 +404,20 @@ int Mexican1Sprite::GetScoreWorth()
 	Score *= bSwapSprites ? 2 : 1;
 
 	return Score;
+}
+
+void Mexican1Sprite::StopSounds()
+{
+	if (ClimbChannel != -1 && Mix_Playing(ClimbChannel))
+	{
+		Mix_Volume(ClimbChannel, 128);
+		Mix_HaltChannel(ClimbChannel);
+		ClimbChannel = -1;
+		NumClimbingSoundsPlaying--;
+
+		if (NumClimbingSoundsPlaying < 0)
+		{
+			SDL_Log("HOW");
+		}
+	}
 }
