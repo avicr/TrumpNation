@@ -20,6 +20,8 @@ ItemSprite::ItemSprite(SDL_Texture *InTexture)
 
 	RandomizePosition();	
 	CountDown = ITEM_LIFE_TIME;
+
+	Mix_PlayChannel(-1, ItemSpawnFX, 0);
 }
 
 ItemSprite::ItemSprite(int X, int Y) :
@@ -85,16 +87,27 @@ void ItemSprite::Tick(double DeltaTime)
 	}
 }
 
-BrickItem::BrickItem()
+BrickItem::BrickItem(bool bFirstBrick)
 	: ItemSprite(ResourceManager::BrickTexture->Texture)
 {		
+	bIsFirstBrick = bFirstBrick;
 	CollisionRect = { -8, -16, 48, 48 };
 	CountDown = -1;
+	
+	//Mix_PlayChannel(-1, BrickSpawnFX, 0);
 }
 
 void BrickItem::Interact(TrumpPlayerSprite *OtherSprite)
 {
-	OtherSprite->SetHasWall(true);
+	OtherSprite->AddBrick(true);
 	Mix_PlayChannel(-1, PickUpItemFX, 0);
 	bPendingDelete = true;
+}
+
+BrickItem::~BrickItem()
+{
+	if (bIsFirstBrick)
+	{
+		BrickSpawnCountDown -= BRICK_FIRST_SPAWN_PENALITY;
+	}
 }

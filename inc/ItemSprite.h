@@ -22,8 +22,11 @@ public:
 
 class BrickItem : public ItemSprite
 {
+protected:
+	bool bIsFirstBrick;
 public:
-	BrickItem();	
+	BrickItem(bool bFirstBrick = false);	
+	~BrickItem();
 	virtual void Interact(TrumpPlayerSprite *OtherSprite);
 };
 
@@ -95,12 +98,14 @@ public:
 		SetWidth(40);
 		SetHeight(40);
 		RandomizePosition();
+		NumNonBrickItems++;
 	}
 
 	virtual ~ExtraLifeItem()
 	{
 		NumNonBrickItems--;
 	}
+
 	virtual void Interact(TrumpPlayerSprite *OtherSprite)
 	{
 		Mix_PlayChannel(-1, PickUpItemFX, 0);

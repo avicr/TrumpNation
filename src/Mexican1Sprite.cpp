@@ -258,7 +258,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 		VelY = 0;
 		MovingFlags = MOVING_DOWN;
 		TransitionSpeed = 1;
-		bClimbingWall = false;
+		bClimbingWall = false;		
 	}
 	if (Growth < 1)
 	{
@@ -267,7 +267,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 		if (Growth > 1)
 		{
 			Growth = 1;
-			MovingFlags = MOVING_DOWN;
+			MovingFlags = MOVING_DOWN;			
 		}
 
 		if (bClimbingWall)
@@ -276,6 +276,11 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 			StopSpeed = 0.5;
 			TransitionSpeed = 33;
 			MaxVelocity = 500;
+
+			if (Growth == 1)
+			{
+				Mix_PlayChannel(-1, BrickSpawnFX, 0);
+			}
 		}
 		else
 		{

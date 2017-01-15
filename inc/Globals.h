@@ -31,6 +31,14 @@
 #define FACT_TIME 7
 #define GLOBAL_SCALE 2.25
 
+#define BRICK_FIRST_SPAWN_PENALITY 5
+#define BRICK_ON_BRICK_SPAWN_PENALITY 0.25
+#define ITEM_ON_BRICK_SPAWN_PENALITY 0.15
+#define BRICK_SPAWN_RATE 1.5
+#define BRICK_SPAWN_PERCENT 33
+#define MAX_BRICKS 3
+#define BRICK_FORCE_TIME_BONUS 0.15
+
 #define NUM_CLOUDS 5
 #define CLOUD_SCALE_MIN 0.5
 #define CLOUD_SCALE_MAX 2
@@ -66,8 +74,11 @@ extern SDL_Renderer * GRenderer;
 extern bool bSDLInitialized;
 extern class SpriteList Mexicans;
 extern class SpriteList Items;
+extern class SpriteList DecoSprites;
 extern class TrumpPlayerSprite *ThePlayer;
 
+extern Mix_Chunk *BrickSpawnFX;
+extern Mix_Chunk *ItemSpawnFX;
 extern Mix_Chunk *LevelClearFX;
 extern Mix_Chunk *TrumpDieFX;
 extern Mix_Chunk *PickUpItemFX;
@@ -81,7 +92,7 @@ extern class Game *TheGame;
 extern bool bFreezeSpawn;
 extern bool bSwapSprites;
 extern bool bRenderCollision;
-
+extern double BrickSpawnCountDown;
 
 extern struct Glyph FontSeg36[94];
 extern struct Glyph FontSeg20[94];

@@ -17,7 +17,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	SetHeight(32 * GLOBAL_SCALE);
 
 	NumBombs = 2;
-	NumLives = 0;// 2;
+	NumLives = 2;
 	MoveRate = 444;
 	MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
 	TransitionSpeed = 7;
@@ -30,7 +30,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	PosX = 445;
 	PosY = 340;
 	Joy = SDL_JoystickOpen(0);
-	bHasWall = false;
+	NumBricks = 0;
 	bHasRedHat = false;
 	bPlayingStepFX = false;
 
@@ -145,9 +145,14 @@ SDL_Rect TrumpPlayerSprite::GetScreenSpaceCollisionRect()
 	return CollisionRect;
 }
 
-void TrumpPlayerSprite::SetHasWall(bool bInHasWall)
+void TrumpPlayerSprite::AddBrick(int Amount)
 {
-	bHasWall = bInHasWall;
+	NumBricks += Amount;
+}
+
+int TrumpPlayerSprite::GetNumBricks()
+{
+	return NumBricks;
 }
 
 void TrumpPlayerSprite::AddToScore(int Amount)
@@ -240,7 +245,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	}*/
 
 	bool bPressingButton1 = state[SDL_SCANCODE_SPACE] || state[SDL_SCANCODE_RETURN] || (Joy && SDL_JoystickGetButton(Joy, 0));
-	if (!bButtonPreviouslyPressed[0] && bHasWall && bPressingButton1)
+	if (!bButtonPreviouslyPressed[0] && NumBricks && bPressingButton1)
 	{
 		int TotalScore = PLACE_WALL_SCORE * (bSwapSprites ? 2 : 1);
 		//bFreezeSpawn = true;
@@ -260,8 +265,13 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 				}
 				TheGame->WallArray[WallIndex * 2 + 1] = TheGame->WallArray[WallIndex * 2];
 
-				bHasWall = false;								
-				Items.push_back(new BrickItem());
+				NumBricks--;
+				
+				// If there are no bricks left on the field spawn a new one
+				if (NumBricks == 0 && Items.size() - ItemSprite::NumNonBrickItems == 0)
+				{
+					BrickSpawnCountDown -= BRICK_FORCE_TIME_BONUS;
+				}
 
 				for (int i = 0; i < Mexicans.size(); i++)
 				{
@@ -271,7 +281,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 					}					
 				}				
 
-				Items.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
+				DecoSprites.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
 				Score += TotalScore;
 			}
 		}
@@ -322,7 +332,7 @@ void TrumpPlayerSprite::TakeDamage()
 
 void TrumpPlayerSprite::Reset()
 {	
-	bHasWall = false;
+	NumBricks = 0; //MAX_BRICKS - 1;
 	SetPosition(445, 340);
 	PlayerState = StatePlaying;
 
@@ -347,7 +357,7 @@ ePlayerState TrumpPlayerSprite::GetPlayerState()
 
 void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 {
-	if (bHasWall && PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
+	if (NumBricks && PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 	{
 		int WallIndex = (int)round((PosX - Rect.w/2) / 128);
 		WallIndex *= 2;
@@ -370,7 +380,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 	/*SDL_SetRenderDrawColor(Renderer, 255, 0, 0, 255);
 	SDL_RenderDrawRect(Renderer, &GetScreenSpaceCollisionRect());*/
 
-	/*if (bHasWall)
+	/*if (NumBricks)
 	{
 		SDL_Rect BrickDstRect = { PosX + 22, PosY + 35, ResourceManager::BrickTexture->SrcRect.w, ResourceManager::BrickTexture->SrcRect.h };
 		SDL_RenderCopy(Renderer, ResourceManager::BrickTexture->Texture, &ResourceManager::BrickTexture->SrcRect, &BrickDstRect);

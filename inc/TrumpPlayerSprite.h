@@ -17,7 +17,8 @@ public:
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);
 	SDL_Rect GetScreenSpaceCollisionRect();
-	void SetHasWall(bool bInHasWall);
+	void AddBrick(int Amount);
+	int GetNumBricks();
 	void AddToScore(int Amount);
 	void AddLives(int Amount);
 	long GetScore();
@@ -41,7 +42,7 @@ protected:
 	int NumLives;
 	long Score;
 	bool bPlayingStepFX;
-	bool bHasWall;
+	int NumBricks;
 	bool bHasRedHat;
 	double RedHatCountDown;
 	SDL_Joystick *Joy;

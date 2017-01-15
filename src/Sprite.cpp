@@ -30,7 +30,7 @@ Sprite::Sprite() :
 	bPendingDelete = false;
 
 	MovingFlags = MOVING_NONE;
-	CollisionRect = { 0, 0, Rect.w, Rect.h };
+	CollisionRect = { 0, 0, Rect.w, Rect.h };	
 }
 
 void Sprite::Tick(double DeltaTime)
