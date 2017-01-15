@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+#define RENDER_COLLISION 0
+
 #define TEXTURE_PATH "resource/textures/"
 #define HORIZON 264
 #define WALL_TOP HORIZON - 104

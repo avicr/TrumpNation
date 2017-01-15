@@ -25,6 +25,7 @@ enum eMovingFlags
 class Sprite
 {
 protected:
+	SDL_Color CollisionRenderColor;
 	SDL_Rect CollisionRect;
 	double CountDown;
 	SDL_RendererFlip Flip;
@@ -61,13 +62,14 @@ public:
 	virtual void HandleInput(double DeltaTime);
 	virtual void CheckCollision(class TrumpPlayerSprite *OtherSprite);
 	virtual void Interact(class TrumpPlayerSprite *OtherSprite);
-	virtual SDL_Rect GetCollisionRect();
+	virtual SDL_Rect GetScreenSpaceCollisionRect();
 	virtual bool HandleWallPlaced(int WallIndex) { return false; };
 	void SetTexture(SDL_Texture* Texture);
 	void SetPosition(int NewX, int NewY);
 	void SetWidth(int NewWidth);
 	void SetHeight(int NewHeight);
 	virtual void Render(SDL_Renderer* Renderer);
+	void RenderCollision(SDL_Renderer* Renderer);
 	void PlayAnimation(AnimationResource *Anim);
 	void SetAnimationPlayRate(double Rate);
 	void UpdateAnimationData();

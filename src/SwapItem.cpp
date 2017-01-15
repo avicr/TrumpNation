@@ -16,6 +16,6 @@ SwapItem::SwapItem() :
 	SetHeight(80);
 	NumNonBrickItems++;
 
-	CollisionRect = { 16, 16, 40, 40 };
+	CollisionRect = { 16, 16, 48, 48 };
 	RandomizePosition();
 }

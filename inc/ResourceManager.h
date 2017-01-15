@@ -85,6 +85,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(CloudTexture, "cloud.bmp");
 	DECLARE_TEXTURE_RESOURCE(SingleBrickTexture, "singlebrick.bmp")
 	DECLARE_TEXTURE_RESOURCE(SmallBrickTileTexture, "smallbricktile.bmp")
+	DECLARE_TEXTURE_RESOURCE(TrumpDamageHatSpriteSheet, "Trump_hat-Angry.bmp")
 	//DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");	
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 	DECLARE_TEXTURE_RESOURCE(Tiles, "tiles2x.bmp");
@@ -180,6 +181,19 @@ public:
 		}
 	}
 	END_DECLARE_ANIMATION_RESOURCE(TrumpDamageAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpDamageHatAnimation)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::TrumpDamageHatSpriteSheet->Texture, SrcRect, 0.02));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(TrumpDamageHatAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(Mexican1Animation)
 	{

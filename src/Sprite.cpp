@@ -3,6 +3,11 @@
 Sprite::Sprite() :
 	Texture(NULL)
 {	
+	CollisionRenderColor.a = 128;
+	CollisionRenderColor.r = 255;
+	CollisionRenderColor.g = 255;
+	CollisionRenderColor.b = 255;
+
 	Scale = 1;
 	CountDown = -1;
 	Flip = SDL_FLIP_NONE;
@@ -118,11 +123,11 @@ void Sprite::Interact(TrumpPlayerSprite *OtherSprite)
 {
 }
 
-SDL_Rect Sprite::GetCollisionRect()
+SDL_Rect Sprite::GetScreenSpaceCollisionRect()
 {
-	SDL_Rect CollisionToUse = Rect;
-	CollisionToUse.x += CollisionRect.x;
-	CollisionToUse.y += CollisionRect.y;
+	SDL_Rect CollisionToUse = CollisionRect;
+	CollisionToUse.x += Rect.x;
+	CollisionToUse.y += Rect.y;
 	return CollisionToUse;
 }
 
@@ -194,6 +199,21 @@ void Sprite::Render(SDL_Renderer* Renderer)
 		DstRect.h *= Scale;
 		SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
 	}
+
+	if (RENDER_COLLISION)
+	{
+		RenderCollision(Renderer);
+	}
+}
+
+void Sprite::RenderCollision(SDL_Renderer *Renderer)
+{
+	SDL_Rect ScreenSpaceCollision = GetScreenSpaceCollisionRect();
+
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(Renderer, CollisionRenderColor.r, CollisionRenderColor.g, CollisionRenderColor.b, 128);
+	SDL_RenderFillRect(Renderer, &ScreenSpaceCollision);
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_NONE);
 }
 
 void Sprite::PlayAnimation(AnimationResource *Anim)

@@ -22,7 +22,7 @@ void SpriteList::Render(SDL_Renderer *Renderer)
 	for (int i = size() - 1; i >= 0; i--)
 	{
 		(*this)[i]->Render(Renderer);
-		/*SDL_Rect CollisionRect = Mexicans[i]->GetCollisionRect();
+		/*SDL_Rect CollisionRect = Mexicans[i]->GetScreenSpaceCollisionRect();
 		SDL_SetRenderDrawColor(GRenderer, 255, 0, 0, 255);
 		SDL_RenderDrawRect(GRenderer, &CollisionRect);*/
 	}

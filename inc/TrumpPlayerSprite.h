@@ -16,7 +16,7 @@ public:
 	TrumpPlayerSprite();
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);
-	SDL_Rect GetCollisionRect();
+	SDL_Rect GetScreenSpaceCollisionRect();
 	void SetHasWall(bool bInHasWall);
 	void AddToScore(int Amount);
 	void AddLives(int Amount);

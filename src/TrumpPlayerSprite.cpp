@@ -6,6 +6,11 @@
 
 TrumpPlayerSprite::TrumpPlayerSprite()
 {
+	CollisionRenderColor.a = 128;
+	CollisionRenderColor.r = 0;
+	CollisionRenderColor.g = 255;
+	CollisionRenderColor.b = 0;
+
 	memset(bButtonPreviouslyPressed, 0, sizeof(bButtonPreviouslyPressed));
 
 	SetWidth(32 * GLOBAL_SCALE);
@@ -134,7 +139,7 @@ void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 	Sprite::TickAnimation(DeltaTime);
 }
 
-SDL_Rect TrumpPlayerSprite::GetCollisionRect()
+SDL_Rect TrumpPlayerSprite::GetScreenSpaceCollisionRect()
 {
 	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 30, 30, 39 };
 	return CollisionRect;
@@ -304,7 +309,15 @@ void TrumpPlayerSprite::SetNumLives(int Amount)
 void TrumpPlayerSprite::TakeDamage()
 {
 	PlayerState = StateDying;
-	PlayAnimation(ResourceManager::TrumpDamageAnimation);
+
+	if (!bHasRedHat)
+	{
+		PlayAnimation(ResourceManager::TrumpDamageAnimation);
+	}
+	else
+	{
+		PlayAnimation(ResourceManager::TrumpDamageHatAnimation);
+	}
 }
 
 void TrumpPlayerSprite::Reset()
@@ -355,7 +368,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 
 	Sprite::Render(Renderer);
 	/*SDL_SetRenderDrawColor(Renderer, 255, 0, 0, 255);
-	SDL_RenderDrawRect(Renderer, &GetCollisionRect());*/
+	SDL_RenderDrawRect(Renderer, &GetScreenSpaceCollisionRect());*/
 
 	/*if (bHasWall)
 	{
@@ -368,6 +381,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 
 void TrumpPlayerSprite::DoSwap(bool bSwap)
 {
+	bSwapSprites = bSwap;
 	if (bSwap)
 	{
 		RedHatCountDown = 0;
@@ -378,9 +392,12 @@ void TrumpPlayerSprite::DoSwap(bool bSwap)
 			Mexicans[i]->PlayAnimation(ResourceManager::TrumpAnimation);
 		}
 
-		ThePlayer->PlayAnimation(ResourceManager::Mexican1Animation);
+		if (PlayerState != StateDying)
+		{
+			ThePlayer->PlayAnimation(ResourceManager::Mexican1Animation);
+		}
 	}
-	else if (bSwapSprites)
+	else 
 	{
 		Mix_FadeInMusic(BGMusic, -1, 500);
 		for (int i = 0; i < Mexicans.size(); i++)
@@ -388,16 +405,18 @@ void TrumpPlayerSprite::DoSwap(bool bSwap)
 			Mexicans[i]->PlayAnimation(ResourceManager::Mexican1Animation);
 		}
 
-		if (!bHasRedHat)
+		if (PlayerState != StateDying)
 		{
-			ThePlayer->PlayAnimation(ResourceManager::TrumpAnimation);
-		}
-		else
-		{
-			ThePlayer->PlayAnimation(ResourceManager::TrumpRedHatAnimation);
-		}
-	}
-	bSwapSprites = bSwap;
+			if (!bHasRedHat)
+			{
+				ThePlayer->PlayAnimation(ResourceManager::TrumpAnimation);
+			}
+			else
+			{
+				ThePlayer->PlayAnimation(ResourceManager::TrumpRedHatAnimation);
+			} 
+		}		
+	}	
 }
 
 void TrumpPlayerSprite::PickupRedHat()
@@ -428,7 +447,7 @@ void TrumpPlayerSprite::KillEverything(bool bBecauseBomb)
 
 	for (int i = 0; i < Mexicans.size(); i++)
 	{
-		SDL_Rect MexiRect = Mexicans[i]->GetCollisionRect();
+		SDL_Rect MexiRect = Mexicans[i]->GetScreenSpaceCollisionRect();
 
 		Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, Mexicans[i]->GetScoreWorth()));
 		AddToScore(Mexicans[i]->GetScoreWorth());

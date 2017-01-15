@@ -808,11 +808,11 @@ void SpawnRandomItem()
 	int Roll = rand() % 100;
 	ItemSprite *NewItem;
 	
-	if (Roll < 15)
+	if (Roll < 10)
 	{
 		NewItem = new ExtraLifeItem();
 	}
-	else if (Roll < 20)
+	else if (Roll < 25)
 	{
 		NewItem = new SwapItem();
 	}

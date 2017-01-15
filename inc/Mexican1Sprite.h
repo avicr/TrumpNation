@@ -8,7 +8,7 @@ class Mexican1Sprite : public Sprite
 public:
 	Mexican1Sprite();
 	bool HandleWallPlaced(int WallIndex);
-	SDL_Rect GetCollisionRect();
+	SDL_Rect GetScreenSpaceCollisionRect();
 	void Render(SDL_Renderer *Renderer);
 	void CheckCollision(TrumpPlayerSprite *OtherSprite);
 	void Interact(TrumpPlayerSprite *OtherSprite);

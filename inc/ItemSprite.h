@@ -39,7 +39,7 @@ public:
 		SetHeight(80);
 		NumNonBrickItems++;
 				
-		CollisionRect = { 16, 16, 32, 32 };
+		CollisionRect = { 16, 16, 48, 48 };
 		RandomizePosition();
 	}
 
@@ -67,7 +67,7 @@ public:
 		SetHeight(64);
 		NumNonBrickItems++;
 
-		CollisionRect = { 0, 0, 64, 64 };
+		CollisionRect = { 0, 0, 48, 48 };
 		RandomizePosition();
 	}
 
@@ -91,9 +91,9 @@ public:
 	ExtraLifeItem() :
 		ItemSprite(ResourceManager::TrumpFaceTexture->Texture)
 	{
-		CollisionRect = { 0, 0, 32, 32 };
-		SetWidth(32);
-		SetHeight(32);
+		CollisionRect = { -4, -4, 48, 48 };
+		SetWidth(40);
+		SetHeight(40);
 		RandomizePosition();
 	}
 

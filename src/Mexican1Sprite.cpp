@@ -11,6 +11,11 @@ Mexican1Sprite::Mexican1Sprite()
 	bool bGood = false;
 	int WallIndex = 0;
 
+	CollisionRenderColor.a = 128;
+	CollisionRenderColor.r = 255;
+	CollisionRenderColor.g = 0;
+	CollisionRenderColor.b = 0;
+
 	SetWidth(int(32 * GLOBAL_SCALE));
 	SetHeight(int(32 * GLOBAL_SCALE));
 	
@@ -186,9 +191,9 @@ bool Mexican1Sprite::HandleWallPlaced(int WallIndex)
 	return false;
 }
 
-SDL_Rect Mexican1Sprite::GetCollisionRect()
+SDL_Rect Mexican1Sprite::GetScreenSpaceCollisionRect()
 {
-	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 20, Rect.w - 40, Rect.h - 30 };
+	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 20, Rect.w - 40, Rect.h - 20 };
 
 	return CollisionRect;
 }
@@ -218,6 +223,12 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 			SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &RenderRect, 0, NULL, Flip);
 		}
 	}
+
+	if (RENDER_COLLISION)
+	{
+		RenderCollision(Renderer);
+	}
+	
 }
 
 
@@ -278,10 +289,10 @@ void Mexican1Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
 	{
 		return;
 	}
-	SDL_Rect TrumpCollision = OtherSprite->GetCollisionRect();
+	SDL_Rect TrumpCollision = OtherSprite->GetScreenSpaceCollisionRect();
 	SDL_Rect ResultRect;
 
-	SDL_Rect CollisionRect = GetCollisionRect();
+	SDL_Rect CollisionRect = GetScreenSpaceCollisionRect();
 	if (SDL_IntersectRect(&TrumpCollision, &CollisionRect, &ResultRect))
 	{
 		OtherSprite->TakeDamage();

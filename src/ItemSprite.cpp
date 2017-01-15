@@ -5,6 +5,11 @@ int ItemSprite::NumNonBrickItems = 0;
 ItemSprite::ItemSprite(SDL_Texture *InTexture)
 	: Sprite()
 {	
+	CollisionRenderColor.a = 128;
+	CollisionRenderColor.r = 255;
+	CollisionRenderColor.g = 255;
+	CollisionRenderColor.b = 0;
+
 	SetTexture(InTexture);
 	Rect.w *= GLOBAL_SCALE;
 	Rect.h *= GLOBAL_SCALE;
@@ -33,9 +38,9 @@ void ItemSprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
 
 bool ItemSprite::HitTest(TrumpPlayerSprite *OtherSprite)
 {
-	SDL_Rect TrumpCollision = OtherSprite->GetCollisionRect();
+	SDL_Rect TrumpCollision = OtherSprite->GetScreenSpaceCollisionRect();
 	SDL_Rect ResultRect;
-	SDL_Rect CollisionToUse = GetCollisionRect();
+	SDL_Rect CollisionToUse = GetScreenSpaceCollisionRect();
 
 	return SDL_IntersectRect(&TrumpCollision, &CollisionToUse, &ResultRect);
 }
@@ -83,6 +88,7 @@ void ItemSprite::Tick(double DeltaTime)
 BrickItem::BrickItem()
 	: ItemSprite(ResourceManager::BrickTexture->Texture)
 {		
+	CollisionRect = { -8, -8, 49, 34 };
 	CountDown = -1;
 }
 
