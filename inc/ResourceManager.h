@@ -71,6 +71,7 @@ public:
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "mexican.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1PinkSpriteSheet, "MexicanPink.bmp");		
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
+	DECLARE_TEXTURE_RESOURCE(TrumpFaceTexture, "trumpface.bmp");
 	DECLARE_TEXTURE_RESOURCE(WallOpaqueTexture, "WallAssembledOpaque.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
 	DECLARE_TEXTURE_RESOURCE(SombreroSpriteSheet, "sombrerosheet.bmp");
@@ -82,6 +83,8 @@ public:
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(StarBGTexture, "starBG.bmp");
 	DECLARE_TEXTURE_RESOURCE(CloudTexture, "cloud.bmp");
+	DECLARE_TEXTURE_RESOURCE(SingleBrickTexture, "singlebrick.bmp")
+	DECLARE_TEXTURE_RESOURCE(SmallBrickTileTexture, "smallbricktile.bmp")
 	//DECLARE_TEXTURE_RESOURCE(InfoTexture, "Info.bmp");	
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 	DECLARE_TEXTURE_RESOURCE(Tiles, "tiles2x.bmp");

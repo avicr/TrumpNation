@@ -105,11 +105,7 @@ void Game::GenerateRandomTerrain()
 		SDL_Rect SrcRect = { TileX, 0, 64, 64 };
 		SDL_Rect DstRect = { Col * 64, 0, 64, 64 };
 		
-		SDL_RenderCopy(GRenderer, ResourceManager::Tiles->Texture, &SrcRect, &DstRect);
-
-		SrcRect = { 768, 0, 64, 64 };
-		DstRect = { Col * 64, 64, 64, 64 };
-		SDL_RenderCopy(GRenderer, ResourceManager::Tiles->Texture, &SrcRect, &DstRect);
+		SDL_RenderCopy(GRenderer, ResourceManager::Tiles->Texture, &SrcRect, &DstRect);		
 	}
 	
 	for (int Row = 0; Row < 5; Row++)

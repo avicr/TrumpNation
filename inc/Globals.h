@@ -84,10 +84,12 @@ extern bool bSwapSprites;
 extern struct Glyph FontSeg36[94];
 extern struct Glyph FontSeg20[94];
 extern struct Glyph FontSeg20White[94];
+extern struct Glyph FontShadowedWhite[128];
+extern struct Glyph FontBlue[128];
 
 extern double BombCountDown;
 
 SDL_Renderer *GetRenderer();
-extern void DrawText(std::string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, struct Glyph Glyphs[10], float ScaleX = 1, float ScaleY = 1, bool bRightJustify = false);
+extern void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[127], float SpaceScaleX = 1, float SpaceScaleY = 1, bool bRightJustify = false);
 extern void DrawTextBitmap(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, bool bRightJustified = false);
 #endif

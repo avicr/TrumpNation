@@ -12,7 +12,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	SetHeight(32 * GLOBAL_SCALE);
 
 	NumBombs = 2;
-	NumLives = 2;
+	NumLives = 0;// 2;
 	MoveRate = 444;
 	MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
 	TransitionSpeed = 7;
