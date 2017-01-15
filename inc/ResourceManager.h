@@ -73,9 +73,11 @@ public:
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(WallOpaqueTexture, "WallAssembledOpaque.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
-	DECLARE_TEXTURE_RESOURCE(HatTexture, "Hat.bmp");
+	DECLARE_TEXTURE_RESOURCE(SombreroSpriteSheet, "sombrerosheet.bmp");
 	DECLARE_TEXTURE_RESOURCE(BombTexture, "Bomb.bmp");
 	DECLARE_TEXTURE_RESOURCE(RedHatTexture, "Redhat.bmp");
+	DECLARE_TEXTURE_RESOURCE(RedHatSpriteSheet, "hatsheet.bmp");
+	DECLARE_TEXTURE_RESOURCE(BombSpriteSheet, "bombsheet.bmp");
 	DECLARE_TEXTURE_RESOURCE(HUDTexture, "GUI.bmp");
 	DECLARE_TEXTURE_RESOURCE(TitleScreenTexture, "TitleScreen.bmp");
 	DECLARE_TEXTURE_RESOURCE(StarBGTexture, "starBG.bmp");
@@ -84,6 +86,45 @@ public:
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 	DECLARE_TEXTURE_RESOURCE(Tiles, "tiles2x.bmp");
 	DECLARE_TEXTURE_RESOURCE(BitmapFont, "numbers.bmp");
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(RedHatAnimation)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::RedHatSpriteSheet->Texture, SrcRect, 0.1));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(RedHatAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(SombreroAnimation)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::SombreroSpriteSheet->Texture, SrcRect, 0.1));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(SombreroAnimation)
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(BombAnimation)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::BombSpriteSheet->Texture, SrcRect, 0.1));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(BombAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(TrumpAnimation)
 	{

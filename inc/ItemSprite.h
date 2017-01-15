@@ -8,9 +8,9 @@
 class ItemSprite : public Sprite
 {
 public:
-	virtual ~ItemSprite() {};
-	static int NumNonBrickItems;
 	ItemSprite(SDL_Texture *InTexture);
+	virtual ~ItemSprite() {};
+	static int NumNonBrickItems;	
 	ItemSprite(int X, int Y);
 	virtual void CheckCollision(TrumpPlayerSprite *OtherSprite);
 	virtual void Interact(TrumpPlayerSprite *OtherSprite) {};
@@ -33,7 +33,14 @@ public:
 	RedHatItem() :
 		ItemSprite(ResourceManager::RedHatTexture->Texture)
 	{
+		PlayAnimation(ResourceManager::RedHatAnimation);		
+		
+		SetWidth(80);
+		SetHeight(80);
 		NumNonBrickItems++;
+				
+		CollisionRect = { 16, 16, 32, 32 };
+		RandomizePosition();
 	}
 
 	virtual ~RedHatItem()
@@ -45,7 +52,7 @@ public:
 		Mix_PlayChannel(-1, PickUpItemFX, 0);
 		ThePlayer->PickupRedHat();
 		bPendingDelete = true;
-	}
+	}	
 };
 
 class BombItem : public ItemSprite
@@ -55,7 +62,13 @@ public:
 	BombItem() :
 		ItemSprite(ResourceManager::BombTexture->Texture)
 	{
+		PlayAnimation(ResourceManager::BombAnimation);
+		SetWidth(64);
+		SetHeight(64);
 		NumNonBrickItems++;
+
+		CollisionRect = { 0, 0, 64, 64 };
+		RandomizePosition();
 	}
 
 	virtual ~BombItem()
@@ -68,7 +81,7 @@ public:
 		bPendingDelete = true;
 		//OtherSprite->AddBombs(1);
 		OtherSprite->KillEverything();
-	}
+	}	
 	
 };
 

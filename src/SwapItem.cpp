@@ -9,7 +9,13 @@ void SwapItem::Interact(TrumpPlayerSprite *OtherSprite)
 }
 
 SwapItem::SwapItem() :
-	ItemSprite(ResourceManager::HatTexture->Texture)
+	ItemSprite(NULL)
 {	
+	PlayAnimation(ResourceManager::SombreroAnimation);
+	SetWidth(80);
+	SetHeight(80);
 	NumNonBrickItems++;
+
+	CollisionRect = { 16, 16, 40, 40 };
+	RandomizePosition();
 }

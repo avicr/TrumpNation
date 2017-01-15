@@ -25,6 +25,7 @@ enum eMovingFlags
 class Sprite
 {
 protected:
+	SDL_Rect CollisionRect;
 	double CountDown;
 	SDL_RendererFlip Flip;
 	// Screen region to render the sprite to

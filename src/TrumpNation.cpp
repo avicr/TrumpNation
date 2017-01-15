@@ -151,6 +151,10 @@ bool GameLoop()
 	ThePlayer->PlayAnimation(ResourceManager::TrumpAnimation);
 	TheGame = new Game();
 	TheGame->SetLevel(1);
+	SDL_SetRenderTarget(GRenderer, NULL);
+	SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(GRenderer);
+	SDL_SetRenderTarget(GRenderer, BackBuffer);
 
 	while (!bGameComplete)
 	{
@@ -382,7 +386,7 @@ bool DoTitleScreen()
 	int NumIntrosPlayed = 0;
 
 	SDL_Event TheEvent;
-	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
+	//TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
 	Mix_PlayMusic(TitleMusic, 0);
 	Sprite *TrumpIntroSprite = new Sprite();	
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
@@ -511,8 +515,7 @@ bool DoTitleScreen()
 void InitSDL()
 {
 	if (!bSDLInitialized)
-	{		
-		
+	{				
 
 		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
 		SDL_Log("SDL INIT");

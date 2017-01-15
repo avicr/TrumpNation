@@ -28,6 +28,8 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	bHasWall = false;
 	bHasRedHat = false;
 	bPlayingStepFX = false;
+
+	CollisionRect = {20, 30, 30, 39 };
 }
 
 void TrumpPlayerSprite::Tick(double DeltaTime)

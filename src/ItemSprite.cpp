@@ -3,10 +3,16 @@
 int ItemSprite::NumNonBrickItems = 0;
 
 ItemSprite::ItemSprite(SDL_Texture *InTexture)
+	: Sprite()
 {	
 	SetTexture(InTexture);
 	Rect.w *= GLOBAL_SCALE;
 	Rect.h *= GLOBAL_SCALE;
+
+	CollisionRect = Rect;
+	CollisionRect.x = 0;
+	CollisionRect.y = 0;
+
 	RandomizePosition();	
 	CountDown = ITEM_LIFE_TIME;
 }
@@ -29,15 +35,20 @@ bool ItemSprite::HitTest(TrumpPlayerSprite *OtherSprite)
 {
 	SDL_Rect TrumpCollision = OtherSprite->GetCollisionRect();
 	SDL_Rect ResultRect;
+	SDL_Rect CollisionToUse = GetCollisionRect();
 
-	return SDL_IntersectRect(&TrumpCollision, &Rect, &ResultRect);
+	return SDL_IntersectRect(&TrumpCollision, &CollisionToUse, &ResultRect);
 }
 
 void ItemSprite::RandomizePosition()
-{
+{	
+	// Plus four for good measure 
+	int BoundX = CollisionRect.w + CollisionRect.x + 4;
+	int BoundY = CollisionRect.h + CollisionRect.y + 4;
+
 	do
 	{
-		SetPosition((rand() % (1024 - Rect.w)), (rand() % ((600 - (HORIZON + 65)) - Rect.h)) + (HORIZON) + 65);
+		SetPosition((rand() % (1024 - BoundX)), (rand() % ((600 - (HORIZON + 65)) - BoundY)) + (HORIZON) + 65);
 	} while (HitTest(ThePlayer));
 
 	
@@ -57,6 +68,7 @@ void ItemSprite::Render(SDL_Renderer *Renderer)
 
 void ItemSprite::Tick(double DeltaTime)
 {
+	Sprite::Tick(DeltaTime);
 	if (CountDown > -1)
 	{
 		CountDown -= DeltaTime;

@@ -8,6 +8,6 @@ class SwapItem : public ItemSprite
 public: 	
 	SwapItem();
 	virtual ~SwapItem() { NumNonBrickItems--; }
-	virtual void Interact(TrumpPlayerSprite *OtherSprite);
+	virtual void Interact(TrumpPlayerSprite *OtherSprite);	
 };
 #endif

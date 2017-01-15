@@ -1,0 +1,26 @@
+New font
+Animated items - COMPLETE
+Extra life item
+Implement red hat damage
+Add brick inventory to HUD
+Add sounds for when item spawns
+Finish high score input
+Navigate past high score and game over
+Multiple birck pick up
+Add speech bubble
+Clean up assets folder
+
+Fix red hat speed bug
+Fix back buffer drawing into empty space
+Fix wrong trump sprite when mexican trump dies
+
+Intro music
+Game music
+Red hat music
+game over music
+
+Confirm sound effect
+clear level sound effect
+High score initial change tick sound effect
+High score initial input confirm sound effect
+High score go back sound effect

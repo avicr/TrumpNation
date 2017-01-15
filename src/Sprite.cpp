@@ -25,6 +25,7 @@ Sprite::Sprite() :
 	bPendingDelete = false;
 
 	MovingFlags = MOVING_NONE;
+	CollisionRect = { 0, 0, Rect.w, Rect.h };
 }
 
 void Sprite::Tick(double DeltaTime)
@@ -119,7 +120,10 @@ void Sprite::Interact(TrumpPlayerSprite *OtherSprite)
 
 SDL_Rect Sprite::GetCollisionRect()
 {
-	return Rect;
+	SDL_Rect CollisionToUse = Rect;
+	CollisionToUse.x += CollisionRect.x;
+	CollisionToUse.y += CollisionRect.y;
+	return CollisionToUse;
 }
 
 void Sprite::UpdateAnimationData()
