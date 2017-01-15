@@ -200,7 +200,7 @@ void Sprite::Render(SDL_Renderer* Renderer)
 		SDL_RenderCopyEx(Renderer, Texture, &SrcRect, &DstRect, 0, NULL, Flip);
 	}
 
-	if (RENDER_COLLISION)
+	if (bRenderCollision)
 	{
 		RenderCollision(Renderer);
 	}

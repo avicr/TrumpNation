@@ -1,5 +1,6 @@
 #include "../inc/Mexican1Sprite.h"
 #include "../inc/TrumpPlayerSprite.h"
+#include "../inc/Globals.h"
 
 Mexican1Sprite::Mexican1Sprite()
 {
@@ -224,7 +225,7 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 		}
 	}
 
-	if (RENDER_COLLISION)
+	if (bRenderCollision)
 	{
 		RenderCollision(Renderer);
 	}

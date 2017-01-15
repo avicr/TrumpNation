@@ -88,7 +88,7 @@ void ItemSprite::Tick(double DeltaTime)
 BrickItem::BrickItem()
 	: ItemSprite(ResourceManager::BrickTexture->Texture)
 {		
-	CollisionRect = { -8, -8, 49, 34 };
+	CollisionRect = { -8, -16, 48, 48 };
 	CountDown = -1;
 }
 

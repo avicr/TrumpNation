@@ -92,6 +92,7 @@ SDL_Texture *BackBuffer;
 int WindowWidth;
 int WindowHeight;
 bool bSwapSprites = false;
+bool bRenderCollision = false;
 double BombCountDown = 0;
 
 bool GameLoop();
@@ -250,6 +251,12 @@ bool GameLoop()
 					{
 						Mix_PlayChannel(-1, LevelClearFX, 0);
 						SpawnRandomItem();
+					}
+
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
+					{
+						Mix_PlayChannel(-1, LevelClearFX, 0);
+						bRenderCollision = !bRenderCollision;
 					}
 				}
 				if (TheEvent.type == SDL_JOYAXISMOTION)
