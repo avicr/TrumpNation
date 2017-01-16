@@ -66,13 +66,16 @@ public:
 	DECLARE_TEXTURE_RESOURCE(BGTexture, "BG.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpSpriteSheet, "Trump.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpRedHatSpriteSheet, "Trump_hat.bmp");
+	DECLARE_TEXTURE_RESOURCE(SombreroTexture, "sombrero.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpDamageSpriteSheet, "Trump_Angry.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpIntroSpriteSheet, "large trump.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1SpriteSheet, "mexican.bmp");
 	DECLARE_TEXTURE_RESOURCE(Mexican1PinkSpriteSheet, "MexicanPink.bmp");		
+	DECLARE_TEXTURE_RESOURCE(WallGoldTexture, "WallAssembledGold.bmp");
 	DECLARE_TEXTURE_RESOURCE(WallTexture, "WallAssembled.bmp");
 	DECLARE_TEXTURE_RESOURCE(TrumpFaceTexture, "trumpface.bmp");
 	DECLARE_TEXTURE_RESOURCE(WallOpaqueTexture, "WallAssembledOpaque.bmp");
+	DECLARE_TEXTURE_RESOURCE(BrickGoldTexture, "brickgold.bmp");
 	DECLARE_TEXTURE_RESOURCE(BrickTexture, "brick.bmp");
 	DECLARE_TEXTURE_RESOURCE(SombreroSpriteSheet, "sombrerosheet.bmp");
 	DECLARE_TEXTURE_RESOURCE(BombTexture, "Bomb.bmp");

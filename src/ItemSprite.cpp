@@ -145,7 +145,7 @@ BrickItem::BrickItem(bool bFirstBrick)
 
 void BrickItem::Interact(TrumpPlayerSprite *OtherSprite)
 {
-	OtherSprite->AddBrick(true);
+	OtherSprite->AddBrick(BrickRegular);
 	Mix_PlayChannel(-1, PickUpItemFX, 0);
 	bPendingDelete = true;
 }

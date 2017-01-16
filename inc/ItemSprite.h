@@ -33,6 +33,24 @@ public:
 	virtual void Interact(TrumpPlayerSprite *OtherSprite);
 };
 
+class BrickGoldItem : public BrickItem
+{
+public:
+	BrickGoldItem(bool bFirstBrick = false) : BrickItem(bFirstBrick)
+	{
+		SetTexture(ResourceManager::BrickGoldTexture->Texture);
+		SetWidth(Rect.w *= GLOBAL_SCALE);
+		SetHeight(Rect.h *= GLOBAL_SCALE);
+	}
+	virtual void Interact(TrumpPlayerSprite *OtherSprite)
+	{
+		SDL_Log("GOLD");
+		OtherSprite->AddBrick(BrickGold);
+		Mix_PlayChannel(-1, PickUpItemFX, 0);
+		bPendingDelete = true;
+	}
+};
+
 class RedHatItem : public ItemSprite
 {
 public:

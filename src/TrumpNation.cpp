@@ -211,12 +211,14 @@ bool GameLoop()
 
 		ThePlayer->Reset();
 		BrickItem *FirstBrick = NULL;
-		
+		BrickSpawnCountDown = BRICK_SPAWN_RATE;
+
 		if (ThePlayer->GetNumBricks() == 0)
 		{
 			FirstBrick = new BrickItem(true);
 			FirstBrick->SetPosition(490, 570);
 			Items.push_back(FirstBrick);
+			BrickSpawnCountDown += BRICK_FIRST_SPAWN_PENALITY;
 		}
 		
 		SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
@@ -224,7 +226,6 @@ bool GameLoop()
 		Uint64 CurrentTime = SDL_GetPerformanceCounter();
 		double DeltaTime;
 		bool bLevelComplete = false;
-		BrickSpawnCountDown = BRICK_SPAWN_RATE + BRICK_FIRST_SPAWN_PENALITY;
 
 		for (int i = 0; i < NUM_CLOUDS; i++)
 		{
@@ -238,10 +239,10 @@ bool GameLoop()
 				bUserQuit = true;
 			}
 
-			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A])
+			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2])
 			{
 				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
-				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_A]) { SDL_PollEvent(&TheEvent); }
+				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2]) { SDL_PollEvent(&TheEvent); }
 				SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
 			}
 
@@ -364,7 +365,14 @@ void Tick(double DeltaTime)
 		
 		if (ThePlayer->GetPlayerState() != StateDying && (bForceBrickSpawn || (ThePlayer->GetNumBricks() + Items.size() - ItemSprite::NumNonBrickItems < MAX_BRICKS && rand() % (100 / BRICK_SPAWN_PERCENT) == 0)))
 		{
-			Items.push_back(new BrickItem());
+			if (TheGame->GetLevelNumber() >= GOLD_BRICK_MILE_START && rand() % (100 / GOLD_BRICK_SPAWN_PERCENT) == 0)
+			{
+				Items.push_back(new BrickGoldItem());
+			}
+			else
+			{
+				Items.push_back(new BrickItem());
+			}
 
 			if (!bForceBrickSpawn)
 			{
@@ -431,7 +439,7 @@ void Render()
 		Rect.w = 64;
 		Rect.h = 160;
 
-		if (TheGame->WallArray[WallIndex])
+		if (TheGame->WallArray[WallIndex] == 1)
 		{
 			SDL_RenderCopy(GRenderer, ResourceManager::WallTexture->Texture, NULL, &Rect);
 			
@@ -440,6 +448,10 @@ void Render()
 				Rect.y -= 160;				
 				SDL_RenderCopy(GRenderer, ResourceManager::WallTexture->Texture, NULL, &Rect);				
 			}*/
+		}
+		else if (TheGame->WallArray[WallIndex] == 2)
+		{
+			SDL_RenderCopy(GRenderer, ResourceManager::WallGoldTexture->Texture, NULL, &Rect);
 		}
 	}
 	/*Rect = { 0, HORIZON + 65, 992, 600 - (600-HORIZON) - 21};
@@ -473,7 +485,7 @@ bool DoTitleScreen()
 	int NumIntrosPlayed = 0;	
 
 	SDL_Event TheEvent;
-	//TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
+	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
 	Mix_PlayMusic(TitleMusic, 0);
 	Sprite *TrumpIntroSprite = new Sprite();	
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
@@ -524,7 +536,7 @@ bool DoTitleScreen()
 			}
 			else
 			{
-				DisplayGreatFact();
+				//DisplayGreatFact();
 			}
 		}
 
@@ -780,6 +792,25 @@ void DrawHUD(SDL_Renderer *Renderer)
 	
 	SDL_Rect DstRect = { 12, 11, 36, 36 };
 	SDL_RenderCopy(GRenderer, ResourceManager::TrumpFaceTexture->Texture, NULL, &DstRect);
+	
+	if (ThePlayer->HasRedHat())
+	{
+		DstRect.x = 16;
+		DstRect.y = 14;
+		DstRect.w = ResourceManager::RedHatTexture->SrcRect.w * 2.6;
+		DstRect.h = ResourceManager::RedHatTexture->SrcRect.h * 2.6;
+	
+		SDL_RenderCopy(GRenderer, ResourceManager::RedHatTexture->Texture, NULL, &DstRect);
+	}
+	else if (bSwapSprites)
+	{
+		DstRect.x = 7;
+		DstRect.y = 7;
+		DstRect.w = ResourceManager::SombreroTexture->SrcRect.w * 2.7;
+		DstRect.h = ResourceManager::SombreroTexture->SrcRect.h * 2.7;
+
+		SDL_RenderCopy(GRenderer, ResourceManager::SombreroTexture->Texture, NULL, &DstRect);
+	}
 	DrawText("X", 48, 22, 24, 24, Renderer, FontBlue, 0.75, 0.75);
 	DrawText(std::to_string(ThePlayer->GetNumLives()), 70, 15, 32, 32, Renderer, FontShadowedWhite, 0.75, 0.75);
 
@@ -791,7 +822,15 @@ void DrawHUD(SDL_Renderer *Renderer)
 		DstRect.w *= 2.25;
 		DstRect.h *= 2.25;
 
-		SDL_RenderCopy(GRenderer, ResourceManager::BrickTexture->Texture, NULL, &DstRect);
+		if (ThePlayer->GetBrickInvetory()[i] == BrickRegular)
+		{
+			SDL_RenderCopy(GRenderer, ResourceManager::BrickTexture->Texture, NULL, &DstRect);
+		}
+		else if (ThePlayer->GetBrickInvetory()[i] == BrickGold)
+		{
+			SDL_RenderCopy(GRenderer, ResourceManager::BrickGoldTexture->Texture, NULL, &DstRect);
+		}
+		
 	}
 
 	DrawText("MILE", 444, 17, 32, 32, Renderer, FontBlue, 0.75, 0.75);
@@ -895,6 +934,7 @@ void PresentBackBuffer()
 
 void SpawnRandomItem()
 {
+	int CurrentLevel = TheGame->GetLevelNumber();
 	int Roll = rand() % 100;
 	ItemSprite *NewItem;
 	
@@ -902,11 +942,12 @@ void SpawnRandomItem()
 	{
 		return;
 	}
-	if (Roll < 4)
+
+	if (Roll < 2 && CurrentLevel >= EXTRA_LIFE_MILE_START)
 	{
 		NewItem = new ExtraLifeItem();
 	}
-	else if (Roll < 25)
+	else if (Roll < 25 && CurrentLevel >= SOMBRERO_MILE_START)
 	{
 		NewItem = new SwapItem();
 	}
@@ -1104,7 +1145,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 	int MoveY = 0;
 	int MoveX = 0;
 	int NamePos = 0;
-	int CharIndex = 0;
+	int CharIndex = 1;
 	char *CharArray = " ABCDEFGHIJKLMNOPQRSTUVWXYZ.-?!";
 
 	SDL_Event TheEvent;
@@ -1309,7 +1350,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 					else
 					{
 						Mix_PlayChannel(4, MenuSound2FX, 0);
-						CharIndex = 0;
+						CharIndex = 1;
 						NamePos++;
 
 						if (NamePos < 3)
@@ -1388,14 +1429,24 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 
 void ReadHighScores()
 {
-	FILE *HighScoreFile = fopen("data.dat", "r");
+	fstream HighScoreFile;
+	HighScoreFile.open("data.dat", ios_base::in);
 
 	for (int i = 0; i < 10; i++)
 	{
-		fscanf(HighScoreFile, "%ld %d %s", &HighScores[i].Score, &HighScores[i].Mile, &HighScores[i].Name);
+		string Line;
+		char Dummy;
+		
+		HighScoreFile >>HighScores[i].Score >> HighScores[i].Mile;
+		HighScoreFile.get();
+
+		for (int j = 0; j < 3; j++)
+		{
+			HighScores[i].Name[j] = HighScoreFile.get();
+		}
 	}
 
-	fclose(HighScoreFile);
+	HighScoreFile.close();
 }
 
 void WriteHighScores()

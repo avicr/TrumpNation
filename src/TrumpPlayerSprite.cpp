@@ -34,7 +34,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	bHasRedHat = false;	
 	StepChannel = -1;
 
-	CollisionRect = {20, 30, 30, 39 };
+	CollisionRect = {18, 30, 32, 39 };
 }
 
 void TrumpPlayerSprite::Tick(double DeltaTime)
@@ -55,6 +55,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 			TheGame->SetLevel(TheGame->GetLevelNumber());
 			PlayerState = StateDead;
 			NumBricks = 0;
+			BrickInventory.empty();
 			NumBombs = 2;
 		}
 	}
@@ -142,13 +143,15 @@ void TrumpPlayerSprite::TickAnimation(double DeltaTime)
 
 SDL_Rect TrumpPlayerSprite::GetScreenSpaceCollisionRect()
 {
-	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 30, 30, 39 };
+	SDL_Rect CollisionRect = { Rect.x + 20, Rect.y + 27, 32, 43 };
 	return CollisionRect;
 }
 
-void TrumpPlayerSprite::AddBrick(int Amount)
+void TrumpPlayerSprite::AddBrick(eBrickType BrickType)
 {
-	NumBricks += Amount;
+	SDL_Log("Adding brick %d", BrickType);
+	NumBricks++;
+	BrickInventory.push_back(BrickType);
 }
 
 int TrumpPlayerSprite::GetNumBricks()
@@ -259,9 +262,9 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 			int WallIndex = (int)round((PosX - Rect.w / 2) / 128);
 
 			if (TheGame->WallArray[WallIndex * 2] < 1)
-			{				
+			{	
 				Mix_PlayChannel(-1, PlaceWallFX, 0);
-				TheGame->WallArray[WallIndex * 2]++;
+				TheGame->WallArray[WallIndex * 2] = BrickInventory.front() + 1;
 
 				if (TheGame->WallArray[WallIndex * 2] > 2)
 				{
@@ -269,6 +272,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 				}
 				TheGame->WallArray[WallIndex * 2 + 1] = TheGame->WallArray[WallIndex * 2];
 
+				BrickInventory.pop_front();
 				NumBricks--;
 				
 				// If there are no bricks left on the field spawn a new one
@@ -369,8 +373,15 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 	if (NumBricks && PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 	{
 		int WallIndex = (int)round((PosX - Rect.w/2) / 128);
+		TextureResource *TextureToUse = ResourceManager::WallTexture;
+
+		if (BrickInventory.front() == BrickGold)
+		{
+			TextureToUse = ResourceManager::WallGoldTexture;
+		}
+
 		WallIndex *= 2;
-		SDL_Rect DstRect = { WallIndex * 64, WALL_TOP,ResourceManager::WallTexture->SrcRect.w, ResourceManager::WallTexture->SrcRect.h };
+		SDL_Rect DstRect = { WallIndex * 64, WALL_TOP, TextureToUse->SrcRect.w, TextureToUse->SrcRect.h };
 
 		/*if (TheGame->WallArray[WallIndex] > 0)
 		{
@@ -378,11 +389,11 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 		}*/
 		
 		
-		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 64);
-		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);
+		SDL_SetTextureAlphaMod(TextureToUse->Texture, 64);
+		SDL_RenderCopy(Renderer, TextureToUse->Texture, &TextureToUse->SrcRect, &DstRect);
 		DstRect.x += 64;
-		SDL_RenderCopy(Renderer, ResourceManager::WallTexture->Texture, &ResourceManager::WallTexture->SrcRect, &DstRect);
-		SDL_SetTextureAlphaMod(ResourceManager::WallTexture->Texture, 255);
+		SDL_RenderCopy(Renderer, TextureToUse->Texture, &TextureToUse->SrcRect, &DstRect);
+		SDL_SetTextureAlphaMod(TextureToUse->Texture, 255);
 	}
 
 	Sprite::Render(Renderer);
@@ -440,8 +451,11 @@ void TrumpPlayerSprite::DoSwap(bool bSwap)
 
 void TrumpPlayerSprite::PickupRedHat()
 {
-	DoSwap(false);
-	
+	if (bSwapSprites)
+	{
+		DoSwap(false);
+	}
+
 	bHasRedHat = true;
 	RedHatCountDown = RED_HAT_TIME;
 	PlayAnimation(ResourceManager::TrumpRedHatAnimation);
@@ -478,4 +492,14 @@ void TrumpPlayerSprite::KillEverything(bool bBecauseBomb)
 int TrumpPlayerSprite::GetNumBombs()
 {
 	return NumBombs;
+}
+
+deque <eBrickType> TrumpPlayerSprite::GetBrickInvetory()
+{
+	return BrickInventory;
+}
+
+bool TrumpPlayerSprite::HasRedHat()
+{
+	return bHasRedHat;
 }

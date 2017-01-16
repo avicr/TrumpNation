@@ -2,6 +2,7 @@
 #define TRUMPPLAYERSPRITE_H
 
 #include "../inc/Sprite.h"
+#include <deque>
 
 enum ePlayerState
 {
@@ -10,6 +11,12 @@ enum ePlayerState
 	StateDying,
 	StateDead
 };
+
+enum eBrickType
+{
+	BrickRegular = 0,
+	BrickGold
+};
 class TrumpPlayerSprite : public Sprite
 {
 public:
@@ -17,7 +24,7 @@ public:
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);
 	SDL_Rect GetScreenSpaceCollisionRect();
-	void AddBrick(int Amount);
+	void AddBrick(eBrickType BrickType);
 	int GetNumBricks();
 	void AddToScore(int Amount);
 	void AddLives(int Amount);
@@ -33,8 +40,11 @@ public:
 	void AddBombs(int NumToAdd);
 	void KillEverything(bool bBecauseBomb = true);
 	int GetNumBombs();
+	deque <eBrickType> GetBrickInvetory();
+	bool HasRedHat();
 
 protected:
+	deque <eBrickType> BrickInventory;
 	bool bButtonPreviouslyPressed[3];
 	ePlayerState PlayerState;
 	int NumBombs;
