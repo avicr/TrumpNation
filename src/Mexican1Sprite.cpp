@@ -257,13 +257,12 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 	
 }
 
-
 void Mexican1Sprite::HandleInput(double DeltaTime)
 {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	double GrowthRate = 0.5;
 
-	if (bHasPlayedSpawnSound)
+	if (bDoSpawnPop && bHasPlayedSpawnSound)
 	{
 		GrowthRate *= 5.5;
 	}
@@ -297,11 +296,23 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 		Mix_PlayChannel(-1, MexicanLandFX, 0);		
 	}
 
-
 	if (Growth == 1)
 	{
 		AttackCountDown -= DeltaTime;
 		
+		if (bIsJumping && AttackCountDown > 0)
+		{
+			PlayAnimation(AnimData.Anim);
+			
+			if ((AttackCountDown <= 0.35 && AttackCountDown > 0.1))
+			{
+				Flip = SDL_FLIP_HORIZONTAL;
+			}
+			else
+			{
+				Flip = SDL_FLIP_NONE;
+			}
+		}
 		if (AttackCountDown <= 0)
 		{
 			AttackCountDown = 0;
@@ -323,7 +334,6 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 		if (bIsJumping && AttackCountDown == 0 && JumpCountDown > 0)
 		{
-			
 			TransitionSpeed = 20;
 			MaxVelocity = 333;
 			MoveRate = 333;
@@ -345,7 +355,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 	
 		if (Growth > 1)
 		{
-			Growth = 1;			
+			Growth = 1;
 		}
 
 		if (bClimbingWall)
@@ -355,17 +365,26 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 			TransitionSpeed = 33;
 			MaxVelocity = 500;						
 			bIsJumping = true;
+			
 			if (Growth == 1)
 			{
 				StopSounds();				
 			}
 		}
 		else
-		{			
-			if (Growth >= 0.50 && !bHasPlayedSpawnSound)
+		{	
+			if (bDoSpawnPop)
 			{
-				Mix_PlayChannel(-1, MexicanSpawnedFX, 0);
-				bHasPlayedSpawnSound = true;				
+				if (Growth >= 0.50 && !bHasPlayedSpawnSound)
+				{
+					Mix_PlayChannel(-1, MexicanSpawnedFX, 0);
+					bHasPlayedSpawnSound = true;
+				}
+			}
+			else
+			{
+				AttackCountDown = 0;
+				bHasPlayedSpawnSound = true;
 			}
 			PosY = HORIZON - Rect.h * Growth + 1;
 		}

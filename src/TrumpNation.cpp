@@ -51,6 +51,7 @@ struct Glyph
 
 HighScoreEntry HighScores[10];
 bool bFreezeSpawn = false;
+bool bDoSpawnPop = false;
 SDL_Window *GWindow;
 SDL_Renderer *GRenderer;
 ResourceManager *GResourceManager;
@@ -70,6 +71,8 @@ Mix_Chunk *MexicanJumpFX = NULL;
 Mix_Chunk *ItemSpawnFX = NULL;
 Mix_Chunk *PickUpItemFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
+Mix_Chunk *MenuSound1FX = NULL;
+Mix_Chunk *MenuSound2FX = NULL;
 Mix_Chunk *StepFX = NULL;
 Mix_Chunk *TitleConfirmFX = NULL;
 Mix_Chunk *TrumpDieFX = NULL;
@@ -159,6 +162,8 @@ void CleanUp()
 {
 	delete GResourceManager;
 
+	Mix_FreeChunk(MenuSound1FX);
+	Mix_FreeChunk(MenuSound2FX);
 	Mix_FreeMusic(HatDanceMusic);
 	Mix_FreeMusic(BGMusic);
 	Mix_FreeChunk(PlaceWallFX);
@@ -270,6 +275,11 @@ bool GameLoop()
 			{
 				if (TheEvent.type == SDL_KEYDOWN)
 				{
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_0)
+					{
+						bDoSpawnPop = !bDoSpawnPop;
+					}
+
 					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
 					{
 						//Mix_PlayChannel(-1, LevelClearFX, 0);
@@ -351,7 +361,8 @@ void Tick(double DeltaTime)
 	{
 		bool bForceBrickSpawn = ThePlayer->GetNumBricks() == 0 && Items.size() - ItemSprite::NumNonBrickItems == 0;
 		BrickSpawnCountDown = BRICK_SPAWN_RATE;
-		if (bForceBrickSpawn || (ThePlayer->GetNumBricks() + Items.size() - ItemSprite::NumNonBrickItems < MAX_BRICKS && rand() % (100 / BRICK_SPAWN_PERCENT) == 0))
+		
+		if (ThePlayer->GetPlayerState() != StateDying && (bForceBrickSpawn || (ThePlayer->GetNumBricks() + Items.size() - ItemSprite::NumNonBrickItems < MAX_BRICKS && rand() % (100 / BRICK_SPAWN_PERCENT) == 0)))
 		{
 			Items.push_back(new BrickItem());
 
@@ -603,6 +614,8 @@ void InitSDL()
 		}
 		else
 		{
+			MenuSound2FX = Mix_LoadWAV("resource/sounds/menusound1.wav");
+			MenuSound1FX = Mix_LoadWAV("resource/sounds/mexicanclimb.wav");
 			PickUpItemFX = Mix_LoadWAV("resource/sounds/Pickupitem.wav");
 			PlaceWallFX = Mix_LoadWAV("resource/sounds/Placewall.wav");
 			StepFX = Mix_LoadWAV("resource/sounds/mexicanstep2.wav");
@@ -862,7 +875,9 @@ void CopyGlyph(Glyph &TheGlyph, SDL_Texture *FontTexture, int TextureStartX)
 	TheGlyph.Texture = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 16, 16);
 
 	SDL_SetRenderTarget(GRenderer, TheGlyph.Texture);	
-	SDL_SetTextureBlendMode(TheGlyph.Texture, SDL_BLENDMODE_BLEND);	
+	SDL_SetTextureBlendMode(TheGlyph.Texture, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(GRenderer, 255, 0, 255, 0);
+	SDL_RenderClear(GRenderer);
 	SDL_Rect DstRect = { 0, 0, 16, 16 };
 	SDL_RenderCopy(GRenderer, FontTexture, &SrcRect, &DstRect);
 	SDL_SetRenderTarget(GRenderer, NULL);
@@ -883,7 +898,11 @@ void SpawnRandomItem()
 	int Roll = rand() % 100;
 	ItemSprite *NewItem;
 	
-	if (Roll < 10)
+	if (ThePlayer->GetPlayerState() == StateDying)
+	{
+		return;
+	}
+	if (Roll < 4)
 	{
 		NewItem = new ExtraLifeItem();
 	}
@@ -1126,7 +1145,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 		DeltaTime *= (double)0.001;
 
-		HighScoreCountDown -= DeltaTime;						
+		HighScoreCountDown -= DeltaTime;
 
 		if (HighScoreCountDown < 0)
 		{
@@ -1141,8 +1160,14 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		}
 
 		RenderStars(DeltaTime);
-		DrawText("GREATEST AMERICANS", 244, 16, 32, 32, GRenderer, FontShadowedRed, 0.95, 0.95);
-
+		if (!bInputtingName)
+		{
+			DrawText("GREATEST AMERICANS", 244, 16, 32, 32, GRenderer, FontShadowedRed, 0.95, 0.95);
+		}
+		else
+		{
+			DrawText("INPUT INITIALS!", 268, 16, 32, 32, GRenderer, FontShadowedRed, 0.95, 0.95);
+		}
 		//SDL_Rect WallRect = { 120, 109, 769, 432 };
 		//RenderBrickRectangle(GRenderer, WallRect, false, 0, 11, 42);
 		
@@ -1197,7 +1222,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 				char Name[4];
 				strcpy(Name, HighScores[i].Name);
 				Name[NamePos + 1] = 0;
-				DrawText(Name, 800, 190 + PosY, 32, 32, GRenderer, FontShadowedWhite, 0.75, 0.75);
+				DrawText(Name, 769, 190 + PosY, 32, 32, GRenderer, FontShadowedWhite, 0.75, 0.75);
 				
 			}
 			else
@@ -1283,6 +1308,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 					}
 					else
 					{
+						Mix_PlayChannel(4, MenuSound2FX, 0);
 						CharIndex = 0;
 						NamePos++;
 
@@ -1302,6 +1328,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 
 				if (MoveY != 0)
 				{
+					Mix_PlayChannel(3, MenuSound1FX, 0);
 					CharIndex += MoveY;
 
 					if (CharIndex < 0)

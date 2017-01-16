@@ -76,11 +76,6 @@ void ItemSprite::Render(SDL_Renderer *Renderer)
 		SDL_Rect RenderRect = Rect;
 		SDL_Texture *TextureToUse = Texture;
 
-		if (Growth < 1 && Growth > 0.5)
-		{
-			SDL_Log("WHAT");
-		}
-
 		if (AnimData.Anim)
 		{
 			TextureToUse = AnimData.Anim->GetFrame(AnimData.CurrentFrameIndex)->GetTexture();

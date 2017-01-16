@@ -91,12 +91,15 @@ extern Mix_Chunk *LevelClearFX;
 extern Mix_Chunk *TrumpDieFX;
 extern Mix_Chunk *PickUpItemFX;
 extern Mix_Chunk *PlaceWallFX;
+extern Mix_Chunk *MenuSound1FX;
+extern Mix_Chunk *MenuSound2FX;
 extern Mix_Chunk *StepFX;
 extern Mix_Music *BGMusic;
 extern Mix_Music *TitleMusic;
 extern Mix_Music *HatDanceMusic;
 extern class Game *TheGame;
 
+extern bool bDoSpawnPop;
 extern bool bFreezeSpawn;
 extern bool bSwapSprites;
 extern bool bRenderCollision;
