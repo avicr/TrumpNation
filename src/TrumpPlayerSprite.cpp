@@ -55,7 +55,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 			TheGame->SetLevel(TheGame->GetLevelNumber());
 			PlayerState = StateDead;
 			NumBricks = 0;
-			BrickInventory.empty();
+			BrickInventory.clear();
 			NumBombs = 2;
 		}
 	}
@@ -333,6 +333,7 @@ void TrumpPlayerSprite::TakeDamage()
 {
 	PlayerState = StateDying;	
 	Mix_HaltChannel(-1);
+	
 	if (!bHasRedHat)
 	{
 		PlayAnimation(ResourceManager::TrumpDamageAnimation);
