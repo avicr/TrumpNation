@@ -485,8 +485,8 @@ bool DoTitleScreen()
 	int NumIntrosPlayed = 0;	
 
 	SDL_Event TheEvent;
-	TitleMusic = Mix_LoadMUS("resource/sounds/Title.wav");
-	Mix_PlayMusic(TitleMusic, 0);
+	TitleMusic = Mix_LoadMUS("resource/sounds/GroovinInSpace.wav");
+	Mix_PlayMusic(TitleMusic, -1);
 	Sprite *TrumpIntroSprite = new Sprite();	
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
 	TrumpIntroSprite->SetWidth(128);
@@ -657,14 +657,14 @@ void InitSDL()
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
 		SDL_SetRenderTarget(GRenderer, BackBuffer);
 		SDL_Log("After create window");
-		LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36);
+		/*LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36);
 		LoadFont("resource/fonts/segoeuib.ttf", 28, FontSeg20);
 		LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36White, { 255, 255, 255, 255 });
 		LoadFont("resource/fonts/segoeuib.ttf", 28, FontSeg20White, { 255, 255, 255, 255 });
 		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallRed, { 255, 0, 0, 255 });
 		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallWhite, { 255, 255, 255, 255 });
 		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallBlue, { 0, 0, 255, 255 });
-		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallYellow, { 255, 255, 0, 255 });		
+		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallYellow, { 255, 255, 0, 255 });		*/
 
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
