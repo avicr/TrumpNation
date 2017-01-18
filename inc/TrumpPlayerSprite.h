@@ -2,6 +2,7 @@
 #define TRUMPPLAYERSPRITE_H
 
 #include "../inc/Sprite.h"
+#include "../inc/SpeechBubble.h"
 #include <deque>
 
 enum ePlayerState
@@ -42,8 +43,10 @@ public:
 	int GetNumBombs();
 	deque <eBrickType> GetBrickInvetory();
 	bool HasRedHat();
+	void Say(int SpeechType, string Phrase);
 
 protected:
+	SpeechBubble *CurrentSpeech;
 	deque <eBrickType> BrickInventory;
 	bool bButtonPreviouslyPressed[3];
 	ePlayerState PlayerState;

@@ -46,7 +46,7 @@ public:
 	{
 		SDL_Log("GOLD");
 		OtherSprite->AddBrick(BrickGold);
-		Mix_PlayChannel(-1, PickUpItemFX, 0);
+		Mix_PlayChannel(CHAN_ITEM_PICKUP, PickUpItemFX, 0);
 		bPendingDelete = true;
 	}
 };
@@ -73,7 +73,11 @@ public:
 	}
 	virtual void Interact(TrumpPlayerSprite *OtherSprite)
 	{
-		Mix_PlayChannel(-1, PickUpItemFX, 0);
+		if (!ThePlayer->HasRedHat())
+		{
+			//Mix_PlayMusic(BGMusicFast, -1);
+		}
+		Mix_PlayChannel(CHAN_ITEM_PICKUP, PickUpItemFX, 0);		
 		ThePlayer->PickupRedHat();
 		bPendingDelete = true;
 	}	
@@ -129,7 +133,7 @@ public:
 
 	virtual void Interact(TrumpPlayerSprite *OtherSprite)
 	{
-		Mix_PlayChannel(-1, PickUpItemFX, 0);
+		Mix_PlayChannel(CHAN_ITEM_PICKUP, PickUpItemFX, 0);
 		ThePlayer->AddLives(1);
 		bPendingDelete = true;
 	}

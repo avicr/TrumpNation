@@ -146,10 +146,10 @@ Mexican1Sprite::Mexican1Sprite()
 			}
 
 			bClimbingWall = true;
-			if (NumClimbingSoundsPlaying < MAX_CLIMBING_SOUNDS)
+			//if (NumClimbingSoundsPlaying < MAX_CLIMBING_SOUNDS)
 			{
-				ClimbChannel = Mix_PlayChannel(-1, MexicanClimbFX, -1);
-				Mix_Volume(ClimbChannel, 128 - 24 * NumClimbingSoundsPlaying);
+				ClimbChannel = Mix_PlayChannel(CHAN_MEXICAN_CLIMB, MexicanClimbFX, -1);
+				//Mix_Volume(ClimbChannel, 128 - 24 * NumClimbingSoundsPlaying);
 				NumClimbingSoundsPlaying++;
 			}
 			MoveRate = 333;
@@ -320,6 +320,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 		if (TheGame)
 		{
 			TheGame->OnMexicanEscaped();
+			bPendingDelete = true;
 		}
 		else
 		{
@@ -347,7 +348,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 		bClimbingWall = false;		
 		bIsJumping = false;
 		StopSounds();		
-		Mix_PlayChannel(-1, MexicanLandFX, 0);		
+		Mix_PlayChannel(CHAN_MEXICAN_LAND, MexicanLandFX, 0);		
 	}
 
 	if (Growth == 1)
@@ -380,8 +381,9 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 			}
 
 			if (bIsJumping && MovingFlags != MOVING_UP)
-			{
-				Mix_PlayChannel(-1, MexicanJumpFX, 0);
+			{				
+				Mix_HaltChannel(99);
+				Mix_PlayChannel(99, MexicanJumpFX, 0);
 				SDL_Log("PLAYING SOUND");
 			}
 		}

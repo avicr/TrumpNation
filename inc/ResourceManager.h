@@ -93,6 +93,9 @@ public:
 	DECLARE_TEXTURE_RESOURCE(MexicanFaceTexture, "MexicanFace.bmp");
 	DECLARE_TEXTURE_RESOURCE(Tiles, "tiles2x.bmp");
 	DECLARE_TEXTURE_RESOURCE(BitmapFont, "numbers.bmp");
+	DECLARE_TEXTURE_RESOURCE(SpeechBubble1, "speech1.bmp");
+	DECLARE_TEXTURE_RESOURCE(SpeechBubble2, "speech2.bmp");
+
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(RedHatAnimation)
 	{

@@ -56,6 +56,7 @@ protected:
 
 public:
 	Sprite();
+	Sprite(SDL_Texture *InTexture);
 	virtual ~Sprite() {};
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);

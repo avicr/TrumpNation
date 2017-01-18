@@ -24,7 +24,7 @@ ItemSprite::ItemSprite(SDL_Texture *InTexture)
 	RandomizePosition();	
 	CountDown = ITEM_LIFE_TIME;
 
-	Mix_PlayChannel(-1, BrickSpawnFX, 0);
+	Mix_PlayChannel(CHAN_ITEM_SPAWN, BrickSpawnFX, 0);
 }
 
 ItemSprite::ItemSprite(int X, int Y) :
@@ -146,7 +146,7 @@ BrickItem::BrickItem(bool bFirstBrick)
 void BrickItem::Interact(TrumpPlayerSprite *OtherSprite)
 {
 	OtherSprite->AddBrick(BrickRegular);
-	Mix_PlayChannel(-1, PickUpItemFX, 0);
+	Mix_PlayChannel(CHAN_ITEM_PICKUP, PickUpItemFX, 0);
 	bPendingDelete = true;
 }
 

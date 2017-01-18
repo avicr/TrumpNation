@@ -32,6 +32,7 @@ Game::Game()
 void Game::OnMexicanEscaped()
 {
 	NumMexicansEscaped++;
+	SDL_Log("Total escaped: %d", NumMexicansEscaped);
 	//Mix_PlayChannel(-1, MexicanEscapedFX, 0);
 }
 

@@ -1,8 +1,13 @@
 #include "../inc/Sprite.h"
 
 Sprite::Sprite() :
-	Texture(NULL)
+	Sprite(NULL)
 {	
+	
+}
+
+Sprite::Sprite(SDL_Texture *InTexture)
+{
 	CollisionRenderColor.a = 128;
 	CollisionRenderColor.r = 255;
 	CollisionRenderColor.g = 255;
@@ -15,7 +20,7 @@ Sprite::Sprite() :
 	Rect.y = 0;
 	Rect.w = 0;
 	Rect.h = 0;
-	
+
 	VelX = 0;
 	VelY = 0;
 	AccelX = 0;
@@ -30,7 +35,9 @@ Sprite::Sprite() :
 	bPendingDelete = false;
 
 	MovingFlags = MOVING_NONE;
-	CollisionRect = { 0, 0, Rect.w, Rect.h };	
+	CollisionRect = { 0, 0, Rect.w, Rect.h };
+
+	SetTexture(InTexture);
 }
 
 void Sprite::Tick(double DeltaTime)

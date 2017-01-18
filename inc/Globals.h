@@ -25,7 +25,7 @@
 #define SCORE_LIFE_TIME 1
 #define ITEM_LIFE_TIME 8
 #define TRUMP_DEFAULT_MAX_VELOCITY 333
-#define TRUMP_RED_HAT_MAX_VELOCITY 400
+#define TRUMP_RED_HAT_MAX_VELOCITY 500
 #define RED_HAT_TIME 8
 #define TITLE_SCROLL_TIME 740
 #define HIGH_SCORE_DISPLAY_COUNT 8
@@ -37,7 +37,7 @@
 #define ITEM_ON_BRICK_SPAWN_PENALITY 0.15
 #define BRICK_SPAWN_RATE 1.5
 #define BRICK_SPAWN_PERCENT 33
-#define GOLD_BRICK_SPAWN_PERCENT 50
+#define GOLD_BRICK_SPAWN_PERCENT 20
 #define GOLD_BRICK_MILE_START 12
 #define SOMBRERO_MILE_START 4
 #define EXTRA_LIFE_MILE_START 8
@@ -52,7 +52,7 @@
 #define CLOUD_SPEED_MIN 2
 #define CLOUD_SPEED_MAX 4
 
-#define MAX_CLIMBING_SOUNDS 8
+#define MAX_CLIMBING_SOUNDS 1
 
 #define NUM_RANDOM_GROUND_TILES 10
 #define NUM_RANDOM_MOUNTAIN_TILES 2
@@ -67,11 +67,19 @@
 #define JOYSTICK_DEAD_ZONE 8000
 
 #define PLACE_WALL_SCORE 500
+#define PLACE_GOLD_WALL_SCORE 1500
 #define MEXICAN_BLOCK_SCORE 50
 #define LEVEL_CLEAR_POINTS 2000
 #define MEXICAN_ESCAPED_POINTS -50
 
 #define BOMB_FLASH_TIME 0.20
+
+#define CHAN_MEXICAN_JUMP  99
+#define CHAN_MEXICAN_CLIMB 98
+#define CHAN_ITEM_SPAWN 97
+#define CHAN_ITEM_PICKUP 96
+#define CHAN_MEXICAN_LAND 95
+#define CHAN_TALK 94
 
 using namespace std;
 
@@ -87,6 +95,7 @@ extern class TrumpPlayerSprite *ThePlayer;
 extern Mix_Chunk *MexicanSpawnedFX;
 extern Mix_Chunk *MexicanEscapedFX;
 extern Mix_Chunk *MexicanJumpFX;
+extern Mix_Chunk *TalkFX;
 extern Mix_Chunk *MexicanClimbFX;
 extern Mix_Chunk *MexicanLandFX;
 extern Mix_Chunk *BrickSpawnFX;
@@ -101,6 +110,7 @@ extern Mix_Chunk *StepFX;
 extern Mix_Music *BGMusic;
 extern Mix_Music *TitleMusic;
 extern Mix_Music *HatDanceMusic;
+extern Mix_Music *BGMusicFast;
 extern class Game *TheGame;
 
 extern bool bDoSpawnPop;

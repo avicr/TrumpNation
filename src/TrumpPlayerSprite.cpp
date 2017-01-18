@@ -6,6 +6,7 @@
 
 TrumpPlayerSprite::TrumpPlayerSprite()
 {
+	CurrentSpeech = NULL;
 	CollisionRenderColor.a = 128;
 	CollisionRenderColor.r = 0;
 	CollisionRenderColor.g = 255;
@@ -82,6 +83,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 
 		if (RedHatCountDown <= 0)
 		{
+			//Mix_PlayMusic(BGMusic, -1);
 			MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;			
 
 			bHasRedHat = false;
@@ -116,6 +118,25 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 	if (PosY + Rect.h > 600)
 	{
 		PosY = 600 - Rect.h;
+	}
+
+	if (CurrentSpeech && CurrentSpeech->GetPendingDelete())
+	{
+		delete CurrentSpeech;
+
+		CurrentSpeech = NULL;
+	}
+	else if (CurrentSpeech)
+	{
+		CurrentSpeech->Tick(DeltaTime);
+		/*if (Flip == SDL_FLIP_HORIZONTAL)
+		{
+			CurrentSpeech->SetPosition(PosX - 23, PosY - 70);
+		}
+		else*/
+		{
+			CurrentSpeech->SetPosition(PosX + 23, PosY - 70);
+		}
 	}
 	
 }
@@ -255,6 +276,11 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 	if (!bButtonPreviouslyPressed[0] && NumBricks && bPressingButton1)
 	{
 		int TotalScore = PLACE_WALL_SCORE * (bSwapSprites ? 2 : 1);
+
+		if (BrickInventory.front() == BrickGold)
+		{
+			TotalScore = PLACE_GOLD_WALL_SCORE * (bSwapSprites ? 2 : 1);
+		}
 		//bFreezeSpawn = true;
 		
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
@@ -286,13 +312,20 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 					}
 				}
 
+				int NumMexicansKilled = 0;
 				for (int i = 0; i < Mexicans.size(); i++)
 				{
 					if (Mexicans[i]->HandleWallPlaced(WallIndex * 2) || Mexicans[i]->HandleWallPlaced(WallIndex * 2 + 1))
 					{
+						NumMexicansKilled++;
 						TotalScore += Mexicans[i]->GetScoreWorth();
 					}					
 				}				
+
+				if (NumMexicansKilled >= 3)
+				{
+					Say(2, "GO BACK TO\nUNIVISION!");
+				}
 
 				DecoSprites.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
 				Score += TotalScore;
@@ -332,6 +365,20 @@ void TrumpPlayerSprite::SetNumLives(int Amount)
 void TrumpPlayerSprite::TakeDamage()
 {
 	PlayerState = StateDying;	
+	int Pick = rand() % 3;
+	if ( Pick == 0)
+	{
+		ThePlayer->Say(2, "  RIGGED");
+	}
+	else if (Pick == 1)
+	{
+		ThePlayer->Say(2, "  UNFAIR");
+	}
+	else if (Pick == 3)
+	{
+		ThePlayer->Say(2, "NOT NICE");
+	}
+
 	Mix_HaltChannel(-1);
 	
 	if (!bHasRedHat)
@@ -349,6 +396,12 @@ void TrumpPlayerSprite::Reset()
 	//NumBricks = 0; //MAX_BRICKS - 1;
 	SetPosition(470, 340);
 	PlayerState = StatePlaying;
+
+	if (CurrentSpeech)
+	{
+		delete CurrentSpeech;
+		CurrentSpeech = NULL;
+	}
 
 	if (!bSwapSprites && !bHasRedHat)
 	{
@@ -398,6 +451,10 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 	}
 
 	Sprite::Render(Renderer);
+	if (CurrentSpeech)
+	{
+		CurrentSpeech->Render(Renderer);
+	}
 	/*SDL_SetRenderDrawColor(Renderer, 255, 0, 0, 255);
 	SDL_RenderDrawRect(Renderer, &GetScreenSpaceCollisionRect());*/
 
@@ -425,6 +482,7 @@ void TrumpPlayerSprite::DoSwap(bool bSwap)
 
 		if (PlayerState != StateDying)
 		{
+			Say(2, "  I LOVE\nHISPANICS!");
 			ThePlayer->PlayAnimation(ResourceManager::Mexican1Animation);
 		}
 	}
@@ -503,4 +561,14 @@ deque <eBrickType> TrumpPlayerSprite::GetBrickInvetory()
 bool TrumpPlayerSprite::HasRedHat()
 {
 	return bHasRedHat;
+}
+
+void TrumpPlayerSprite::Say(int SpeechType, string Phrase)
+{
+	if (CurrentSpeech)
+	{
+		delete CurrentSpeech;
+	}
+
+	CurrentSpeech = new SpeechBubble(SpeechType, Phrase);
 }
