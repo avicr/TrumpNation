@@ -18,6 +18,7 @@ Mexican1Sprite::Mexican1Sprite()
 	bool bBehindWall = false;
 	bool bGood = false;
 	int WallIndex = 0;
+	MovingFlags = 0;
 
 	CollisionRenderColor.a = 128;
 	CollisionRenderColor.r = 255;
@@ -60,101 +61,118 @@ Mexican1Sprite::Mexican1Sprite()
 	VelX = 0;
 	VelY = 0;
 	Growth = 0;
-
-	do
+	if (TheGame)
 	{
-		PosX = rand() % (1024 - Rect.w);
-		bClimbingWall = false;
-		CollisionRect = { 0, 0, 0, 0 };
-		bBehindWall = false;		
-		Rect.x = (int)PosX;
-		Rect.y = (int)PosY;
-		bGood = false;
-
-		WallIndex = (int)round(PosX / 64);
-		if (TheGame->WallArray[WallIndex])
+		do
 		{
-			CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
-			bClimbingWall = true;			
-			WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };			
-			bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);						
+			PosX = rand() % (1024 - Rect.w);
+			bClimbingWall = false;
+			CollisionRect = { 0, 0, 0, 0 };
+			bBehindWall = false;
+			Rect.x = (int)PosX;
+			Rect.y = (int)PosY;
+			bGood = false;
 
-			// Not behind wall, we are good
-			if (!bBehindWall)
+			WallIndex = (int)round(PosX / 64);
+			if (TheGame->WallArray[WallIndex])
 			{
-				bGood = true;
+				CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
+				bClimbingWall = true;
+				WallRect = { WallIndex * 64, WALL_TOP, 64, 160 };
+				bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);
+
+				// Not behind wall, we are good
+				if (!bBehindWall)
+				{
+					bGood = true;
+				}
+				// If we are totally covered by the first wall, we are good
+				else if (SDL_RectEquals(&ResultRect, &CollisionRect))
+				{
+					bGood = true;
+				}
+				// If we are partially covered by the first wall, and there is a second wall next to it, we are fully covered and good
+				else if ((WallIndex < 15 && TheGame->WallArray[WallIndex + 1]))
+				{
+					bGood = true;
+				}
+				else
+				{
+					bGood = false;
+				}
 			}
-			// If we are totally covered by the first wall, we are good
-			else if (SDL_RectEquals(&ResultRect, &CollisionRect))
+			// Not covered by first wall index, but are by second wall index
+			else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
 			{
-				bGood = true;
-			}
-			// If we are partially covered by the first wall, and there is a second wall next to it, we are fully covered and good
-			else if ((WallIndex < 15 && TheGame->WallArray[WallIndex + 1]))
-			{
-				bGood = true;
+				CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };
+				WallRect = { (WallIndex + 1) * 64, WALL_TOP, 64, 160 };
+				bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);
+
+				if (!bBehindWall)
+				{
+					bGood = true;
+				}
+				else
+				{
+					PosX = (int)round(PosX / 64) * 64;
+					bGood = true;
+					bBehindWall = false;
+				}
 			}
 			else
 			{
-				bGood = false;
-			}
-		}
-		// Not covered by first wall index, but are by second wall index
-		else if (WallIndex < 15 && TheGame->WallArray[WallIndex + 1])
-		{
-			CollisionRect = { Rect.x + 18, Rect.y - 22, Rect.w - 30, Rect.h };			
-			WallRect = { (WallIndex+1) * 64, WALL_TOP, 64, 160 };
-			bBehindWall = SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect);			
-			
-			if (!bBehindWall)
-			{
 				bGood = true;
 			}
-			else
-			{
-				PosX = (int)round(PosX / 64) * 64;
-				bGood = true;
-				bBehindWall = false;
-			}
-		}
-		else
-		{
-			bGood = true;
-		}
-	} while (!bGood);
+		} while (!bGood);
 
-	// If we spawn with a wall to the left of us
-	if (!bBehindWall)
-	{
-		CollisionRect = { Rect.x, Rect.y - 22, Rect.w, Rect.h };
-		WallRect = { (WallIndex - 1) * 64, WALL_TOP, 64, 160 };
-		
-		if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
+		// If we spawn with a wall to the left of us
+		if (!bBehindWall)
 		{
-			PosX = WallIndex * 64 + 5;
+			CollisionRect = { Rect.x, Rect.y - 22, Rect.w, Rect.h };
+			WallRect = { (WallIndex - 1) * 64, WALL_TOP, 64, 160 };
+
+			if (SDL_IntersectRect(&WallRect, &CollisionRect, &ResultRect))
+			{
+				PosX = WallIndex * 64 + 5;
+			}
+		}
+
+		if (bBehindWall)
+		{
+			if (TheGame->WallArray[WallIndex] > 1 || rand() % 4 != 0)
+			{
+				bPendingDelete = true;
+				return;
+			}
+
+			bClimbingWall = true;
+			if (NumClimbingSoundsPlaying < MAX_CLIMBING_SOUNDS)
+			{
+				ClimbChannel = Mix_PlayChannel(-1, MexicanClimbFX, -1);
+				Mix_Volume(ClimbChannel, 128 - 24 * NumClimbingSoundsPlaying);
+				NumClimbingSoundsPlaying++;
+			}
+			MoveRate = 333;
+			//PosX = WallIndex * 64;
 		}
 	}
-
-	if (bBehindWall)
+	else
 	{
-		if (TheGame->WallArray[WallIndex] > 1 || rand() % 4 != 0)
+		Growth = 1;
+
+		//if (rand() % 2 == 0)
 		{
-			bPendingDelete = true;	
-			return;
+			MovingFlags = MOVING_RIGHT;
+			SetPosition(-425, 414);
+			MaxVelocity = 50;
 		}
-
-		bClimbingWall = true;
-		if (NumClimbingSoundsPlaying < MAX_CLIMBING_SOUNDS)
-		{			
-			ClimbChannel = Mix_PlayChannel(-1, MexicanClimbFX, -1);
-			Mix_Volume(ClimbChannel, 128 - 24 * NumClimbingSoundsPlaying);
-			NumClimbingSoundsPlaying++;
-		}
-		MoveRate = 333;
-		//PosX = WallIndex * 64;
-	}	
-
-	MovingFlags = 0;	
+		/*else
+		{
+			MovingFlags = MOVING_LEFT;
+			SetPosition(1024, 300);
+		}*/
+	}
+	
 	
 }
 
@@ -261,7 +279,37 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
 	double GrowthRate = 0.5;
+	if (!TheGame)
+	{		
+		if (Rect.x >= 215 && Rect.y >= 200)
+		{
+			MovingFlags = MOVING_UP;
+			MaxVelocity = 20;
+			TransitionSpeed = 1;
+		}
+		else if (Rect.x <= 760 && Rect.y < 100)
+		{
+			MovingFlags = MOVING_RIGHT;
+			MaxVelocity = 50;
+			TransitionSpeed = 6;
+		}
+		else if (Rect.x >= 760 && Rect.y < 100)
+		{
+			MovingFlags = MOVING_DOWN;
+			MaxVelocity = 2000;
+			TransitionSpeed = 20;
+		}
 
+		/*if (Rect.x >= 240 && MovingFlags == MOVING_RIGHT)
+		{
+			bPendingDelete = true;
+		}
+		else if (Rect.x <= 770 && MovingFlags == MOVING_LEFT)
+		{
+			bPendingDelete = true;
+		}*/
+		return;
+	}
 	if (bDoSpawnPop && bHasPlayedSpawnSound)
 	{
 		GrowthRate *= 5.5;
@@ -269,8 +317,14 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 	if (Rect.y > 600)
 	{
-		TheGame->OnMexicanEscaped();
-		bPendingDelete = true;
+		if (TheGame)
+		{
+			TheGame->OnMexicanEscaped();
+		}
+		else
+		{
+			bPendingDelete = true;
+		}
 		return;
 		/*Rect.y = 0;
 		PosX = rand() % 900;
@@ -393,7 +447,7 @@ void Mexican1Sprite::HandleInput(double DeltaTime)
 
 void Mexican1Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
 {
-	if (Growth < 1)
+	if (Growth < 1 || !TheGame)
 	{
 		return;
 	}

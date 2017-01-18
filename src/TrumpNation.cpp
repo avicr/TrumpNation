@@ -480,9 +480,11 @@ bool DoTitleScreen()
 	bool bUserQuit = false;
 	bool bDone = false;
 	bool bScrollDone = true;
+	bool bSpawnNew = true;
 	double PosY = 0;
 	double ScrollCountDown = TITLE_SCROLL_TIME;
 	int NumIntrosPlayed = 0;	
+	//double TitleFadeInCount = 0;
 
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/GroovinInSpace.wav");
@@ -492,12 +494,14 @@ bool DoTitleScreen()
 	TrumpIntroSprite->SetWidth(128);
 	TrumpIntroSprite->SetHeight(128);
 
+	double MexicanSpawnCountDown = 0.25;
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
-
+			
 	while (!bDone)
-	{
+	{		
+
 		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
 		{
 			bDone = true;
@@ -513,10 +517,34 @@ bool DoTitleScreen()
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 		DeltaTime *= (double)0.001;
 
+		if (bSpawnNew == true)
+		{
+			Mexican1Sprite *Test = new Mexican1Sprite;;
+			Test->SetWidth(32);
+			Test->SetHeight(32);
+			Mexicans.push_back(Test);
+			bSpawnNew = false;
+		}
+
 		TrumpIntroSprite->Tick(DeltaTime);
 		
 		ScrollCountDown -= DeltaTime;
+		MexicanSpawnCountDown -= DeltaTime;
 
+		/*if (MexicanSpawnCountDown <= 0)
+		{
+			MexicanSpawnCountDown = 0.25;
+
+			if (rand() % 5 == 0)
+			{
+				Mexican1Sprite *Test = new Mexican1Sprite;;
+				Test->SetWidth(32);
+				Test->SetHeight(32);				
+				Mexicans.push_back(Test);
+			}
+		}*/
+		//TitleFadeInCount += DeltaTime * 0.5;
+		
 		if (!bScrollDone && ScrollCountDown <= TITLE_SCROLL_TIME - 21.25)
 		{	
 			PosY += DeltaTime * 80;
@@ -532,7 +560,10 @@ bool DoTitleScreen()
 		{
 			if (rand() % 4 != 0)
 			{
+				bSpawnNew = true;
+				Mexicans.DeleteAll();								
 				DoDisplayHighScore();
+				StartTime += HIGH_SCORE_DISPLAY_COUNT;
 			}
 			else
 			{
@@ -556,8 +587,13 @@ bool DoTitleScreen()
 		
 		//SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::TitleScreenTexture->SrcRect.h - PosY) };
 		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+		//SDL_SetRenderDrawBlendMode(GRenderer, SDL_BLENDMODE_BLEND);
+		//SDL_SetTextureBlendMode(ResourceManager::TitleScreenTexture->Texture, SDL_BLENDMODE_BLEND);
+		//SDL_SetTextureAlphaMod(ResourceManager::TitleScreenTexture->Texture, TitleFadeInCount * 255);
 		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
 		TrumpIntroSprite->Render(GRenderer);
+		Mexicans.Tick(DeltaTime);
+		Mexicans.Render(GRenderer);
 		PresentBackBuffer();
 
 		while (SDL_PollEvent(&TheEvent) != 0)
@@ -579,12 +615,14 @@ bool DoTitleScreen()
 	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
 	SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
 	TrumpIntroSprite->Render(GRenderer);
+	Mexicans.Render(GRenderer);
 	PresentBackBuffer();
-
+	
 	Mix_HaltMusic();	
 	Mix_FreeMusic(TitleMusic);
 
 	delete TrumpIntroSprite;
+	Mexicans.DeleteAll();
 
 	int PlayingChannel = Mix_PlayChannel(-1, TitleConfirmFX, 0);
 
@@ -643,9 +681,10 @@ void InitSDL()
 			MexicanSpawnedFX = Mix_LoadWAV("resource/sounds/step3.wav");
 			
 			Mix_VolumeChunk(MexicanSpawnedFX, 48);
-			Mix_VolumeChunk(StepFX, 128);
-			Mix_VolumeChunk(BrickSpawnFX, 86);
-			Mix_VolumeChunk(MexicanJumpFX, 128);
+			Mix_VolumeChunk(StepFX, 60);
+			Mix_VolumeChunk(BrickSpawnFX, 74);
+			Mix_VolumeChunk(MexicanJumpFX, 90);
+			Mix_VolumeChunk(ItemSpawnFX, 100);
 			Mix_VolumeChunk(MexicanLandFX, 128);
 			Mix_VolumeChunk(MexicanClimbFX, 128);
 			Mix_VolumeChunk(MexicanEscapedFX, 48);
@@ -669,7 +708,7 @@ void InitSDL()
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
 		SDL_ShowCursor(SDL_DISABLE);
-		BGMusic = Mix_LoadMUS("resource/sounds/BGMusic.ogg");
+		BGMusic = Mix_LoadMUS("resource/sounds/PUttingUpWalls.wav");
 		HatDanceMusic = Mix_LoadMUS("resource/sounds/Trumphatdance.ogg");
 	}
 }
@@ -1185,6 +1224,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		CurrentTime = SDL_GetPerformanceCounter();
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 		DeltaTime *= (double)0.001;
+		Mexicans.Tick(DeltaTime);
 
 		HighScoreCountDown -= DeltaTime;
 
