@@ -17,6 +17,7 @@
 #include "../inc/SwapItem.h"
 #include "../inc/ScoreSprite.h"
 #include "../inc/CloudSprite.h"
+#include "../inc/SpeechBubble.h"
 #include <algorithm>
 #include <fstream>
 
@@ -68,6 +69,7 @@ Mix_Chunk *MexicanClimbFX = NULL;
 Mix_Chunk *MexicanLandFX = NULL;
 Mix_Chunk *BrickSpawnFX = NULL;
 Mix_Chunk *MexicanJumpFX = NULL;
+Mix_Chunk *TalkFX = NULL;
 Mix_Chunk *ItemSpawnFX = NULL;
 Mix_Chunk *PickUpItemFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
@@ -79,6 +81,7 @@ Mix_Chunk *TrumpDieFX = NULL;
 Mix_Chunk *LevelClearFX = NULL;
 Mix_Music *TitleMusic = NULL;
 Mix_Music *BGMusic = NULL;
+Mix_Music *BGMusicFast = NULL;
 Mix_Music *HatDanceMusic = NULL;
 Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
@@ -132,8 +135,7 @@ void RenderBrickRectangle(SDL_Renderer *Renderer, SDL_Rect &DrawRect, bool bLeve
 
 int main(int argc, char ** argv)
 {
-	// variables		
-
+	
 	// init SDL	
 	InitSDL();
 	LoadBitMapFont("letters_shadow.bmp", FontShadowedWhite);
@@ -166,6 +168,7 @@ void CleanUp()
 	Mix_FreeChunk(MenuSound2FX);
 	Mix_FreeMusic(HatDanceMusic);
 	Mix_FreeMusic(BGMusic);
+	//Mix_FreeMusic(BGMusicFast);
 	Mix_FreeChunk(PlaceWallFX);
 	Mix_FreeChunk(PickUpItemFX);	
 	Mix_FreeChunk(StepFX);
@@ -175,6 +178,7 @@ void CleanUp()
 	Mix_FreeChunk(ItemSpawnFX);
 	Mix_FreeChunk(BrickSpawnFX);
 	Mix_FreeChunk(MexicanJumpFX);
+	Mix_FreeChunk(TalkFX);
 	Mix_FreeChunk(MexicanLandFX);
 	Mix_FreeChunk(MexicanClimbFX);
 	Mix_FreeChunk(MexicanEscapedFX);
@@ -189,6 +193,7 @@ void CleanUp()
 
 bool GameLoop()
 {
+	bool bLevelComplete = false;
 	bool bUserQuit = false;
 	SDL_Event TheEvent;
 	TickFreq = SDL_GetPerformanceFrequency();
@@ -208,8 +213,20 @@ bool GameLoop()
 		{
 			Mix_PlayMusic(BGMusic, -1);
 		}
-
+		ePlayerState PreviousPlayerState = ThePlayer->GetPlayerState();
 		ThePlayer->Reset();
+		if (bLevelComplete && PreviousPlayerState != StateDead)
+		{
+			int Pick = rand() % 2;
+			if (Pick == 0)
+			{
+				ThePlayer->Say(2, "TREMENDOUS");
+			}
+			if (Pick == 1)
+			{
+				ThePlayer->Say(2, " WINNING");
+			}
+		}
 		BrickItem *FirstBrick = NULL;
 		BrickSpawnCountDown = BRICK_SPAWN_RATE;
 
@@ -225,12 +242,17 @@ bool GameLoop()
 		Uint64 StartTime = SDL_GetPerformanceCounter();
 		Uint64 CurrentTime = SDL_GetPerformanceCounter();
 		double DeltaTime;
-		bool bLevelComplete = false;
+		bLevelComplete = false;
 
 		for (int i = 0; i < NUM_CLOUDS; i++)
 		{
 			DecoSprites.push_back(new CloudSprite());
 		}
+
+		SDL_SetRenderTarget(GRenderer, NULL);
+		SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+		SDL_RenderClear(GRenderer);
+		SDL_SetRenderTarget(GRenderer, BackBuffer);
 		while (!bGameComplete && !bLevelComplete)
 		{			
 			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
@@ -244,6 +266,10 @@ bool GameLoop()
 				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
 				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2]) { SDL_PollEvent(&TheEvent); }
 				SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
+				SDL_SetRenderTarget(GRenderer, NULL);
+				SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+				SDL_RenderClear(GRenderer);
+				SDL_SetRenderTarget(GRenderer, BackBuffer);
 			}
 
 			StartTime = CurrentTime;
@@ -266,7 +292,7 @@ bool GameLoop()
 
 			if (TheGame->LevelComplete() || ThePlayer->GetPlayerState() == StateDead)
 			{
-				bLevelComplete = true;
+				bLevelComplete = true;				
 			}
 
 			Render();
@@ -275,7 +301,7 @@ bool GameLoop()
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
 				if (TheEvent.type == SDL_KEYDOWN)
-				{
+				{					
 					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_0)
 					{
 						bDoSpawnPop = !bDoSpawnPop;
@@ -291,6 +317,11 @@ bool GameLoop()
 					{
 						Mix_PlayChannel(-1, LevelClearFX, 0);
 						bRenderCollision = !bRenderCollision;
+					}
+
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_4)
+					{						
+						ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
 					}
 				}
 				if (TheEvent.type == SDL_JOYAXISMOTION)
@@ -488,7 +519,7 @@ bool DoTitleScreen()
 
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/GroovinInSpace.wav");
-	Mix_PlayMusic(TitleMusic, -1);
+	Mix_PlayMusic(TitleMusic, 0);
 	Sprite *TrumpIntroSprite = new Sprite();	
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
 	TrumpIntroSprite->SetWidth(128);
@@ -498,7 +529,13 @@ bool DoTitleScreen()
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;
-			
+	
+	SDL_SetRenderTarget(GRenderer, NULL);
+	SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(GRenderer);
+	SDL_SetRenderTarget(GRenderer, BackBuffer);
+	
+	
 	while (!bDone)
 	{		
 
@@ -507,11 +544,7 @@ bool DoTitleScreen()
 			bDone = true;
 			bUserQuit = true;
 		}
-
-		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_RETURN] || SDL_GetKeyboardState(NULL)[SDL_SCANCODE_SPACE])
-		{
-			bDone = true;
-		}
+		
 		StartTime = CurrentTime;
 		CurrentTime = SDL_GetPerformanceCounter();
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
@@ -575,7 +608,7 @@ bool DoTitleScreen()
 		{	
 
 			Mix_PlayMusic(TitleMusic, 0);
-			bScrollDone = false;
+			//bScrollDone = false;
 			
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
@@ -587,13 +620,15 @@ bool DoTitleScreen()
 		
 		//SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::TitleScreenTexture->SrcRect.h - PosY) };
 		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
 		//SDL_SetRenderDrawBlendMode(GRenderer, SDL_BLENDMODE_BLEND);
 		//SDL_SetTextureBlendMode(ResourceManager::TitleScreenTexture->Texture, SDL_BLENDMODE_BLEND);
 		//SDL_SetTextureAlphaMod(ResourceManager::TitleScreenTexture->Texture, TitleFadeInCount * 255);
-		SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
+
 		TrumpIntroSprite->Render(GRenderer);
 		Mexicans.Tick(DeltaTime);
 		Mexicans.Render(GRenderer);
+		
 		PresentBackBuffer();
 
 		while (SDL_PollEvent(&TheEvent) != 0)
@@ -603,6 +638,15 @@ bool DoTitleScreen()
 			//{
 			//	bDone = true;
 			//}
+
+			if (TheEvent.type == SDL_KEYDOWN)
+			{
+				if (TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN || TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE)
+				{
+					bDone = true;
+				}
+			}
+
 			if (TheEvent.type == SDL_QUIT)
 			{
 				bDone = true;
@@ -668,13 +712,14 @@ void InitSDL()
 			MenuSound1FX = Mix_LoadWAV("resource/sounds/mexicanclimb.wav");
 			PickUpItemFX = Mix_LoadWAV("resource/sounds/Pickupitem.wav");
 			PlaceWallFX = Mix_LoadWAV("resource/sounds/Placewall.wav");
-			StepFX = Mix_LoadWAV("resource/sounds/mexicanstep2.wav");
+			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
 			TitleConfirmFX = Mix_LoadWAV("resource/sounds/Titleconfirm.wav");
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
 			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");
 			ItemSpawnFX = Mix_LoadWAV("resource/sounds/itemspawn.wav");
 			BrickSpawnFX = Mix_LoadWAV("resource/sounds/brickspawn3.wav");
 			MexicanJumpFX = Mix_LoadWAV("resource/sounds/mexicanjump.wav");
+			TalkFX = Mix_LoadWAV("resource/sounds/talk.wav");
 			MexicanLandFX = Mix_LoadWAV("resource/sounds/mexicanland.wav");
 			MexicanClimbFX = Mix_LoadWAV("resource/sounds/mexicanclimb.wav");
 			MexicanEscapedFX = Mix_LoadWAV("resource/sounds/step7.wav");
@@ -682,11 +727,11 @@ void InitSDL()
 			
 			Mix_VolumeChunk(MexicanSpawnedFX, 48);
 			Mix_VolumeChunk(StepFX, 60);
-			Mix_VolumeChunk(BrickSpawnFX, 74);
+			Mix_VolumeChunk(BrickSpawnFX, 54);
 			Mix_VolumeChunk(MexicanJumpFX, 90);
-			Mix_VolumeChunk(ItemSpawnFX, 100);
-			Mix_VolumeChunk(MexicanLandFX, 128);
-			Mix_VolumeChunk(MexicanClimbFX, 128);
+			Mix_VolumeChunk(PickUpItemFX, 90);
+			Mix_VolumeChunk(MexicanLandFX, 110);
+			Mix_VolumeChunk(MexicanClimbFX, 100);
 			Mix_VolumeChunk(MexicanEscapedFX, 48);
 		}
 
@@ -705,10 +750,12 @@ void InitSDL()
 		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallBlue, { 0, 0, 255, 255 });
 		LoadFont("resource/fonts/segoeuib.ttf", 18, FontSegSmallYellow, { 255, 255, 0, 255 });		*/
 
+		Mix_AllocateChannels(100);
 		SDL_Log("After load numerals");
 		bSDLInitialized = true;
 		SDL_ShowCursor(SDL_DISABLE);
-		BGMusic = Mix_LoadMUS("resource/sounds/PUttingUpWalls.wav");
+		BGMusic = Mix_LoadMUS("resource/sounds/PuttingUpWalls.wav");
+		//BGMusicFast = Mix_LoadMUS("resource/sounds/PuttingUpWallsFast.mp3");
 		HatDanceMusic = Mix_LoadMUS("resource/sounds/Trumphatdance.ogg");
 	}
 }
@@ -1194,7 +1241,10 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 	double DeltaTime;	
 	bool bButtonPressed = false;
 	SDL_Joystick *Joy = SDL_JoystickOpen(0);
-
+	SDL_SetRenderTarget(GRenderer, NULL);
+	SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(GRenderer);
+	SDL_SetRenderTarget(GRenderer, BackBuffer);
 	ReadHighScores();
 	
 	if (EnterRank != -1)
@@ -1455,7 +1505,16 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 					}
 				}*/
 			}
-
+			else
+			{
+				if (TheEvent.type == SDL_KEYDOWN)
+				{
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN || TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE)
+					{
+						bDone = true;
+					}
+				}
+			}
 			if (TheEvent.type == SDL_QUIT)
 			{
 				bDone = true;
