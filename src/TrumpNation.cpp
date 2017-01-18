@@ -168,7 +168,7 @@ void CleanUp()
 	Mix_FreeChunk(MenuSound2FX);
 	Mix_FreeMusic(HatDanceMusic);
 	Mix_FreeMusic(BGMusic);
-	//Mix_FreeMusic(BGMusicFast);
+	Mix_FreeMusic(BGMusicFast);
 	Mix_FreeChunk(PlaceWallFX);
 	Mix_FreeChunk(PickUpItemFX);	
 	Mix_FreeChunk(StepFX);
@@ -490,11 +490,14 @@ void Render()
 	SDL_RenderFillRect(GRenderer, &Rect);*/
 	
 	//new BrickItem(rand() % 992, (rand() % (200) + HORIZON + 65)));
+	
 	DecoSprites.Render(GRenderer);
 	Items.Render(GRenderer);
 	Mexicans.Render(GRenderer);
 
 	ThePlayer->Render(GRenderer);	
+
+	
 
 	DrawHUD(GRenderer);
 
@@ -755,7 +758,7 @@ void InitSDL()
 		bSDLInitialized = true;
 		SDL_ShowCursor(SDL_DISABLE);
 		BGMusic = Mix_LoadMUS("resource/sounds/PuttingUpWalls.wav");
-		//BGMusicFast = Mix_LoadMUS("resource/sounds/PuttingUpWallsFast.mp3");
+		BGMusicFast = Mix_LoadMUS("resource/sounds/PuttingUpWallsFast.mp3");
 		HatDanceMusic = Mix_LoadMUS("resource/sounds/Trumphatdance.ogg");
 	}
 }
@@ -1022,7 +1025,7 @@ void SpawnRandomItem()
 {
 	int CurrentLevel = TheGame->GetLevelNumber();
 	int Roll = rand() % 100;
-	ItemSprite *NewItem;
+	ItemSprite *NewItem = NULL;
 	
 	if (ThePlayer->GetPlayerState() == StateDying)
 	{
@@ -1033,7 +1036,7 @@ void SpawnRandomItem()
 	{
 		NewItem = new ExtraLifeItem();
 	}
-	else if (Roll < 25 && CurrentLevel >= SOMBRERO_MILE_START)
+	else if (Roll < 25 && CurrentLevel >= SOMBRERO_MILE_START && !bSwapSprites && !ThePlayer->HasRedHat())
 	{
 		NewItem = new SwapItem();
 	}
@@ -1041,12 +1044,15 @@ void SpawnRandomItem()
 	{
 		NewItem = new BombItem();
 	}
-	else 
+	else if (!bSwapSprites && !ThePlayer->HasRedHat())
 	{
 		NewItem = new RedHatItem();
 	}	
 
-	Items.push_back(NewItem);
+	if (NewItem)
+	{
+		Items.push_back(NewItem);
+	}
 }
 
 double GetSpawnTime()

@@ -83,7 +83,7 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 
 		if (RedHatCountDown <= 0)
 		{
-			//Mix_PlayMusic(BGMusic, -1);
+			Mix_PlayMusic(BGMusic, -1);
 			MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;			
 
 			bHasRedHat = false;
@@ -327,7 +327,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 					Say(2, "GO BACK TO\nUNIVISION!");
 				}
 
-				DecoSprites.push_back(new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
+				DecoSprites.insert(DecoSprites.begin(), new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));
 				Score += TotalScore;
 			}
 		}
@@ -488,7 +488,14 @@ void TrumpPlayerSprite::DoSwap(bool bSwap)
 	}
 	else 
 	{
-		Mix_FadeInMusic(BGMusic, -1, 500);
+		if (!bHasRedHat)
+		{
+			Mix_FadeInMusic(BGMusic, -1, 500);
+		}
+		else
+		{
+			Mix_PlayMusic(BGMusicFast, -1);
+		}
 		for (int i = 0; i < Mexicans.size(); i++)
 		{
 			Mexicans[i]->PlayAnimation(ResourceManager::Mexican1Animation);
@@ -541,7 +548,7 @@ void TrumpPlayerSprite::KillEverything(bool bBecauseBomb)
 	{
 		SDL_Rect MexiRect = Mexicans[i]->GetScreenSpaceCollisionRect();
 
-		Items.push_back(new ScoreSprite(MexiRect.x, MexiRect.y, Mexicans[i]->GetScoreWorth()));
+		DecoSprites.insert(DecoSprites.begin(), new ScoreSprite(MexiRect.x, MexiRect.y, Mexicans[i]->GetScoreWorth()));
 		AddToScore(Mexicans[i]->GetScoreWorth());
 	}
 	

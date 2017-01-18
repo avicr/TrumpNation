@@ -75,7 +75,7 @@ public:
 	{
 		if (!ThePlayer->HasRedHat())
 		{
-			//Mix_PlayMusic(BGMusicFast, -1);
+			Mix_PlayMusic(BGMusicFast, -1);
 		}
 		Mix_PlayChannel(CHAN_ITEM_PICKUP, PickUpItemFX, 0);		
 		ThePlayer->PickupRedHat();
