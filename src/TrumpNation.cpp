@@ -18,6 +18,7 @@
 #include "../inc/ScoreSprite.h"
 #include "../inc/CloudSprite.h"
 #include "../inc/SpeechBubble.h"
+#include "../inc/CatSprite.h"
 #include <algorithm>
 #include <fstream>
 
@@ -215,6 +216,7 @@ bool GameLoop()
 		}
 		ePlayerState PreviousPlayerState = ThePlayer->GetPlayerState();
 		ThePlayer->Reset();
+		
 		if (bLevelComplete && PreviousPlayerState != StateDead)
 		{
 			int Pick = rand() % 2;
@@ -226,7 +228,8 @@ bool GameLoop()
 			{
 				ThePlayer->Say(2, " WINNING");
 			}
-		}
+		}		
+
 		BrickItem *FirstBrick = NULL;
 		BrickSpawnCountDown = BRICK_SPAWN_RATE;
 
@@ -313,6 +316,12 @@ bool GameLoop()
 						SpawnRandomItem();
 					}
 
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_5)
+					{
+						//Mix_PlayChannel(-1, LevelClearFX, 0);
+						Items.push_back(new CatSprite());
+					}
+
 					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
 					{
 						Mix_PlayChannel(-1, LevelClearFX, 0);
@@ -324,24 +333,24 @@ bool GameLoop()
 						ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
 					}
 				}
-				if (TheEvent.type == SDL_JOYAXISMOTION)
-				{
-					int Axis = TheEvent.jaxis.axis;
-					SDL_Log("Axis: %d, %d", Axis, TheEvent.jaxis.value);
-				}
-				//SDL_Log("Event Type: %d", TheEvent.type);
-				if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
-				{
-					ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
-				}
-				//User requests quit
-				if (TheEvent.type == SDL_QUIT)
-				{
-					bGameComplete = true;
-				}
+if (TheEvent.type == SDL_JOYAXISMOTION)
+{
+	int Axis = TheEvent.jaxis.axis;
+	SDL_Log("Axis: %d, %d", Axis, TheEvent.jaxis.value);
+}
+//SDL_Log("Event Type: %d", TheEvent.type);
+if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
+{
+	ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
+}
+//User requests quit
+if (TheEvent.type == SDL_QUIT)
+{
+	bGameComplete = true;
+}
 			}
 		}
-		
+
 		if (ThePlayer->GetNumLives() < 0)
 		{
 			bGameComplete = true;
@@ -365,9 +374,9 @@ bool GameLoop()
 }
 
 void Tick(double DeltaTime)
-{	
+{
 	static double SpawnCountdown = GetSpawnTime();
-	static double ItemSpawnCountdown = ITEM_RATE;		
+	static double ItemSpawnCountdown = ITEM_RATE;
 	static int ItemChance = ITEM_SPAWN_PERCENT;
 
 	if (BombCountDown >= 0)
@@ -384,8 +393,15 @@ void Tick(double DeltaTime)
 	BrickSpawnCountDown -= DeltaTime;
 
 	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
-	{						
-		Mexicans.push_back(new Mexican1Sprite());		
+	{
+		if (rand() % (100 / CAT_SPAWN_PERCENT) == 0)
+		{
+			Mexicans.push_back(new CatSprite());
+		}
+		else
+		{
+			Mexicans.push_back(new Mexican1Sprite());
+		}
 		SpawnCountdown = GetSpawnTime();
 	}
 
@@ -393,7 +409,7 @@ void Tick(double DeltaTime)
 	{
 		bool bForceBrickSpawn = ThePlayer->GetNumBricks() == 0 && Items.size() - ItemSprite::NumNonBrickItems == 0;
 		BrickSpawnCountDown = BRICK_SPAWN_RATE;
-		
+
 		if (ThePlayer->GetPlayerState() != StateDying && (bForceBrickSpawn || (ThePlayer->GetNumBricks() + Items.size() - ItemSprite::NumNonBrickItems < MAX_BRICKS && rand() % (100 / BRICK_SPAWN_PERCENT) == 0)))
 		{
 			if (TheGame->GetLevelNumber() >= GOLD_BRICK_MILE_START && rand() % (100 / GOLD_BRICK_SPAWN_PERCENT) == 0)
@@ -415,7 +431,7 @@ void Tick(double DeltaTime)
 
 	if (ItemSpawnCountdown <= 0)
 	{
-		ItemSpawnCountdown = ITEM_RATE;
+		ItemSpawnCountdown = ITEM_RATE;		
 		if (rand() % (100 / ItemChance) == 0)
 		{
 			ItemChance = ITEM_SPAWN_PERCENT;
@@ -519,6 +535,7 @@ bool DoTitleScreen()
 	double ScrollCountDown = TITLE_SCROLL_TIME;
 	int NumIntrosPlayed = 0;	
 	//double TitleFadeInCount = 0;
+	int HighScoresCount = 0;
 
 	SDL_Event TheEvent;
 	TitleMusic = Mix_LoadMUS("resource/sounds/GroovinInSpace.wav");
@@ -527,7 +544,7 @@ bool DoTitleScreen()
 	TrumpIntroSprite->PlayAnimation(ResourceManager::TrumpIntroAnimation);
 	TrumpIntroSprite->SetWidth(128);
 	TrumpIntroSprite->SetHeight(128);
-
+	
 	double MexicanSpawnCountDown = 0.25;
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
@@ -538,6 +555,9 @@ bool DoTitleScreen()
 	SDL_RenderClear(GRenderer);
 	SDL_SetRenderTarget(GRenderer, BackBuffer);
 	
+	Sprite CatTest;
+	
+	CatTest.PlayAnimation(ResourceManager::CatAnimation);	
 	
 	while (!bDone)
 	{		
@@ -555,14 +575,17 @@ bool DoTitleScreen()
 
 		if (bSpawnNew == true)
 		{
-			Mexican1Sprite *Test = new Mexican1Sprite;;
+			Mexican1Sprite *Test = new Mexican1Sprite;
 			Test->SetWidth(32);
 			Test->SetHeight(32);
 			Mexicans.push_back(Test);
-			bSpawnNew = false;
-		}
 
-		TrumpIntroSprite->Tick(DeltaTime);
+			CatTest.SetWidth(32);
+			CatTest.SetHeight(32);			
+			bSpawnNew = false;
+		}		
+
+		TrumpIntroSprite->Tick(DeltaTime);		
 		
 		ScrollCountDown -= DeltaTime;
 		MexicanSpawnCountDown -= DeltaTime;
@@ -592,34 +615,98 @@ bool DoTitleScreen()
 			bScrollDone = true;
 		}*/
 
-		if (bScrollDone && ((long)round(ScrollCountDown * 1000) % 30000) <= 1000)
+		if (ScrollCountDown <= 0)
 		{
-			if (rand() % 4 != 0)
-			{
-				bSpawnNew = true;
-				Mexicans.DeleteAll();								
-				DoDisplayHighScore();
-				StartTime += HIGH_SCORE_DISPLAY_COUNT;
-			}
-			else
-			{
-				//DisplayGreatFact();
-			}
+			//if (rand() % 4 != 0)
+			{				
+				Mexicans.DeleteAll();
+				Uint64 PauseStart = SDL_GetPerformanceCounter();
+				DoDisplayHighScore();				
+				Uint64 PauseTime = SDL_GetPerformanceCounter() - PauseStart;
+				CurrentTime += PauseTime;
+				PauseTime *= 1000 / (double)SDL_GetPerformanceFrequency();
+				ScrollCountDown = TITLE_SCROLL_TIME;
+				NumIntrosPlayed++;
+
+				if (NumIntrosPlayed == 5)
+				{
+					for (int i = 0; i < 1; i++)
+					{
+						Sprite *MexicanIntroSprite = new Sprite();
+						MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
+						MexicanIntroSprite->SetAnimationPlayRate(0.5);
+						MexicanIntroSprite->SetWidth(32);
+						MexicanIntroSprite->SetHeight(32);
+						int NewX = 264 + (rand() % (int)(700 - 264 + 1));
+						int NewY = 200 + (rand() % (int)(380 - 200 + 1));
+						MexicanIntroSprite->SetPosition(NewX, NewY);
+						Mexicans.push_back(MexicanIntroSprite);
+
+					}
+				}
+
+				if (NumIntrosPlayed == 6)
+				{
+					for (int i = 0; i < 10; i++)
+					{
+						Sprite *MexicanIntroSprite = new Sprite();
+						MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
+						MexicanIntroSprite->SetAnimationPlayRate(0.5);
+						MexicanIntroSprite->SetWidth(32);
+						MexicanIntroSprite->SetHeight(32);
+						int NewX = 264 + (rand() % (int)(700 - 264 + 1));
+						int NewY = 200 + (rand() % (int)(380 - 200 + 1));
+						MexicanIntroSprite->SetPosition(NewX, NewY);
+						Mexicans.push_back(MexicanIntroSprite);
+
+					}
+				}
+
+				if (NumIntrosPlayed == 7)
+				{
+					for (int i = 0; i < 70; i++)
+					{
+						Sprite *MexicanIntroSprite = new Sprite();
+						MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
+						MexicanIntroSprite->SetAnimationPlayRate(0.5);
+						MexicanIntroSprite->SetWidth(32);
+						MexicanIntroSprite->SetHeight(32);
+						int NewX = 264 + (rand() % (int)(700 - 264 + 1));
+						int NewY = 200 + (rand() % (int)(380 - 200 + 1));
+						MexicanIntroSprite->SetPosition(NewX, NewY);
+						Mexicans.push_back(MexicanIntroSprite);
+
+					}
+				}
+
+
+				if (NumIntrosPlayed == 1)
+				{
+					CatTest.SetPosition(2080, 408);					
+					CatTest.SetMovingFlags(MOVING_LEFT);
+				}
+				else
+				{
+					CatTest.SetMovingFlags(MOVING_NONE);
+					CatTest.SetPosition(0, 0);
+				}
+			}			
 		}
 
-		if (ScrollCountDown <= 0)
-		{	
 
+		if (NumIntrosPlayed == NUM_INTRO_CYCLES)
+		{	
+			bSpawnNew = true;
 			Mix_PlayMusic(TitleMusic, 0);
 			//bScrollDone = false;
-			
+			NumIntrosPlayed = 0;
 			ScrollCountDown = TITLE_SCROLL_TIME;			
 		}
 
 		RenderStars(DeltaTime);
 
 		//SDL_Log("Info texture: %d", ResourceManager::InfoTexture->Texture);
-		TrumpIntroSprite->SetPosition(454, 255 - PosY);
+		TrumpIntroSprite->SetPosition(454, 255 - PosY);		
 		
 		//SDL_Rect BackBufferRect = { 0, 0, 1024, fmin(600,ResourceManager::TitleScreenTexture->SrcRect.h - PosY) };
 		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
@@ -628,9 +715,21 @@ bool DoTitleScreen()
 		//SDL_SetTextureBlendMode(ResourceManager::TitleScreenTexture->Texture, SDL_BLENDMODE_BLEND);
 		//SDL_SetTextureAlphaMod(ResourceManager::TitleScreenTexture->Texture, TitleFadeInCount * 255);
 
-		TrumpIntroSprite->Render(GRenderer);
+		if (NumIntrosPlayed < 5 || NumIntrosPlayed > 7)
+		{		
+			TrumpIntroSprite->Render(GRenderer);
+		}
 		Mexicans.Tick(DeltaTime);
 		Mexicans.Render(GRenderer);
+		
+		CatTest.Tick(DeltaTime);
+
+		if (CatTest.GetScreenSpaceCollisionRect().x > 260 && CatTest.GetMovingFlags() == MOVING_LEFT && CatTest.GetScreenSpaceCollisionRect().x <= 730)
+		{											
+			CatTest.Render(GRenderer);						
+			CatTest.SetMovingFlags(MOVING_LEFT);
+			//CatTest.SetMaxVelocity(100);			
+		}
 		
 		PresentBackBuffer();
 
@@ -868,7 +967,7 @@ void DrawHUD(SDL_Renderer *Renderer)
 	SDL_Rect HUDRect = { 0, 0, 1024, 64 };
 	//SDL_RenderCopy(GRenderer, ResourceManager::HUDTexture->Texture, &HUDRect, &HUDRect);
 	//DrawText(std::to_string(TheGame->GetLevelNumber()), 535, 17, 32, 32, Renderer, FontSeg36);
-	
+
 
 	//DrawText(std::to_string(ThePlayer->GetScore()), 918, 3, 18, 32, Renderer, FontSeg20);
 	string ScoreString = std::to_string(ThePlayer->GetScore());
@@ -878,17 +977,17 @@ void DrawHUD(SDL_Renderer *Renderer)
 	{
 		PadString += "0";
 	}
-	
+
 	SDL_Rect DstRect = { 12, 11, 36, 36 };
 	SDL_RenderCopy(GRenderer, ResourceManager::TrumpFaceTexture->Texture, NULL, &DstRect);
-	
+
 	if (ThePlayer->HasRedHat())
 	{
 		DstRect.x = 16;
 		DstRect.y = 14;
 		DstRect.w = ResourceManager::RedHatTexture->SrcRect.w * 2.6;
 		DstRect.h = ResourceManager::RedHatTexture->SrcRect.h * 2.6;
-	
+
 		SDL_RenderCopy(GRenderer, ResourceManager::RedHatTexture->Texture, NULL, &DstRect);
 	}
 	else if (bSwapSprites)
@@ -904,7 +1003,7 @@ void DrawHUD(SDL_Renderer *Renderer)
 	DrawText(std::to_string(ThePlayer->GetNumLives()), 70, 15, 32, 32, Renderer, FontShadowedWhite, 0.75, 0.75);
 
 	for (int i = 0; i < ThePlayer->GetNumBricks(); i++)
-	{		
+	{
 		DstRect = ResourceManager::BrickTexture->SrcRect;
 		DstRect.x = 110 + i * 35;
 		DstRect.y = 24;
@@ -919,11 +1018,13 @@ void DrawHUD(SDL_Renderer *Renderer)
 		{
 			SDL_RenderCopy(GRenderer, ResourceManager::BrickGoldTexture->Texture, NULL, &DstRect);
 		}
-		
+
 	}
 
 	DrawText("MILE", 444, 17, 32, 32, Renderer, FontBlue, 0.75, 0.75);
+	
 	DrawText(std::to_string(TheGame->GetLevelNumber()), 540, 15, 32, 32, Renderer, FontShadowedWhite, 0.75, 0.75);
+	
 	
 	DrawText("SCORE", 740, 17, 32, 32, Renderer, FontBlue, 0.75, 0.75);
 	DrawText(PadString, 866, 15, 32, 32, Renderer, FontShadowedWhite, 0.75, 0.75);

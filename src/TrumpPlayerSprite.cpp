@@ -322,7 +322,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 					}					
 				}				
 
-				if (NumMexicansKilled >= 3)
+				if (NumMexicansKilled >= 4)
 				{
 					Say(2, "GO BACK TO\nUNIVISION!");
 				}

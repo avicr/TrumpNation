@@ -12,11 +12,12 @@ public:
 	SDL_Rect GetScreenSpaceCollisionRect();
 	void Render(SDL_Renderer *Renderer);
 	void CheckCollision(TrumpPlayerSprite *OtherSprite);
-	void Interact(TrumpPlayerSprite *OtherSprite);
+	virtual void Interact(TrumpPlayerSprite *OtherSprite);
 	int GetScoreWorth();
 	void StopSounds();
 
 protected:
+	double GrowthRate;
 	bool bReachedMaxGrowth;
 	float AttackCountDown;
 	float JumpCountDown;

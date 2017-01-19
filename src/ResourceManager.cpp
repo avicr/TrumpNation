@@ -35,6 +35,7 @@ INIT_TEXTURE_RESOURCE(BombSpriteSheet);
 INIT_TEXTURE_RESOURCE(SombreroSpriteSheet);
 INIT_TEXTURE_RESOURCE(SpeechBubble1);
 INIT_TEXTURE_RESOURCE(SpeechBubble2);
+INIT_TEXTURE_RESOURCE(CatSpriteSheet);
 
 INIT_ANIMATION_RESOURCE(TrumpAnimation)
 INIT_ANIMATION_RESOURCE(TrumpRedHatAnimation)
@@ -46,6 +47,7 @@ INIT_ANIMATION_RESOURCE(RedHatAnimation)
 INIT_ANIMATION_RESOURCE(BombAnimation)
 INIT_ANIMATION_RESOURCE(SombreroAnimation)
 INIT_ANIMATION_RESOURCE(TrumpDamageHatAnimation)
+INIT_ANIMATION_RESOURCE(CatAnimation)
 
 ResourceManager::ResourceManager()
 {

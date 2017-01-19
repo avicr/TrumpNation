@@ -252,3 +252,19 @@ void Sprite::Delete()
 {
 	bPendingDelete = true;
 }
+
+
+void Sprite::SetMovingFlags(eMovingFlags NewFlags)
+{
+	MovingFlags = NewFlags;
+}
+
+void Sprite::SetMaxVelocity(double NewMaxVel)
+{
+	MaxVelocity = NewMaxVel;
+}
+
+int Sprite::GetMovingFlags()
+{
+	return MovingFlags;
+}

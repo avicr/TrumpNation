@@ -95,7 +95,20 @@ public:
 	DECLARE_TEXTURE_RESOURCE(BitmapFont, "numbers.bmp");
 	DECLARE_TEXTURE_RESOURCE(SpeechBubble1, "speech1.bmp");
 	DECLARE_TEXTURE_RESOURCE(SpeechBubble2, "speech2.bmp");
+	DECLARE_TEXTURE_RESOURCE(CatSpriteSheet, "cat.bmp");
 
+	BEGIN_DECLARE_ANIMATION_RESORCE(CatAnimation)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			int SpriteWidth = 32;
+			int SpriteHeight = 32;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+
+			Frames.push_back(new Frame(ResourceManager::CatSpriteSheet->Texture, SrcRect, 0.045));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(CatAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(RedHatAnimation)
 	{

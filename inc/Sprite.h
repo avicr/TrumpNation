@@ -57,6 +57,9 @@ protected:
 public:
 	Sprite();
 	Sprite(SDL_Texture *InTexture);
+	void SetMovingFlags(eMovingFlags NewFlags);
+	void SetMaxVelocity(double NewMaxVel);
+	int GetMovingFlags();
 	virtual ~Sprite() {};
 	virtual void Tick(double DeltaTime);
 	virtual void TickAnimation(double DeltaTime);

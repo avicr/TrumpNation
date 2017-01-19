@@ -6,6 +6,7 @@ int Mexican1Sprite::NumClimbingSoundsPlaying = 0;
 
 Mexican1Sprite::Mexican1Sprite()
 {
+	GrowthRate = 0.5;
 	bIsJumping = false;
 	AttackCountDown = 0.5;
 	JumpCountDown = 0.15;
@@ -278,7 +279,7 @@ void Mexican1Sprite::Render(SDL_Renderer *Renderer)
 void Mexican1Sprite::HandleInput(double DeltaTime)
 {
 	const Uint8 *state = SDL_GetKeyboardState(NULL);
-	double GrowthRate = 0.5;
+	
 	if (!TheGame)
 	{		
 		if (Rect.x >= 215 && Rect.y >= 200)
@@ -459,12 +460,13 @@ void Mexican1Sprite::CheckCollision(TrumpPlayerSprite *OtherSprite)
 	SDL_Rect CollisionRect = GetScreenSpaceCollisionRect();
 	if (SDL_IntersectRect(&TrumpCollision, &CollisionRect, &ResultRect))
 	{
-		OtherSprite->TakeDamage();
+		Interact(OtherSprite);
 	}
 }
 
 void Mexican1Sprite::Interact(TrumpPlayerSprite *OtherSprite)
 {
+	OtherSprite->TakeDamage();
 }
 
 int Mexican1Sprite::GetScoreWorth()
