@@ -71,7 +71,6 @@ Mix_Chunk *MexicanLandFX = NULL;
 Mix_Chunk *BrickSpawnFX = NULL;
 Mix_Chunk *MexicanJumpFX = NULL;
 Mix_Chunk *TalkFX = NULL;
-Mix_Chunk *ItemSpawnFX = NULL;
 Mix_Chunk *PickUpItemFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
 Mix_Chunk *MenuSound1FX = NULL;
@@ -117,9 +116,9 @@ void Tick(double DeltaTime);
 void Render();
 void InitSDL();
 void CleanUp();
+void LoadBitMapFont(string FileName, Glyph *Glyphs);
 void DrawHUD(SDL_Renderer *Renderer);
 void LoadFont(const char *FontName, int Point, Glyph Glyphs[94], SDL_Color Color = { 0, 0, 0, 255 });
-void LoadBitMapFont(string FileName, Glyph *Glyphs);
 void CopyGlyph(Glyph &TheGlyph, SDL_Texture *FontTexture, int TextureStartX);
 void PresentBackBuffer();
 void SpawnRandomItem();
@@ -144,7 +143,6 @@ int main(int argc, char ** argv)
 	LoadBitMapFont("letters_shadow_yellow.bmp", FontShadowedYellow);
 	LoadBitMapFont("letters_shadow_red.bmp", FontShadowedRed);
 	LoadBitMapFont("letters_regular.bmp", FontBlue);
-
 	srand(SDL_GetTicks());
 	SDL_SetRenderDrawColor(GRenderer, 255, 255, 255, 255);
 	ReadGreatFacts();
@@ -177,7 +175,6 @@ void CleanUp()
 	Mix_FreeChunk(TitleConfirmFX);
 	Mix_FreeChunk(TrumpDieFX);
 	Mix_FreeChunk(LevelClearFX);	
-	Mix_FreeChunk(ItemSpawnFX);
 	Mix_FreeChunk(BrickSpawnFX);
 	Mix_FreeChunk(MexicanJumpFX);
 	Mix_FreeChunk(TalkFX);
@@ -534,7 +531,7 @@ bool DoTitleScreen()
 	bool bSpawnNew = true;
 	double PosY = 0;
 	double ScrollCountDown = TITLE_SCROLL_TIME;
-	int NumIntrosPlayed = 4;	
+	int NumIntrosPlayed = 0;	
 	//double TitleFadeInCount = 0;
 	int HighScoresCount = 0;
 
@@ -628,8 +625,13 @@ bool DoTitleScreen()
 				PauseTime *= 1000 / (double)SDL_GetPerformanceFrequency();
 				ScrollCountDown = TITLE_SCROLL_TIME;
 				NumIntrosPlayed++;
-
-				if (NumIntrosPlayed == 5)
+#ifndef PARTY
+				if (NumIntrosPlayed % 4 == 0)
+				{
+					Mix_PlayMusic(TitleMusic, 0);
+				}
+#endif
+				if (NumIntrosPlayed == 8)
 				{
 					for (int i = 0; i < 1; i++)
 					{
@@ -646,7 +648,7 @@ bool DoTitleScreen()
 					}
 				}
 
-				if (NumIntrosPlayed == 6)
+				if (NumIntrosPlayed == 9)
 				{
 					for (int i = 0; i < 10; i++)
 					{
@@ -664,7 +666,7 @@ bool DoTitleScreen()
 					}
 				}
 
-				if (NumIntrosPlayed == 7)
+				if (NumIntrosPlayed == 10)
 				{
 					for (int i = 0; i < 70; i++)
 					{
@@ -726,7 +728,7 @@ bool DoTitleScreen()
 		//SDL_SetTextureBlendMode(ResourceManager::TitleScreenTexture->Texture, SDL_BLENDMODE_BLEND);
 		//SDL_SetTextureAlphaMod(ResourceManager::TitleScreenTexture->Texture, TitleFadeInCount * 255);
 
-		if (NumIntrosPlayed < 5 || NumIntrosPlayed > 7 && NumIntrosPlayed != 15)
+		if (NumIntrosPlayed < 8 || NumIntrosPlayed > 10 && NumIntrosPlayed != 15)
 		{		
 			TrumpIntroSprite->Render(GRenderer);
 		}
@@ -742,7 +744,7 @@ bool DoTitleScreen()
 			//CatTest.SetMaxVelocity(100);			
 		}
 		
-		DrawText("CREATED BY CRIS AVILA\n  ART BY IVAN DIXON", 346, 550, 16, 16, GRenderer, FontShadowedWhite, 1, 1);
+		DrawText("CREATED BY CRISPIN AVILA\n    ART BY IVAN DIXON", 326, 550, 16, 16, GRenderer, FontShadowedWhite, 1, 1.65);
 		PresentBackBuffer();
 
 		while (SDL_PollEvent(&TheEvent) != 0)
@@ -767,13 +769,14 @@ bool DoTitleScreen()
 			}
 		}
 	}
-
+	RenderStars(DeltaTime);
 	TrumpIntroSprite->SetPosition(454, 255);
 	//SDL_Rect TitleRect = { 0, 0, 1024, 600 };
 	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
 	SDL_RenderCopy(GRenderer, ResourceManager::TitleScreenTexture->Texture, NULL, &BackBufferRect);
 	TrumpIntroSprite->Render(GRenderer);
-	Mexicans.Render(GRenderer);
+	DrawText("CREATED BY CRISPIN AVILA\n    ART BY IVAN DIXON", 326, 550, 16, 16, GRenderer, FontShadowedWhite, 1, 1.65);
+	//Mexicans.Render(GRenderer);
 	PresentBackBuffer();
 	
 	Mix_HaltMusic();	
@@ -829,8 +832,7 @@ void InitSDL()
 			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
 			TitleConfirmFX = Mix_LoadWAV("resource/sounds/Titleconfirm.wav");
 			TrumpDieFX = Mix_LoadWAV("resource/sounds/Trumpdie.wav");
-			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");
-			ItemSpawnFX = Mix_LoadWAV("resource/sounds/itemspawn.wav");
+			LevelClearFX = Mix_LoadWAV("resource/sounds/Levelclear.wav");			
 			BrickSpawnFX = Mix_LoadWAV("resource/sounds/brickspawn3.wav");
 			MexicanJumpFX = Mix_LoadWAV("resource/sounds/mexicanjump.wav");
 			TalkFX = Mix_LoadWAV("resource/sounds/talk.wav");
@@ -884,39 +886,7 @@ SDL_Renderer *GetRenderer()
 	return GRenderer;
 }
 
-void DrawTextBitmap(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, bool bRightJustified)
-{
-	int PosX = X;
 
-	if (!bRightJustified)
-	{
-		for (int i = 0; i < Text.size(); i++)
-		{
-			char CharToRender = Text.at(i) - '0';
-
-			SDL_Rect SrcRect = { CharToRender * 16, 0, 16, 16 };
-			SDL_Rect DstRect = { PosX, Y, SizeX, SizeY };
-
-			SDL_RenderCopy(Renderer, ResourceManager::BitmapFont->Texture, &SrcRect, &DstRect);
-
-			PosX += SizeX / 1.5;
-		}
-	}
-	else
-	{		
-		PosX = X + SizeX / 1.5;
-		for (int i = Text.size() - 1; i >= 0; i--)
-		{
-			char CharToRender = Text.at(i) - '0';			
-
-			SDL_Rect SrcRect = { CharToRender * 16, 0, 16, 16 };
-			SDL_Rect DstRect = { PosX, Y, SizeX, SizeY };
-
-			SDL_RenderCopy(Renderer, ResourceManager::BitmapFont->Texture, &SrcRect, &DstRect);			
-			PosX -= SizeX / 1.5;
-		}
-	}
-}
 
 void DrawText(string Text, int X, int Y, int SizeX, int SizeY, SDL_Renderer *Renderer, Glyph Glyphs[127], float SpaceScaleX, float SpaceScaleY, bool bRightJustify)
 {
@@ -1820,7 +1790,7 @@ void WriteHighScores()
 
 void ReadGreatFacts()
 {
-	fstream FactFile;
+	/*fstream FactFile;
 
 	SDL_Log("Before open fact file");
 	FactFile.open("data2.dat");
@@ -1839,7 +1809,7 @@ void ReadGreatFacts()
 	
 	SDL_Log("Before fact file close");
 	FactFile.close();
-	SDL_Log("After open fact file");
+	SDL_Log("After open fact file");*/
 }
 
 void DisplayGreatFact()
