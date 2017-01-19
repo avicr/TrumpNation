@@ -88,7 +88,7 @@ class BombItem : public ItemSprite
 
 public:
 	BombItem() :
-		ItemSprite(ResourceManager::BombTexture->Texture)
+		ItemSprite(NULL)
 	{
 		PlayAnimation(ResourceManager::BombAnimation);
 		SetWidth(64);

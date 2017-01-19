@@ -35,7 +35,7 @@ Mexican1Sprite::Mexican1Sprite()
 		MaxVelocity = 120;
 		if (!bSwapSprites)
 		{
-			PlayAnimation(ResourceManager::Mexican1PinkAnimation);
+			
 		}
 		else
 		{
@@ -471,12 +471,7 @@ void Mexican1Sprite::Interact(TrumpPlayerSprite *OtherSprite)
 
 int Mexican1Sprite::GetScoreWorth()
 {
-	int Score = MEXICAN_BLOCK_SCORE;
-
-	if (AnimData.Anim == ResourceManager::Mexican1PinkAnimation)
-	{
-		Score *= 100;
-	}
+	int Score = MEXICAN_BLOCK_SCORE;	
 
 	Score *= bSwapSprites ? 2 : 1;
 

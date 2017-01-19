@@ -29,7 +29,13 @@
 #define TRUMP_RED_HAT_MAX_VELOCITY 450
 #define RED_HAT_TIME 12
 #define TITLE_SCROLL_TIME 20
+
+#ifdef PARTY
 #define NUM_INTRO_CYCLES 25
+#else
+#define NUM_INTRO_CYCLES 12
+#endif
+
 #define HIGH_SCORE_DISPLAY_COUNT 8
 #define FACT_TIME 7
 #define GLOBAL_SCALE 2.25
@@ -102,7 +108,6 @@ extern Mix_Chunk *TalkFX;
 extern Mix_Chunk *MexicanClimbFX;
 extern Mix_Chunk *MexicanLandFX;
 extern Mix_Chunk *BrickSpawnFX;
-extern Mix_Chunk *ItemSpawnFX;
 extern Mix_Chunk *LevelClearFX;
 extern Mix_Chunk *TrumpDieFX;
 extern Mix_Chunk *PickUpItemFX;
