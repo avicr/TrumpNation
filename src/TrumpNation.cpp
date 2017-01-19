@@ -133,6 +133,7 @@ void DisplayGreatFact();
 void ReadGreatFacts();
 void RenderStars(float DeltaTime);
 void RenderBrickRectangle(SDL_Renderer *Renderer, SDL_Rect &DrawRect, bool bLevelBG = false, int R = -1, int G = -1, int B = -1);
+void DoHowTo();
 
 int main(int argc, char ** argv)
 {
@@ -194,6 +195,7 @@ void CleanUp()
 
 bool GameLoop()
 {
+	double LevelStartedCountDown = 1;
 	bool bLevelComplete = false;
 	bool bUserQuit = false;
 	SDL_Event TheEvent;
@@ -208,6 +210,7 @@ bool GameLoop()
 	SDL_RenderClear(GRenderer);
 	SDL_SetRenderTarget(GRenderer, BackBuffer);
 
+	//DoHowTo();
 	while (!bGameComplete)
 	{
 		if (!Mix_PlayingMusic())
@@ -394,11 +397,11 @@ void Tick(double DeltaTime)
 
 	if (SpawnCountdown <= 0 && !bFreezeSpawn && ThePlayer->GetPlayerState() != StateDying)
 	{
-		if (rand() % (100 / CAT_SPAWN_PERCENT) == 0)
+		/*if (rand() % (100 / CAT_SPAWN_PERCENT) == 0)
 		{
 			Mexicans.push_back(new CatSprite());
 		}
-		else
+		else*/
 		{
 			Mexicans.push_back(new Mexican1Sprite());
 		}
@@ -513,8 +516,6 @@ void Render()
 
 	ThePlayer->Render(GRenderer);	
 
-	
-
 	DrawHUD(GRenderer);
 
 	if (BombCountDown > 0 && (int)round(BombCountDown * 100) % 4 >= 2)
@@ -533,7 +534,7 @@ bool DoTitleScreen()
 	bool bSpawnNew = true;
 	double PosY = 0;
 	double ScrollCountDown = TITLE_SCROLL_TIME;
-	int NumIntrosPlayed = 0;	
+	int NumIntrosPlayed = 4;	
 	//double TitleFadeInCount = 0;
 	int HighScoresCount = 0;
 
@@ -635,8 +636,8 @@ bool DoTitleScreen()
 						Sprite *MexicanIntroSprite = new Sprite();
 						MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
 						MexicanIntroSprite->SetAnimationPlayRate(0.5);
-						MexicanIntroSprite->SetWidth(32);
-						MexicanIntroSprite->SetHeight(32);
+						MexicanIntroSprite->SetWidth(64);
+						MexicanIntroSprite->SetHeight(64);
 						int NewX = 264 + (rand() % (int)(700 - 264 + 1));
 						int NewY = 200 + (rand() % (int)(380 - 200 + 1));
 						MexicanIntroSprite->SetPosition(NewX, NewY);
@@ -652,12 +653,13 @@ bool DoTitleScreen()
 						Sprite *MexicanIntroSprite = new Sprite();
 						MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
 						MexicanIntroSprite->SetAnimationPlayRate(0.5);
-						MexicanIntroSprite->SetWidth(32);
-						MexicanIntroSprite->SetHeight(32);
+						MexicanIntroSprite->SetWidth(64);
+						MexicanIntroSprite->SetHeight(64);
 						int NewX = 264 + (rand() % (int)(700 - 264 + 1));
 						int NewY = 200 + (rand() % (int)(380 - 200 + 1));
 						MexicanIntroSprite->SetPosition(NewX, NewY);
 						Mexicans.push_back(MexicanIntroSprite);
+						MexicanIntroSprite->Tick(DeltaTime * i);
 
 					}
 				}
@@ -669,16 +671,25 @@ bool DoTitleScreen()
 						Sprite *MexicanIntroSprite = new Sprite();
 						MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
 						MexicanIntroSprite->SetAnimationPlayRate(0.5);
-						MexicanIntroSprite->SetWidth(32);
-						MexicanIntroSprite->SetHeight(32);
+						MexicanIntroSprite->SetWidth(64);
+						MexicanIntroSprite->SetHeight(64);
 						int NewX = 264 + (rand() % (int)(700 - 264 + 1));
 						int NewY = 200 + (rand() % (int)(380 - 200 + 1));
 						MexicanIntroSprite->SetPosition(NewX, NewY);
 						Mexicans.push_back(MexicanIntroSprite);
-
 					}
 				}
 
+				if (NumIntrosPlayed == 15)
+				{
+					Sprite *MexicanIntroSprite = new Sprite();
+					MexicanIntroSprite->PlayAnimation(ResourceManager::Mexican1Animation);
+					MexicanIntroSprite->SetAnimationPlayRate(0.5);
+					MexicanIntroSprite->SetWidth(128);
+					MexicanIntroSprite->SetHeight(128);
+					MexicanIntroSprite->SetPosition(454, 255 - PosY);
+					Mexicans.push_back(MexicanIntroSprite);
+				}
 
 				if (NumIntrosPlayed == 1)
 				{
@@ -715,7 +726,7 @@ bool DoTitleScreen()
 		//SDL_SetTextureBlendMode(ResourceManager::TitleScreenTexture->Texture, SDL_BLENDMODE_BLEND);
 		//SDL_SetTextureAlphaMod(ResourceManager::TitleScreenTexture->Texture, TitleFadeInCount * 255);
 
-		if (NumIntrosPlayed < 5 || NumIntrosPlayed > 7)
+		if (NumIntrosPlayed < 5 || NumIntrosPlayed > 7 && NumIntrosPlayed != 15)
 		{		
 			TrumpIntroSprite->Render(GRenderer);
 		}
@@ -731,6 +742,7 @@ bool DoTitleScreen()
 			//CatTest.SetMaxVelocity(100);			
 		}
 		
+		DrawText("CREATED BY CRIS AVILA\n  ART BY IVAN DIXON", 346, 550, 16, 16, GRenderer, FontShadowedWhite, 1, 1);
 		PresentBackBuffer();
 
 		while (SDL_PollEvent(&TheEvent) != 0)
@@ -1201,6 +1213,7 @@ void DoGameOver()
 	bool bUserQuit = false;
 	bool bDone = false;
 	double GameOverCountDown = 10;
+	bool bCountFinished = false;
 
 	SDL_Event TheEvent;	
 
@@ -1225,7 +1238,7 @@ void DoGameOver()
 
 		if (GameOverCountDown < 0)
 		{
-			bDone = true;
+			bCountFinished = true;
 		}
 		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
 		SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, NULL, &BackBufferRect);
@@ -1243,7 +1256,6 @@ void DoGameOver()
 		}
 		DrawText("PLAYER SCORE", 152, 180, 24, 24, GRenderer, FontShadowedYellow);
 		DrawText(std::to_string(ThePlayer->GetScore()), 869, 180, 24, 24, GRenderer, FontShadowedWhite, 1, 1, true);
-		
 		
 		if (GameOverCountDown <= 9)
 		{
@@ -1278,6 +1290,7 @@ void DoGameOver()
 		{
 			if (GameOverState == GameOverMexicans)
 			{
+				bCountFinished = true;
 				GameOverState = GameOverTotal;
 				Mix_PlayChannel(-1, PlaceWallFX, 0);
 			}
@@ -1290,11 +1303,152 @@ void DoGameOver()
 			TotalScore = ThePlayer->GetScore() + (TheGame->GetLevelNumber() - 1) * LEVEL_CLEAR_POINTS + TheGame->GetNumMexicansEscaped() * MEXICAN_ESCAPED_POINTS;
 			DrawText("TOTAL", 152, 384, 24, 24, GRenderer, FontShadowedYellow, 1, 1);
 			DrawText(std::to_string(TotalScore), 869, 384, 24, 24, GRenderer, FontShadowedWhite, 1, 1, true);
+			DrawText("PRESS BUTTON", 665, 500, 24, 24, GRenderer, FontShadowedWhite, 1, 1, true);
 		}
 		/*if (GameOverCountDown > 0 && (int)round(GameOverCountDown * 100) % 40 >= 20)
 		{
 			DrawText("GAME OVER", 0, 0, 0, 0, GRenderer, FontSeg20White);
 		}				*/		
+		PresentBackBuffer();
+
+		while (SDL_PollEvent(&TheEvent) != 0)
+		{
+			if (TheEvent.type == SDL_KEYDOWN)
+			{
+				if (TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN || TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE)
+				{
+					if (!bCountFinished)
+					{
+						GameOverCountDown = 0;
+					}
+					else
+					{
+						bDone = true;
+					}
+				}
+			}
+			if (TheEvent.type == SDL_QUIT)
+			{
+				bDone = true;
+			}
+		}
+	}	
+
+	ReadHighScores();
+	DoDisplayHighScore(GetHighScorePosition(TotalScore), TotalScore, TheGame->GetLevelNumber()-1);
+}
+
+void DrawTexture(SDL_Renderer *Renderer, SDL_Texture *Texture, int X, int Y, int Width, int Height)
+{
+	SDL_Rect Rect = { X, Y, Width, Height };
+	SDL_RenderCopy(Renderer, Texture, NULL, &Rect);
+}
+void DoHowTo()
+{
+	enum eHowToState { HowToBricks = 0, HowToWalls, HowToMexicans, HowToPussy, HowToDestroy, HowToFinish }
+	HowToState = HowToBricks;
+	long TotalScore = 0;
+	bool bUserQuit = false;
+	bool bDone = false;
+	double GameOverCountDown = 10;
+
+	SDL_Event TheEvent;
+
+	Uint64 StartTime = SDL_GetPerformanceCounter();
+	Uint64 CurrentTime = SDL_GetPerformanceCounter();
+	double DeltaTime;
+
+	while (!bDone)
+	{
+		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
+		{
+			bDone = true;
+			bUserQuit = true;
+		}
+
+		StartTime = CurrentTime;
+		CurrentTime = SDL_GetPerformanceCounter();
+		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
+		DeltaTime *= (double)0.001;
+
+		GameOverCountDown -= DeltaTime;
+
+		if (GameOverCountDown < 0)
+		{
+			bDone = true;
+		}
+		SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+		SDL_RenderCopy(GRenderer, ResourceManager::StarBGTexture->Texture, NULL, &BackBufferRect);
+
+		DrawText("HOW TO PLAY", 300, 16, 32, 32, GRenderer, FontShadowedRed, 0.95, 0.95);
+
+		SDL_Rect WallRect = { 118, 157, 769, 304 };
+
+		RenderBrickRectangle(GRenderer, WallRect, true, 0, 11, 42);
+
+		if (HowToState == HowToBricks)
+		{
+			HowToState = HowToWalls;
+			Mix_PlayChannel(-1, PlaceWallFX, 0);
+		}
+		DrawText("COLLECT", 152, 180, 24, 24, GRenderer, FontShadowedWhite);
+		DrawTexture(GRenderer, ResourceManager::BrickTexture->Texture, 360, 184, 24, 24);
+
+
+		if (GameOverCountDown <= 9)
+		{
+			if (HowToState == HowToWalls)
+			{
+				HowToState = HowToMexicans;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+			DrawText("BUILD", 152, 220, 24, 24, GRenderer, FontShadowedWhite, 1, 1);
+			DrawTexture(GRenderer, ResourceManager::WallTexture->Texture, 360, 216, 32, 32);
+		}
+
+		if (GameOverCountDown <= 8)
+		{
+			if (HowToState == HowToMexicans)
+			{
+				HowToState = HowToPussy;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+
+			DrawText("AVOID", 152, 260, 24, 24, GRenderer, FontShadowedWhite, 1, 1);
+			DrawTexture(GRenderer, ResourceManager::MexicanFaceTexture->Texture, 360, 256, 32, 32);
+		}
+
+		if (GameOverCountDown <= 7)
+		{
+			if (HowToState == HowToMexicans)
+			{
+				HowToState = HowToPussy;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+			DrawText("GRAB", 152, 300, 24, 24, GRenderer, FontShadowedWhite, 1, 1);
+			DrawTexture(GRenderer, ResourceManager::BrickTexture->Texture, 360, 296, 32, 32);
+
+		}
+
+		if (GameOverCountDown <= 6)
+		{
+			if (HowToState == HowToPussy)
+			{
+				HowToState = HowToDestroy;
+				Mix_PlayChannel(-1, PlaceWallFX, 0);
+			}
+
+			/*DrawText("DESTROY", 152, 370, 24, 24, GRenderer, FontShadowedRed, 1, 1);
+			DrawText("        A NATION", 152, 370, 24, 24, GRenderer, FontShadowedWhite, 1, 1);
+			DrawText("          NATION", 152, 370, 24, 24, GRenderer, FontBlue, 1, 1);
+			DrawTexture(GRenderer, ResourceManager::BrickTexture->Texture, 300, 340, 32, 32);*/
+
+		}
+
+		/*if (GameOverCountDown > 0 && (int)round(GameOverCountDown * 100) % 40 >= 20)
+		{
+		DrawText("GAME OVER", 0, 0, 0, 0, GRenderer, FontSeg20White);
+		}				*/
 		PresentBackBuffer();
 
 		while (SDL_PollEvent(&TheEvent) != 0)
@@ -1309,10 +1463,7 @@ void DoGameOver()
 				bDone = true;
 			}
 		}
-	}	
-
-	ReadHighScores();
-	DoDisplayHighScore(GetHighScorePosition(TotalScore), TotalScore, TheGame->GetLevelNumber()-1);
+	}
 }
 
 int GetHighScorePosition(long Score)

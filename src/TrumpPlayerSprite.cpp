@@ -366,6 +366,7 @@ void TrumpPlayerSprite::TakeDamage()
 {
 	PlayerState = StateDying;	
 	int Pick = rand() % 3;
+	
 	if ( Pick == 0)
 	{
 		ThePlayer->Say(2, "  RIGGED");
@@ -374,9 +375,9 @@ void TrumpPlayerSprite::TakeDamage()
 	{
 		ThePlayer->Say(2, "  UNFAIR");
 	}
-	else if (Pick == 3)
+	else if (Pick == 2)
 	{
-		ThePlayer->Say(2, "NOT NICE");
+		ThePlayer->Say(2, " NOT NICE");
 	}
 
 	Mix_HaltChannel(-1);
@@ -575,7 +576,8 @@ void TrumpPlayerSprite::Say(int SpeechType, string Phrase)
 	if (CurrentSpeech)
 	{
 		delete CurrentSpeech;
-	}
+	}	
 
 	CurrentSpeech = new SpeechBubble(SpeechType, Phrase);
+	CurrentSpeech->SetPosition(PosX + 23, PosY - 70);
 }
