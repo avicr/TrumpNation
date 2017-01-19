@@ -305,33 +305,33 @@ bool GameLoop()
 			{
 				if (TheEvent.type == SDL_KEYDOWN)
 				{					
-					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_0)
-					{
-						bDoSpawnPop = !bDoSpawnPop;
-					}
+					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_0)
+					//{
+					//	bDoSpawnPop = !bDoSpawnPop;
+					//}
 
-					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
-					{
-						//Mix_PlayChannel(-1, LevelClearFX, 0);
-						SpawnRandomItem();
-					}
+					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
+					//{
+					//	//Mix_PlayChannel(-1, LevelClearFX, 0);
+					//	SpawnRandomItem();
+					//}
 
-					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_5)
-					{
-						//Mix_PlayChannel(-1, LevelClearFX, 0);
-						Items.push_back(new CatSprite());
-					}
+					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_5)
+					//{
+					//	//Mix_PlayChannel(-1, LevelClearFX, 0);
+					//	Items.push_back(new CatSprite());
+					//}
 
-					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
-					{
-						Mix_PlayChannel(-1, LevelClearFX, 0);
-						bRenderCollision = !bRenderCollision;
-					}
+					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
+					//{
+					//	Mix_PlayChannel(-1, LevelClearFX, 0);
+					//	bRenderCollision = !bRenderCollision;
+					//}
 
-					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_4)
-					{						
-						ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
-					}
+					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_4)
+					//{						
+					//	ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
+					//}
 				}
 if (TheEvent.type == SDL_JOYAXISMOTION)
 {
