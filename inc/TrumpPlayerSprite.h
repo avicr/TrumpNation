@@ -57,8 +57,7 @@ protected:
 	int StepChannel;	
 	int NumBricks;
 	bool bHasRedHat;
-	double RedHatCountDown;
-	SDL_Joystick *Joy;
+	double RedHatCountDown;	
 
 	void HandleInput(double DeltaTime);
 };

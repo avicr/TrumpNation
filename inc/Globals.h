@@ -16,6 +16,7 @@
 #include <vector>
 #include <string>
 
+
 #define TEXTURE_PATH "resource/textures/"
 #define HORIZON 264
 #define WALL_TOP HORIZON - 104
@@ -122,6 +123,7 @@ extern Mix_Music *TitleMusic;
 extern Mix_Music *HatDanceMusic;
 extern Mix_Music *BGMusicFast;
 extern class Game *TheGame;
+extern SDL_Joystick *Joy;
 
 extern bool bDoSpawnPop;
 extern bool bFreezeSpawn;

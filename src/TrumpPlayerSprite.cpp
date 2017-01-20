@@ -29,8 +29,7 @@ TrumpPlayerSprite::TrumpPlayerSprite()
 	PlayerState = StatePlaying;
 	Score = 0;
 	PosX = 500;
-	PosY = 340;
-	Joy = SDL_JoystickOpen(0);
+	PosY = 340;	
 	NumBricks = 0;
 	bHasRedHat = false;	
 	StepChannel = -1;
@@ -481,6 +480,8 @@ void TrumpPlayerSprite::DoSwap(bool bSwap)
 	if (bSwap)
 	{
 		RedHatCountDown = 0;
+		MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
+		bHasRedHat = false;
 		Mix_PlayMusic(HatDanceMusic, 0);
 		MaxVelocity = TRUMP_DEFAULT_MAX_VELOCITY;
 		for (int i = 0; i < Mexicans.size(); i++)

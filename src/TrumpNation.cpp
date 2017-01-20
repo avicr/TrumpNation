@@ -110,6 +110,8 @@ bool bSwapSprites = false;
 bool bRenderCollision = false;
 double BombCountDown = 0;
 
+SDL_Joystick *Joy = NULL;
+
 bool GameLoop();
 bool DoTitleScreen();
 void Tick(double DeltaTime);
@@ -140,6 +142,9 @@ int main(int argc, char ** argv)
 	
 	// init SDL	
 	InitSDL();
+	
+	Joy = SDL_JoystickOpen(0);
+
 	LoadBitMapFont("letters_shadow.bmp", FontShadowedWhite);
 	LoadBitMapFont("letters_shadow_yellow.bmp", FontShadowedYellow);
 	LoadBitMapFont("letters_shadow_red.bmp", FontShadowedRed);
@@ -155,9 +160,13 @@ int main(int argc, char ** argv)
 			break;
 		}
 	} while (GameLoop());
-	
-	CleanUp();	
 
+	if (Joy)
+	{
+		SDL_JoystickClose(Joy);
+	}
+	CleanUp();	
+	
 	return 0;
 }
 
@@ -780,6 +789,14 @@ bool DoTitleScreen()
 			//	bDone = true;
 			//}
 
+			if (TheEvent.type == SDL_JOYBUTTONDOWN)
+			{
+				if (TheEvent.jbutton.button == 0)
+				{
+					bDone = true;
+				}
+			}
+
 			if (TheEvent.type == SDL_KEYDOWN)
 			{
 				if (TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN || TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE)
@@ -1308,8 +1325,24 @@ void DoGameOver()
 
 		while (SDL_PollEvent(&TheEvent) != 0)
 		{
-			if (TheEvent.type == SDL_KEYDOWN)
+			if (TheEvent.type == SDL_JOYBUTTONDOWN)
 			{
+				if (TheEvent.jbutton.button == 0)
+				{
+					if (!bCountFinished)
+					{
+						GameOverCountDown = 0;
+					}
+					else
+					{
+						bDone = true;
+					}
+				}
+			}
+
+			if (TheEvent.type == SDL_KEYDOWN)
+			{				
+
 				if (TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN || TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE)
 				{
 					if (!bCountFinished)
@@ -1492,8 +1525,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 	Uint64 StartTime = SDL_GetPerformanceCounter();
 	Uint64 CurrentTime = SDL_GetPerformanceCounter();
 	double DeltaTime;	
-	bool bButtonPressed = false;
-	SDL_Joystick *Joy = SDL_JoystickOpen(0);
+	bool bButtonPressed = false;	
 	SDL_SetRenderTarget(GRenderer, NULL);
 	SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
 	SDL_RenderClear(GRenderer);
@@ -1650,9 +1682,20 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		{
 			if (bInputtingName)
 			{
+
+				bool bAxisLastFrame = MoveX || MoveY;
 				MoveY = 0;
 				MoveX = 0;
 				bButtonPressed = false;
+				
+				if (TheEvent.type == SDL_JOYBUTTONDOWN)
+				{
+					if (TheEvent.jbutton.button == 0)
+					{
+						bButtonPressed = true;
+					}
+				}
+								
 				if (TheEvent.type == SDL_KEYDOWN)
 				{
 					if (TheEvent.key.state == SDL_PRESSED && (TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE || TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN))
@@ -1733,7 +1776,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 					}
 				}
 
-				if (MoveY != 0)
+				if (MoveY != 0 && !bAxisLastFrame)
 				{
 					Mix_PlayChannel(3, MenuSound1FX, 0);
 					CharIndex += MoveY;
@@ -1783,6 +1826,14 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 			}
 			else
 			{
+				if (TheEvent.type == SDL_JOYBUTTONDOWN)
+				{
+					if (TheEvent.jbutton.button == 0)
+					{
+						bDone = true;
+					}
+				}
+
 				if (TheEvent.type == SDL_KEYDOWN)
 				{
 					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_RETURN || TheEvent.key.keysym.scancode == SDL_SCANCODE_SPACE)
@@ -1799,8 +1850,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		}
 	}
 
-	WriteHighScores();
-	SDL_JoystickClose(Joy);
+	WriteHighScores();	
 }
 
 void ReadHighScores()
