@@ -1,5 +1,5 @@
 //#define CHEAT
-
+#define PARTY
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
@@ -70,11 +70,11 @@
 #define MOUNT_TILES_START NUM_RANDOM_GROUND_TILES
 
 
-#ifdef _WIN32
+//#ifdef _WIN32
 #define JOY_Y_AXIS 1
-#else
-#define JOY_Y_AXIS 3
-#endif
+//#else
+//#define JOY_Y_AXIS 3
+//#endif
 #define JOYSTICK_DEAD_ZONE 8000
 
 #define PLACE_WALL_SCORE 500
