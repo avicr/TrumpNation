@@ -1515,6 +1515,12 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		HighScores[EnterRank].Name[3] = 0;
 	}
 
+	Sprite Cat;
+	Cat.SetPosition(0, 0);
+	Cat.PlayAnimation(ResourceManager::CatAnimation);
+	Cat.SetWidth(64);
+	Cat.SetHeight(64);
+
 	while (!bDone)
 	{
 		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
@@ -1528,6 +1534,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 		DeltaTime = (double)((CurrentTime - StartTime) * 1000 / (double)SDL_GetPerformanceFrequency());
 		DeltaTime *= (double)0.001;
 		Mexicans.Tick(DeltaTime);
+		Cat.Tick(DeltaTime);
 
 		HighScoreCountDown -= DeltaTime;
 
@@ -1611,7 +1618,23 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 			}
 			else
 			{
-				DrawText(HighScores[i].Name, 849, 190 + PosY, 32, 32, GRenderer, FontShadowedWhite, 0.75, 0.75, true);
+				if ((string)HighScores[i].Name == "MEX")
+				{
+					DrawTexture(GRenderer, ResourceManager::MexicanFaceTexture->Texture, 769, 190 + PosY, 32, 32);
+				}
+				else if ((string)HighScores[i].Name == "DJT" || (string)HighScores[i].Name == "ASS")
+				{
+					DrawTexture(GRenderer, ResourceManager::TrumpFaceTexture->Texture, 769, 190 + PosY - 4, 40, 40);
+				}
+				else if ((string)HighScores[i].Name == "CAT" || (string)HighScores[i].Name == "PUS")
+				{
+					Cat.SetPosition(769, 190 + PosY - 32);
+					Cat.Render(GRenderer);
+				}
+				else
+				{
+					DrawText(HighScores[i].Name, 849, 190 + PosY, 32, 32, GRenderer, FontShadowedWhite, 0.75, 0.75, true);
+				}
 			}
 		}
 
