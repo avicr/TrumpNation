@@ -324,7 +324,14 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 
 				if (NumMexicansKilled >= 4)
 				{
-					Say(2, "GO BACK TO\nUNIVISION!");
+					if (!bSwapSprites)
+					{
+						ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
+					}
+					else
+					{
+						ThePlayer->Say(2, "REGRESA A\nUNIVISION!");
+					}
 				}
 
 				DecoSprites.insert(DecoSprites.begin(), new ScoreSprite(WallIndex * 128 + 42, WALL_TOP - 38, TotalScore));

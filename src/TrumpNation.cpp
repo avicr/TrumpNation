@@ -222,11 +222,25 @@ bool GameLoop()
 			int Pick = rand() % 2;
 			if (Pick == 0)
 			{
-				ThePlayer->Say(2, "TREMENDOUS");
+				if (!bSwapSprites)
+				{
+					ThePlayer->Say(2, "TREMENDOUS");
+				}
+				else
+				{
+					ThePlayer->Say(2, " TREMENDO");
+				}
 			}
 			if (Pick == 1)
 			{
-				ThePlayer->Say(2, " WINNING");
+				if (!bSwapSprites)
+				{
+					ThePlayer->Say(2, " WINNING");
+				}
+				else
+				{
+					ThePlayer->Say(2, "VICTORIOSO");
+				}
 			}
 		}		
 
@@ -262,18 +276,7 @@ bool GameLoop()
 			{
 				bGameComplete = true;
 				bUserQuit = true;
-			}
-
-			/*if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2])
-			{
-				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
-				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2]) { SDL_PollEvent(&TheEvent); }
-				SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
-				SDL_SetRenderTarget(GRenderer, NULL);
-				SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
-				SDL_RenderClear(GRenderer);
-				SDL_SetRenderTarget(GRenderer, BackBuffer);
-			}*/
+			}			
 
 			StartTime = CurrentTime;
 			CurrentTime = SDL_GetPerformanceCounter();
@@ -304,51 +307,72 @@ bool GameLoop()
 			while (SDL_PollEvent(&TheEvent) != 0)
 			{
 				if (TheEvent.type == SDL_KEYDOWN)
-				{					
-					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_0)
-					//{
-					//	bDoSpawnPop = !bDoSpawnPop;
-					//}
+				{	
+#ifdef CHEAT
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_0)
+					{
+						bDoSpawnPop = !bDoSpawnPop;
+					}
 
-					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
-					//{
-					//	//Mix_PlayChannel(-1, LevelClearFX, 0);
-					//	SpawnRandomItem();
-					//}
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_3)
+					{
+						//Mix_PlayChannel(-1, LevelClearFX, 0);
+						SpawnRandomItem();
+					}
 
-					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_5)
-					//{
-					//	//Mix_PlayChannel(-1, LevelClearFX, 0);
-					//	Items.push_back(new CatSprite());
-					//}
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_5)
+					{
+						//Mix_PlayChannel(-1, LevelClearFX, 0);
+						Items.push_back(new CatSprite());
+					}
 
-					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
-					//{
-					//	Mix_PlayChannel(-1, LevelClearFX, 0);
-					//	bRenderCollision = !bRenderCollision;
-					//}
+					if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2])
+					{
+						TheGame->SetLevel(TheGame->GetLevelNumber() + 1);
+						while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2]) { SDL_PollEvent(&TheEvent); }
+						SDL_Log("Mile: %d, Rate: %f", TheGame->GetLevelNumber(), GetSpawnTime());
+						SDL_SetRenderTarget(GRenderer, NULL);
+						SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
+						SDL_RenderClear(GRenderer);
+						SDL_SetRenderTarget(GRenderer, BackBuffer);
+					}
 
-					//if (TheEvent.key.keysym.scancode == SDL_SCANCODE_4)
-					//{						
-					//	ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
-					//}
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_1)
+					{
+						Mix_PlayChannel(-1, LevelClearFX, 0);
+						bRenderCollision = !bRenderCollision;
+					}
+
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_4)
+					{	
+						if (!bSwapSprites)
+						{
+							ThePlayer->Say(2, "GO BACK TO\nUNIVISION!");
+						}
+						else
+						{
+							ThePlayer->Say(2, "REGRESA A\nUNIVISION!");
+						}
+						
+					}
+#endif
 				}
-if (TheEvent.type == SDL_JOYAXISMOTION)
-{
-	int Axis = TheEvent.jaxis.axis;
-	SDL_Log("Axis: %d, %d", Axis, TheEvent.jaxis.value);
-}
-//SDL_Log("Event Type: %d", TheEvent.type);
-if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
-{
-	ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
-}
-//User requests quit
-if (TheEvent.type == SDL_QUIT)
-{
-	bGameComplete = true;
-	bUserQuit = true;
-}
+				if (TheEvent.type == SDL_JOYAXISMOTION)
+				{
+					int Axis = TheEvent.jaxis.axis;
+					SDL_Log("Axis: %d, %d", Axis, TheEvent.jaxis.value);
+				}
+				//SDL_Log("Event Type: %d", TheEvent.type);
+				/*if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
+				{
+					ThePlayer->SetPosition(TheEvent.button.x, TheEvent.button.y);
+				}*/
+				//User requests quit
+				if (TheEvent.type == SDL_QUIT)
+				{
+					bGameComplete = true;
+					bUserQuit = true;
+				}
 			}
 		}
 
