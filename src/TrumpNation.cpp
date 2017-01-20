@@ -133,6 +133,7 @@ void ReadGreatFacts();
 void RenderStars(float DeltaTime);
 void RenderBrickRectangle(SDL_Renderer *Renderer, SDL_Rect &DrawRect, bool bLevelBG = false, int R = -1, int G = -1, int B = -1);
 void DoHowTo();
+bool bUserQuit = false;
 
 int main(int argc, char ** argv)
 {
@@ -193,8 +194,7 @@ void CleanUp()
 bool GameLoop()
 {
 	double LevelStartedCountDown = 1;
-	bool bLevelComplete = false;
-	bool bUserQuit = false;
+	bool bLevelComplete = false;	
 	SDL_Event TheEvent;
 	TickFreq = SDL_GetPerformanceFrequency();
 	bool bGameComplete = false;
@@ -264,7 +264,7 @@ bool GameLoop()
 				bUserQuit = true;
 			}
 
-			if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2])
+			/*if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2])
 			{
 				TheGame->SetLevel(TheGame->GetLevelNumber()+1);
 				while (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2]) { SDL_PollEvent(&TheEvent); }
@@ -273,7 +273,7 @@ bool GameLoop()
 				SDL_SetRenderDrawColor(GRenderer, 0, 0, 0, 255);
 				SDL_RenderClear(GRenderer);
 				SDL_SetRenderTarget(GRenderer, BackBuffer);
-			}
+			}*/
 
 			StartTime = CurrentTime;
 			CurrentTime = SDL_GetPerformanceCounter();
@@ -347,6 +347,7 @@ if (TheEvent.type == SDL_MOUSEBUTTONDOWN)
 if (TheEvent.type == SDL_QUIT)
 {
 	bGameComplete = true;
+	bUserQuit = true;
 }
 			}
 		}
@@ -524,8 +525,7 @@ void Render()
 }
 
 bool DoTitleScreen()
-{
-	bool bUserQuit = false;
+{	
 	bool bDone = false;
 	bool bScrollDone = true;
 	bool bSpawnNew = true;
@@ -557,7 +557,7 @@ bool DoTitleScreen()
 	
 	CatTest.PlayAnimation(ResourceManager::CatAnimation);	
 	
-	while (!bDone)
+	while (!bDone && !bUserQuit)
 	{		
 
 		if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE])
@@ -613,6 +613,7 @@ bool DoTitleScreen()
 			bScrollDone = true;
 		}*/
 
+		
 		if (ScrollCountDown <= 0)
 		{
 			//if (rand() % 4 != 0)
@@ -765,6 +766,7 @@ bool DoTitleScreen()
 
 			if (TheEvent.type == SDL_QUIT)
 			{
+				bUserQuit = true;
 				bDone = true;
 			}
 		}
@@ -1179,8 +1181,7 @@ void DoGameOver()
 {
 	enum eGameOverState {GameOverInit = 0, GameOverPlayerScore, GameOverMiles, GameOverMexicans, GameOverTotal} 
 	GameOverState = GameOverInit;
-	long TotalScore = 0;
-	bool bUserQuit = false;
+	long TotalScore = 0;	
 	bool bDone = false;
 	double GameOverCountDown = 10;
 	bool bCountFinished = false;
@@ -1300,6 +1301,8 @@ void DoGameOver()
 			if (TheEvent.type == SDL_QUIT)
 			{
 				bDone = true;
+				bUserQuit = true;
+				return;
 			}
 		}
 	}	
@@ -1317,8 +1320,7 @@ void DoHowTo()
 {
 	enum eHowToState { HowToBricks = 0, HowToWalls, HowToMexicans, HowToPussy, HowToDestroy, HowToFinish }
 	HowToState = HowToBricks;
-	long TotalScore = 0;
-	bool bUserQuit = false;
+	long TotalScore = 0;	
 	bool bDone = false;
 	double GameOverCountDown = 10;
 
@@ -1450,8 +1452,7 @@ int GetHighScorePosition(long Score)
 
 void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 {
-	bool bInputtingName = EnterRank != -1;
-	bool bUserQuit = false;
+	bool bInputtingName = EnterRank != -1;	
 	bool bDone = false;
 	double HighScoreCountDown = HIGH_SCORE_DISPLAY_COUNT;
 	int BrickX = 57;
@@ -1746,6 +1747,7 @@ void DoDisplayHighScore(int EnterRank, long Score, int Mile)
 			if (TheEvent.type == SDL_QUIT)
 			{
 				bDone = true;
+				bUserQuit = true;				
 			}
 		}
 	}
@@ -1813,8 +1815,7 @@ void ReadGreatFacts()
 }
 
 void DisplayGreatFact()
-{
-	bool bUserQuit = false;
+{	
 	bool bDone = false;
 	double FactCountDown = FACT_TIME;
 
