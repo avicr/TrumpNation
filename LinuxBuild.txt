@@ -1,0 +1,1 @@
+sudo g++ src/*.cpp -std=c++11 0o TrumpNation `sdl2-config --cflags --libs` -lSDL2_mixer -lSDL2_tt
