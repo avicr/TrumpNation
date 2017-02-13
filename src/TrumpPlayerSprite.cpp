@@ -99,9 +99,9 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 	}
 
 
-	if (PosX < 0 - 20)
+	if (PosX < 0 - 4)
 	{
-		PosX = -20;
+		PosX = -4;
 	}
 
 	if (PosY < WALL_TOP + 64)
@@ -284,7 +284,12 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 		{
-			int WallIndex = (int)round((PosX - Rect.w / 2) / 20);
+			int WallIndex = (int)round((PosX - Rect.w / 2) / 40);
+
+			if (WallIndex < 0)
+			{
+				WallIndex = 0;
+			}
 
 			if (TheGame->WallArray[WallIndex * 2] < 1)
 			{	
@@ -433,7 +438,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 {
 	if (NumBricks && PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 	{
-		int WallIndex = (int)round((PosX - Rect.w/2) / 128);
+		int WallIndex = (int)round((PosX - Rect.w/2) / 40);
 		TextureResource *TextureToUse = ResourceManager::WallTexture;
 
 		if (BrickInventory.front() == BrickGold)
@@ -442,7 +447,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 		}
 
 		WallIndex *= 2;
-		SDL_Rect DstRect = { WallIndex * 64, WALL_TOP, TextureToUse->SrcRect.w, TextureToUse->SrcRect.h };
+		SDL_Rect DstRect = { WallIndex * 20, WALL_TOP, TextureToUse->SrcRect.w, TextureToUse->SrcRect.h };
 
 		/*if (TheGame->WallArray[WallIndex] > 0)
 		{
@@ -452,7 +457,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 		
 		SDL_SetTextureAlphaMod(TextureToUse->Texture, 64);
 		SDL_RenderCopy(Renderer, TextureToUse->Texture, &TextureToUse->SrcRect, &DstRect);
-		DstRect.x += 64;
+		DstRect.x += 20;
 		SDL_RenderCopy(Renderer, TextureToUse->Texture, &TextureToUse->SrcRect, &DstRect);
 		SDL_SetTextureAlphaMod(TextureToUse->Texture, 255);
 	}
