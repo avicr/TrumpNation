@@ -499,13 +499,13 @@ void Render()
 	/*SDL_SetRenderDrawColor(GRenderer, 217, 201, 124, 255);
 	SDL_RenderClear(GRenderer);*/
 
-	SDL_Rect Rect = { 0, 0, 1024, 600 };
+	SDL_Rect Rect = { 0, 0, 320, 240 };
 	SDL_RenderCopy(GRenderer, ResourceManager::BGTexture->Texture, &Rect, &Rect);
 
 	Rect.x = 0;
-	Rect.y = 192;
-	Rect.w = 1024;
-	Rect.h = 448;
+	Rect.y = 64;
+	Rect.w = 320;
+	Rect.h = 192;
 	SDL_RenderCopy(GRenderer, TheGame->GetGroundTexture(), NULL, &Rect);
 
 	// Render sky
@@ -515,10 +515,10 @@ void Render()
 
 	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
 	{
-		Rect.x = WallIndex * 64;
+		Rect.x = WallIndex * 20;
 		Rect.y = WALL_TOP;
-		Rect.w = 64;
-		Rect.h = 160;
+		Rect.w = 20;
+		Rect.h = 64;
 
 		if (TheGame->WallArray[WallIndex] == 1)
 		{
@@ -894,10 +894,10 @@ void InitSDL()
 			Mix_VolumeChunk(MexicanEscapedFX, 48);
 		}
 
-		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 320, 240, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
-		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
+		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 320, 240);
 		SDL_SetRenderTarget(GRenderer, BackBuffer);
 		SDL_Log("After create window");
 		/*LoadFont("resource/fonts/segoeuib.ttf", 36, FontSeg36);
@@ -1140,8 +1140,8 @@ void CopyGlyph(Glyph &TheGlyph, SDL_Texture *FontTexture, int TextureStartX)
 void PresentBackBuffer()
 {
 	SDL_SetRenderTarget(GRenderer, NULL);
-	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
-	SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 512, WindowHeight / 2 - 300, 1024, 600 };
+	SDL_Rect BackBufferRect = { 0, 0, 320, 240 };
+	SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 160, WindowHeight / 2 - 120, 320, 240 };
 	SDL_RenderCopy(GRenderer, BackBuffer, &BackBufferRect, &BackBufferDstRect);
 	SDL_RenderPresent(GRenderer);
 	SDL_SetRenderTarget(GRenderer, BackBuffer);

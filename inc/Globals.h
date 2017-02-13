@@ -1,4 +1,4 @@
-//#define CHEAT
+#define CHEAT
 #define PARTY
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -18,8 +18,8 @@
 
 
 #define TEXTURE_PATH "resource/textures/"
-#define HORIZON 264
-#define WALL_TOP HORIZON - 104
+#define HORIZON 96
+#define WALL_TOP HORIZON - 64
 #define MEXICAN_SPAWN_RATE 0.25
 #define WALL_PLACE_ZONE 140
 #define SPAWN_VARIABLE_TIME 0.25
@@ -41,7 +41,7 @@
 
 #define HIGH_SCORE_DISPLAY_COUNT 8
 #define FACT_TIME 7
-#define GLOBAL_SCALE 2.25
+#define GLOBAL_SCALE 1
 
 #define BRICK_FIRST_SPAWN_PENALITY 5
 #define BRICK_ON_BRICK_SPAWN_PENALITY 0.25

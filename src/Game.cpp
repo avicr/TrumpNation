@@ -7,7 +7,7 @@
 Game::Game()
 {
 	memset(WallArray, 0, sizeof(WallArray));
-	GroundTexture = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 16 * 64, 7 * 64);
+	GroundTexture = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 10 * 32, 6 * 32);
 	GenerateRandomTerrain();
 	/*WallArray[0] = true;
 	WallArray[1] = true;
@@ -98,29 +98,29 @@ Game::~Game()
 void Game::GenerateRandomTerrain()
 {
 	SDL_SetRenderTarget(GRenderer, GroundTexture);
-	for (int Col = 0; Col < 16; Col++)
+	for (int Col = 0; Col < 10; Col++)
 	{
-		int TileX = 64 * (rand () % 2);
+		int TileX = 32 * (rand () % 2);
 
-		TileX += MOUNT_TILES_START * 64;
+		TileX += MOUNT_TILES_START * 32;
 
-		SDL_Rect SrcRect = { TileX, 0, 64, 64 };
-		SDL_Rect DstRect = { Col * 64, 0, 64, 64 };
+		SDL_Rect SrcRect = { TileX, 0, 32, 32 };
+		SDL_Rect DstRect = { Col * 32, 0, 32, 32 };
 		
 		SDL_RenderCopy(GRenderer, ResourceManager::Tiles->Texture, &SrcRect, &DstRect);				
 
-		SrcRect = { 768, 0, 64, 64 };
-		DstRect = { Col * 64, 64, 64, 64 };
+		SrcRect = { 768 / 2, 0, 32, 32 };
+		DstRect = { Col * 32, 32, 32, 32 };
 		SDL_RenderCopy(GRenderer, ResourceManager::Tiles->Texture, &SrcRect, &DstRect);
 	}
 	
-	for (int Row = 0; Row < 5; Row++)
+	for (int Row = 0; Row < 6; Row++)
 	{
-		for (int Col = 0; Col < 16; Col++)
+		for (int Col = 0; Col < 10; Col++)
 		{
 			//GroundTileMap[Row][Col] = rand() % NUM_RANDOM_GROUND_TILES;
-			SDL_Rect SrcRect = { 64 * (rand() % NUM_RANDOM_GROUND_TILES), 0, 64, 64 };
-			SDL_Rect DstRect = { Col * 64, 128 + Row * 64, 64, 64 };			
+			SDL_Rect SrcRect = { 32 * (rand() % NUM_RANDOM_GROUND_TILES), 0, 32, 32 };
+			SDL_Rect DstRect = { Col * 32, 64 + Row * 32, 32, 32 };			
 
 			SDL_RenderCopy(GRenderer, ResourceManager::Tiles->Texture, &SrcRect, &DstRect);			
 		}

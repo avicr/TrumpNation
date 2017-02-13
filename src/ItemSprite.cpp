@@ -58,7 +58,7 @@ void ItemSprite::RandomizePosition()
 
 	do
 	{
-		SetPosition((rand() % (1024 - BoundX)), (rand() % ((600 - (HORIZON + 65)) - BoundY)) + (HORIZON) + 65);
+		SetPosition((rand() % (320 - BoundX)), (rand() % ((240 - (HORIZON + 65)) - BoundY)) + (HORIZON) + 65);
 	} while (HitTest(ThePlayer));
 
 	

@@ -104,19 +104,19 @@ void TrumpPlayerSprite::Tick(double DeltaTime)
 		PosX = -20;
 	}
 
-	if (PosY < WALL_TOP + 100)
+	if (PosY < WALL_TOP + 64)
 	{
-		PosY = WALL_TOP + 100;
+		PosY = WALL_TOP + 64;
 	}
 
-	if (PosX + Rect.w > 1024)
+	if (PosX + Rect.w > 320)
 	{
-		PosX = 1024 - Rect.w;
+		PosX = 320 - Rect.w;
 	}
 
-	if (PosY + Rect.h > 600)
+	if (PosY + Rect.h > 240)
 	{
-		PosY = 600 - Rect.h;
+		PosY = 240 - Rect.h;
 	}
 
 	if (CurrentSpeech && CurrentSpeech->GetPendingDelete())
@@ -284,7 +284,7 @@ void TrumpPlayerSprite::HandleInput(double DeltaTime)
 		
 		if (PosY >= WALL_TOP + 100 && PosY <= WALL_TOP + WALL_PLACE_ZONE)
 		{
-			int WallIndex = (int)round((PosX - Rect.w / 2) / 128);
+			int WallIndex = (int)round((PosX - Rect.w / 2) / 20);
 
 			if (TheGame->WallArray[WallIndex * 2] < 1)
 			{	
