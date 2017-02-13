@@ -516,7 +516,7 @@ void Render()
 	for (int WallIndex = 0; WallIndex < 16; WallIndex++)
 	{
 		Rect.x = WallIndex * 20;
-		Rect.y = WALL_TOP;
+		Rect.y = WALL_TOP + 24;
 		Rect.w = 20;
 		Rect.h = 64;
 

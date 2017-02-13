@@ -447,7 +447,7 @@ void TrumpPlayerSprite::Render(SDL_Renderer *Renderer)
 		}
 
 		WallIndex *= 2;
-		SDL_Rect DstRect = { WallIndex * 20, WALL_TOP, TextureToUse->SrcRect.w, TextureToUse->SrcRect.h };
+		SDL_Rect DstRect = { WallIndex * 20, WALL_TOP + 24, TextureToUse->SrcRect.w, TextureToUse->SrcRect.h };
 
 		/*if (TheGame->WallArray[WallIndex] > 0)
 		{
