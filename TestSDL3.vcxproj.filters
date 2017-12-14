@@ -47,10 +47,19 @@
     <ClCompile Include="src\SpriteList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ScoreSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\SwapItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ScoreSprite.cpp">
+    <ClCompile Include="src\CloudSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpeechBubble.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CatSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -76,13 +85,13 @@
     <ClInclude Include="inc\TrumpPlayerSprite.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\SwapItem.h">
-      <Filter>inc</Filter>
-    </ClInclude>
     <ClInclude Include="inc\ItemSprite.h">
       <Filter>inc</Filter>
     </ClInclude>
-    <ClInclude Include="inc\ScoreSprite.h">
+    <ClInclude Include="inc\Game.h" />
+    <ClInclude Include="inc\SpriteList.h" />
+    <ClInclude Include="inc\CloudSprite.h" />
+    <ClInclude Include="inc\SantaSprite.h">
       <Filter>inc</Filter>
     </ClInclude>
   </ItemGroup>

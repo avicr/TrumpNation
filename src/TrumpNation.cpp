@@ -19,6 +19,7 @@
 #include "../inc/CloudSprite.h"
 #include "../inc/SpeechBubble.h"
 #include "../inc/CatSprite.h"
+#include "../inc/SantaSprite.h"
 #include <algorithm>
 #include <fstream>
 
@@ -52,6 +53,9 @@ struct Glyph
 };
 
 HighScoreEntry HighScores[10];
+double SantaSpawnCountdown = SANTA_RATE;
+bool bChristmasMode = false;
+float ChristmasModeCountdown = 0;
 bool bFreezeSpawn = false;
 bool bDoSpawnPop = false;
 SDL_Window *GWindow;
@@ -335,6 +339,12 @@ bool GameLoop()
 						Items.push_back(new CatSprite());
 					}
 
+					if (TheEvent.key.keysym.scancode == SDL_SCANCODE_6)
+					{
+						//Mix_PlayChannel(-1, LevelClearFX, 0);
+						Items.push_back(new SantaSprite());
+					}
+
 					if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_2])
 					{
 						TheGame->SetLevel(TheGame->GetLevelNumber() + 1);
@@ -410,7 +420,7 @@ bool GameLoop()
 void Tick(double DeltaTime)
 {
 	static double SpawnCountdown = GetSpawnTime();
-	static double ItemSpawnCountdown = ITEM_RATE;
+	static double ItemSpawnCountdown = ITEM_RATE;	
 	static int ItemChance = ITEM_SPAWN_PERCENT;
 
 	if (BombCountDown >= 0)
@@ -420,8 +430,20 @@ void Tick(double DeltaTime)
 
 	//if (ItemSprite::NumNonBrickItems == 0)
 	{
-		ItemSpawnCountdown -= DeltaTime;
+		ItemSpawnCountdown -= DeltaTime;		
 	}
+
+	if (bChristmasMode)
+	{
+		ChristmasModeCountdown -= DeltaTime;
+
+		if (ChristmasModeCountdown <= 0)
+		{
+			bChristmasMode = false;
+			SantaSpawnCountdown = SANTA_RATE;
+		}
+	}
+	SantaSpawnCountdown -= DeltaTime;
 
 	SpawnCountdown -= DeltaTime;
 	BrickSpawnCountDown -= DeltaTime;
@@ -482,6 +504,24 @@ void Tick(double DeltaTime)
 		}
 	}
 
+	if (SantaSpawnCountdown <= 0)
+	{
+		if (!bChristmasMode)
+		{
+			SantaSpawnCountdown = SANTA_RATE;
+			
+			if (rand() % 3 > 0)
+			{
+				Items.push_back(new SantaSprite());
+			}
+		}
+		else
+		{
+			SantaSpawnCountdown = SANTA_TURBO_RATE;
+			Items.push_back(new SantaSprite());
+		}
+
+	}
 	ThePlayer->Tick(DeltaTime);
 	
 	if (ThePlayer->GetPlayerState() != StateDead && ThePlayer->GetPlayerState() != StateDying)
@@ -1152,13 +1192,18 @@ void SpawnRandomItem()
 	int CurrentLevel = TheGame->GetLevelNumber();
 	int Roll = rand() % 100;
 	ItemSprite *NewItem = NULL;
-	
+	int ChristmasRoll = rand() % 100;	
+
 	if (ThePlayer->GetPlayerState() == StateDying)
 	{
 		return;
 	}
-
-	if (Roll < 2 && CurrentLevel >= EXTRA_LIFE_MILE_START)
+	
+	if (ChristmasRoll < PRESENT_CHANCE)
+	{
+		NewItem = new PresentItem();
+	}
+	else if (Roll < 2 && CurrentLevel >= EXTRA_LIFE_MILE_START)
 	{
 		NewItem = new ExtraLifeItem();
 	}

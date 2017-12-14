@@ -139,4 +139,32 @@ public:
 	}
 };
 
+class PresentItem : public ItemSprite
+{
+public:
+	PresentItem() :
+		ItemSprite(ResourceManager::PresentSprite->Texture)
+	{
+		CollisionRect = { -4, -4, 48, 48 };
+		SetWidth(40);
+		SetHeight(40);
+		RandomizePosition();
+		NumNonBrickItems++;
+	}
+
+	virtual ~PresentItem()
+	{
+		NumNonBrickItems--;
+	}
+
+	virtual void Interact(TrumpPlayerSprite *OtherSprite)
+	{
+		Mix_PlayChannel(CHAN_ITEM_PICKUP, PickUpItemFX, 0);
+		SantaSpawnCountdown = 0;
+		bChristmasMode = true;
+		ChristmasModeCountdown = CHRISTMAS_MODE_DURATION;
+		bPendingDelete = true;
+	}
+};
+
 #endif

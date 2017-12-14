@@ -91,6 +91,21 @@ public:
 	DECLARE_TEXTURE_RESOURCE(SpeechBubble1, "speech1.bmp");
 	DECLARE_TEXTURE_RESOURCE(SpeechBubble2, "speech2.bmp");
 	DECLARE_TEXTURE_RESOURCE(CatSpriteSheet, "cat.bmp");
+	DECLARE_TEXTURE_RESOURCE(SantaSheet, "CompositeSantaSmall.bmp")
+	DECLARE_TEXTURE_RESOURCE(PresentSprite, "Present.bmp")
+
+	BEGIN_DECLARE_ANIMATION_RESORCE(SantaAnimation)
+	{
+		for (int i = 0; i < 7; i++)
+		{
+			int SpriteWidth = 63;
+			int SpriteHeight = 63;
+			SDL_Rect SrcRect = { i * SpriteWidth, 0, SpriteWidth, SpriteHeight };
+			
+			Frames.push_back(new Frame(ResourceManager::SantaSheet->Texture, SrcRect, 0.05));
+		}
+	}
+	END_DECLARE_ANIMATION_RESOURCE(SantaAnimation)
 
 	BEGIN_DECLARE_ANIMATION_RESORCE(CatAnimation)
 	{

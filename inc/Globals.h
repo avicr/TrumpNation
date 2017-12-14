@@ -1,4 +1,4 @@
-//#define CHEAT
+#define CHEAT
 #define PARTY
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -24,6 +24,9 @@
 #define WALL_PLACE_ZONE 140
 #define SPAWN_VARIABLE_TIME 0.25
 #define ITEM_RATE 4
+#define CHRISTMAS_MODE_DURATION 6
+#define SANTA_RATE 3.5
+#define SANTA_TURBO_RATE 0.25
 #define ITEM_SPAWN_PERCENT 25 //5
 #define CAT_SPAWN_PERCENT 4
 #define SCORE_LIFE_TIME 1
@@ -32,6 +35,7 @@
 #define TRUMP_RED_HAT_MAX_VELOCITY 450
 #define RED_HAT_TIME 12
 #define TITLE_SCROLL_TIME 20
+#define PRESENT_CHANCE 13
 
 #ifdef PARTY
 #define NUM_INTRO_CYCLES 25
@@ -125,6 +129,9 @@ extern Mix_Music *BGMusicFast;
 extern class Game *TheGame;
 extern SDL_Joystick *Joy;
 
+extern bool bChristmasMode;
+extern float ChristmasModeCountdown;
+extern double SantaSpawnCountdown;
 extern bool bDoSpawnPop;
 extern bool bFreezeSpawn;
 extern bool bSwapSprites;

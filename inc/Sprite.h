@@ -81,6 +81,8 @@ public:
 	bool GetPendingDelete();
 	void Delete();
 	virtual int GetScoreWorth() { return 0; }
+	double GetPosX() { return PosX; }
+	double GetPosY() { return PosY; }
 
 };
 
