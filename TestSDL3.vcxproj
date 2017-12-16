@@ -86,8 +86,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Work\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Work\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>e:\Work\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <LibraryPath>e:\Work\SDL2-2.0.5\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

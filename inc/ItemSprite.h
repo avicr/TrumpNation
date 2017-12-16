@@ -10,8 +10,10 @@ class ItemSprite : public Sprite
 protected:
 	double Growth;
 	bool bReachedMaxSize;
+	int SpawnFxChannel;
+	Mix_Chunk* SpawnFx;
 public:
-	ItemSprite(SDL_Texture *InTexture);
+	ItemSprite(SDL_Texture *InTexture, bool bPlayDefaultSound = true);
 	virtual ~ItemSprite() {};
 	static int NumNonBrickItems;	
 	ItemSprite(int X, int Y);
@@ -164,6 +166,7 @@ public:
 		bChristmasMode = true;
 		ChristmasModeCountdown = CHRISTMAS_MODE_DURATION;
 		bPendingDelete = true;
+		Mix_PlayMusic(SantaMusic, 0);
 	}
 };
 

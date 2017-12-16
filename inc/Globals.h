@@ -1,4 +1,5 @@
-#define CHEAT
+//#define CHEAT
+#define FULLSCREEN_1920_1080
 #define PARTY
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -24,7 +25,7 @@
 #define WALL_PLACE_ZONE 140
 #define SPAWN_VARIABLE_TIME 0.25
 #define ITEM_RATE 4
-#define CHRISTMAS_MODE_DURATION 6
+#define CHRISTMAS_MODE_DURATION 8.5
 #define SANTA_RATE 3.5
 #define SANTA_TURBO_RATE 0.25
 #define ITEM_SPAWN_PERCENT 25 //5
@@ -35,7 +36,7 @@
 #define TRUMP_RED_HAT_MAX_VELOCITY 450
 #define RED_HAT_TIME 12
 #define TITLE_SCROLL_TIME 20
-#define PRESENT_CHANCE 13
+#define PRESENT_CHANCE 10
 
 #ifdef PARTY
 #define NUM_INTRO_CYCLES 25
@@ -87,6 +88,7 @@
 #define LEVEL_CLEAR_POINTS 2000
 #define MEXICAN_ESCAPED_POINTS -50
 #define CAT_SCORE 5000
+#define SANTA_SCORE 500
 
 #define BOMB_FLASH_TIME 0.20
 
@@ -96,6 +98,7 @@
 #define CHAN_ITEM_PICKUP 96
 #define CHAN_MEXICAN_LAND 95
 #define CHAN_TALK 94
+#define CHAN_SANTA_SPAWN 93
 
 using namespace std;
 
@@ -118,6 +121,8 @@ extern Mix_Chunk *BrickSpawnFX;
 extern Mix_Chunk *LevelClearFX;
 extern Mix_Chunk *TrumpDieFX;
 extern Mix_Chunk *PickUpItemFX;
+extern Mix_Chunk *SantaWalkFX;
+extern Mix_Chunk *SantaSpawnFX;
 extern Mix_Chunk *PlaceWallFX;
 extern Mix_Chunk *MenuSound1FX;
 extern Mix_Chunk *MenuSound2FX;
@@ -125,6 +130,7 @@ extern Mix_Chunk *StepFX;
 extern Mix_Music *BGMusic;
 extern Mix_Music *TitleMusic;
 extern Mix_Music *HatDanceMusic;
+extern Mix_Music *SantaMusic;
 extern Mix_Music *BGMusicFast;
 extern class Game *TheGame;
 extern SDL_Joystick *Joy;

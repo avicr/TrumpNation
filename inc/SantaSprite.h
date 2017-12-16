@@ -13,8 +13,9 @@ protected:
 public:
 
 	SantaSprite() :
-		ItemSprite(NULL)
+		ItemSprite((SDL_Texture*) NULL, false)
 	{
+		Mix_PlayChannel(CHAN_SANTA_SPAWN, SantaSpawnFX, 0);
 		Timer = 0;
 		PlayAnimation(ResourceManager::SantaAnimation);
 		SetWidth(80);
@@ -74,6 +75,7 @@ public:
 			{
 				MovingFlags = MOVING_LEFT;
 			}
+			Mix_PlayChannel(90, SantaWalkFX, 1);
 			MaxVelocity = 350;
 		}
 	}
@@ -83,7 +85,7 @@ public:
 	}
 	virtual void Interact(TrumpPlayerSprite *OtherSprite)
 	{
-		int Score = 1500 * TheGame->GetLevelNumber();
+		int Score = SANTA_SCORE * TheGame->GetLevelNumber();
 		Score *= bSwapSprites ? 2 : 1;
 
 		DecoSprites.insert(DecoSprites.begin(), new ScoreSprite(Rect.x, Rect.y - 74, Score));

@@ -2,7 +2,7 @@
 
 int ItemSprite::NumNonBrickItems = 0;
 
-ItemSprite::ItemSprite(SDL_Texture *InTexture)
+ItemSprite::ItemSprite(SDL_Texture *InTexture, bool bPlayDefaultSound)
 	: Sprite()
 {	
 	Growth = 0;
@@ -24,7 +24,10 @@ ItemSprite::ItemSprite(SDL_Texture *InTexture)
 	RandomizePosition();	
 	CountDown = ITEM_LIFE_TIME;
 
-	Mix_PlayChannel(CHAN_ITEM_SPAWN, BrickSpawnFX, 0);
+	if (bPlayDefaultSound)
+	{
+		Mix_PlayChannel(CHAN_ITEM_SPAWN, BrickSpawnFX, 0);
+	}
 }
 
 ItemSprite::ItemSprite(int X, int Y) :

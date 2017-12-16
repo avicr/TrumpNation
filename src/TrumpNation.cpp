@@ -76,6 +76,8 @@ Mix_Chunk *BrickSpawnFX = NULL;
 Mix_Chunk *MexicanJumpFX = NULL;
 Mix_Chunk *TalkFX = NULL;
 Mix_Chunk *PickUpItemFX = NULL;
+Mix_Chunk *SantaSpawnFX = NULL;
+Mix_Chunk *SantaWalkFX = NULL;
 Mix_Chunk *PlaceWallFX = NULL;
 Mix_Chunk *MenuSound1FX = NULL;
 Mix_Chunk *MenuSound2FX = NULL;
@@ -87,6 +89,7 @@ Mix_Music *TitleMusic = NULL;
 Mix_Music *BGMusic = NULL;
 Mix_Music *BGMusicFast = NULL;
 Mix_Music *HatDanceMusic = NULL;
+Mix_Music *SantaMusic = NULL;
 Game *TheGame;
 TrumpPlayerSprite *ThePlayer;
 Glyph FontSeg36[94];
@@ -181,10 +184,13 @@ void CleanUp()
 	Mix_FreeChunk(MenuSound1FX);
 	Mix_FreeChunk(MenuSound2FX);
 	Mix_FreeMusic(HatDanceMusic);
+	Mix_FreeMusic(SantaMusic);
 	Mix_FreeMusic(BGMusic);
 	Mix_FreeMusic(BGMusicFast);
 	Mix_FreeChunk(PlaceWallFX);
 	Mix_FreeChunk(PickUpItemFX);	
+	Mix_FreeChunk(SantaSpawnFX);
+	Mix_FreeChunk(SantaWalkFX);
 	Mix_FreeChunk(StepFX);
 	Mix_FreeChunk(TitleConfirmFX);
 	Mix_FreeChunk(TrumpDieFX);
@@ -307,6 +313,8 @@ bool GameLoop()
 				ThePlayer->DoSwap(false);
 				Mix_HaltMusic();
 				Mix_PlayChannel(3, TrumpDieFX, 0);
+				bChristmasMode = false;
+				SantaSpawnCountdown = SANTA_RATE;
 			}
 
 			if (TheGame->LevelComplete() || ThePlayer->GetPlayerState() == StateDead)
@@ -437,10 +445,28 @@ void Tick(double DeltaTime)
 	{
 		ChristmasModeCountdown -= DeltaTime;
 
+		if (ChristmasModeCountdown <= 2)
+		{
+			// Stall the santa spawn for a second
+			SantaSpawnCountdown = SANTA_RATE;
+			Mix_HaltMusic();
+		}
 		if (ChristmasModeCountdown <= 0)
 		{
 			bChristmasMode = false;
 			SantaSpawnCountdown = SANTA_RATE;
+			if (ThePlayer->HasRedHat())
+			{
+				Mix_PlayMusic(BGMusicFast, -1);
+			}
+			else if (bSwapSprites)
+			{
+				Mix_PlayMusic(HatDanceMusic, -1);
+			}
+			else
+			{
+				Mix_PlayMusic(BGMusic, -1);
+			}
 		}
 	}
 	SantaSpawnCountdown -= DeltaTime;
@@ -504,7 +530,7 @@ void Tick(double DeltaTime)
 		}
 	}
 
-	if (SantaSpawnCountdown <= 0)
+	if (SantaSpawnCountdown <= 0 && ThePlayer->GetPlayerState() != StateDying)
 	{
 		if (!bChristmasMode)
 		{
@@ -911,6 +937,8 @@ void InitSDL()
 			MenuSound2FX = Mix_LoadWAV("resource/sounds/menusound1.wav");
 			MenuSound1FX = Mix_LoadWAV("resource/sounds/mexicanclimb.wav");
 			PickUpItemFX = Mix_LoadWAV("resource/sounds/Pickupitem.wav");
+			SantaSpawnFX = Mix_LoadWAV("resource/sounds/SantaSpawn.wav");
+			SantaWalkFX = Mix_LoadWAV("resource/sounds/SantaWalk.wav");
 			PlaceWallFX = Mix_LoadWAV("resource/sounds/Placewall.wav");
 			StepFX = Mix_LoadWAV("resource/sounds/Step.wav");
 			TitleConfirmFX = Mix_LoadWAV("resource/sounds/Titleconfirm.wav");
@@ -927,6 +955,8 @@ void InitSDL()
 			Mix_VolumeChunk(MexicanSpawnedFX, 48);
 			Mix_VolumeChunk(StepFX, 60);
 			Mix_VolumeChunk(BrickSpawnFX, 54);
+			Mix_VolumeChunk(SantaSpawnFX, 90);
+			Mix_VolumeChunk(SantaWalkFX, 100);
 			Mix_VolumeChunk(MexicanJumpFX, 90);
 			Mix_VolumeChunk(PickUpItemFX, 90);
 			Mix_VolumeChunk(MexicanLandFX, 110);
@@ -934,7 +964,11 @@ void InitSDL()
 			Mix_VolumeChunk(MexicanEscapedFX, 48);
 		}
 
+#ifdef FULLSCREEN_1920_1080
+		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1920, 1080, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+#else
 		GWindow = SDL_CreateWindow("Trump Nation", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1024, 600, SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/);
+#endif
 		SDL_GetWindowSize(GWindow, &WindowWidth, &WindowHeight);
 		GRenderer = SDL_CreateRenderer(GWindow, -1, 0);
 		BackBuffer = SDL_CreateTexture(GRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 600);
@@ -956,6 +990,7 @@ void InitSDL()
 		BGMusic = Mix_LoadMUS("resource/sounds/PuttingUpWalls.wav");
 		BGMusicFast = Mix_LoadMUS("resource/sounds/PuttingUpWallsFast.mp3");
 		HatDanceMusic = Mix_LoadMUS("resource/sounds/Trumphatdance.ogg");
+		SantaMusic = Mix_LoadMUS("resource/sounds/Trumphatdance.ogg");
 	}
 }
 
@@ -1181,7 +1216,11 @@ void PresentBackBuffer()
 {
 	SDL_SetRenderTarget(GRenderer, NULL);
 	SDL_Rect BackBufferRect = { 0, 0, 1024, 600 };
+#ifdef FULLSCREEN_1920_1080
+	SDL_Rect BackBufferDstRect = { 42, 0, 1836, 1080 };
+#else
 	SDL_Rect BackBufferDstRect = { WindowWidth / 2 - 512, WindowHeight / 2 - 300, 1024, 600 };
+#endif
 	SDL_RenderCopy(GRenderer, BackBuffer, &BackBufferRect, &BackBufferDstRect);
 	SDL_RenderPresent(GRenderer);
 	SDL_SetRenderTarget(GRenderer, BackBuffer);
@@ -1193,15 +1232,17 @@ void SpawnRandomItem()
 	int Roll = rand() % 100;
 	ItemSprite *NewItem = NULL;
 	int ChristmasRoll = rand() % 100;	
+	static int PresentMiss = 0;
 
 	if (ThePlayer->GetPlayerState() == StateDying)
 	{
 		return;
 	}
-	
-	if (ChristmasRoll < PRESENT_CHANCE)
+	PresentMiss++;
+	if (ChristmasRoll < PRESENT_CHANCE || PresentMiss >= 7)
 	{
 		NewItem = new PresentItem();
+		PresentMiss = 0;
 	}
 	else if (Roll < 2 && CurrentLevel >= EXTRA_LIFE_MILE_START)
 	{
